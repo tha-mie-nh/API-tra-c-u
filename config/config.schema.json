@@ -1,0 +1,197 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://app-tra-cuu-du-lieu/config.schema.json",
+  "title": "Datasource config.json schema",
+  "description": "AJV schema for config/config.json (the config-driven datasource DSL). See plans/260920-2200-app-tra-cuu-du-lieu/reference-config-schema.md — the single source of truth for this DSL. Structural rules only; cross-field rules that JSON Schema cannot express (unique codes, timestampField/identityField must reference an existing output field, atLeastOneOf must reference existing input fields) are enforced in code by DatasourceConfigLoader.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "defaults", "datasources"],
+  "properties": {
+    "version": { "const": 1 },
+    "defaults": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["maxResults", "pageSize", "timeoutMs", "retry"],
+      "properties": {
+        "maxResults": { "type": "integer", "minimum": 1 },
+        "pageSize": { "type": "integer", "minimum": 1 },
+        "timeoutMs": { "type": "integer", "minimum": 1 },
+        "retry": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["attempts", "backoffMs"],
+          "properties": {
+            "attempts": { "type": "integer", "minimum": 0 },
+            "backoffMs": { "type": "integer", "minimum": 0 }
+          }
+        }
+      }
+    },
+    "datasources": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/datasourceEntry" }
+    }
+  },
+  "$defs": {
+    "fieldType": { "enum": ["string", "number", "date", "datetime", "enum", "boolean", "image"] },
+    "fieldOption": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["value", "label"],
+      "properties": {
+        "value": { "type": "string" },
+        "label": { "type": "string" }
+      }
+    },
+    "inputField": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "label", "type"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "label": { "type": "string", "minLength": 1 },
+        "type": { "$ref": "#/$defs/fieldType" },
+        "required": { "type": "boolean" },
+        "minLength": { "type": "integer", "minimum": 0 },
+        "maxLength": { "type": "integer", "minimum": 0 },
+        "min": { "type": "number" },
+        "max": { "type": "number" },
+        "pattern": { "type": "string" },
+        "options": { "type": "array", "items": { "$ref": "#/$defs/fieldOption" } },
+        "format": { "type": "string" },
+        "mapTo": { "type": "string" }
+      }
+    },
+    "outputField": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "label", "type"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "label": { "type": "string", "minLength": 1 },
+        "from": { "type": "string" },
+        "type": { "$ref": "#/$defs/fieldType" },
+        "valueMap": { "type": "object", "additionalProperties": { "type": "string" } },
+        "sensitive": { "type": "boolean" },
+        "internal": { "type": "boolean" },
+        "emphasize": { "type": "boolean" },
+        "iconMap": { "type": "object", "additionalProperties": { "type": "string" } },
+        "headerField": { "type": "boolean" }
+      }
+    },
+    "transportAuth": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind"],
+      "properties": {
+        "kind": { "enum": ["apiKeyHeader", "bearer", "basic", "none"] },
+        "header": { "type": "string" },
+        "valueEnv": { "type": "string" }
+      }
+    },
+    "transportRetry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["attempts", "backoffMs"],
+      "properties": {
+        "attempts": { "type": "integer", "minimum": 0 },
+        "backoffMs": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "transport": {
+      "type": "object",
+      "required": ["kind"],
+      "properties": {
+        "kind": { "enum": ["http", "mock", "minio-pg"] },
+        "baseUrl": { "type": "string" },
+        "path": { "type": "string" },
+        "method": { "enum": ["GET", "POST"] },
+        "auth": { "$ref": "#/$defs/transportAuth" },
+        "headers": { "type": "object", "additionalProperties": { "type": "string" } },
+        "timeoutMs": { "type": "integer", "minimum": 1 },
+        "retry": { "$ref": "#/$defs/transportRetry" },
+        "dataFile": { "type": "string" },
+        "pgUrlEnv": { "type": "string" },
+        "minio": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["endpointEnv", "accessKeyEnv", "secretKeyEnv", "bucketEnv"],
+          "properties": {
+            "endpointEnv": { "type": "string" },
+            "portEnv": { "type": "string" },
+            "accessKeyEnv": { "type": "string" },
+            "secretKeyEnv": { "type": "string" },
+            "bucketEnv": { "type": "string" },
+            "useSslEnv": { "type": "string" }
+          }
+        },
+        "query": { "type": "string" },
+        "recordQuery": { "type": "string" }
+      }
+    },
+    "datasourceInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["fields"],
+      "properties": {
+        "fields": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/inputField" } },
+        "atLeastOneOf": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+        "requireGroups": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "array", "items": { "type": "string" }, "minItems": 1 }
+        }
+      }
+    },
+    "datasourceOutput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["timestampField", "sortOrder", "identityField", "fields"],
+      "properties": {
+        "recordsPath": { "type": "string" },
+        "totalPath": { "type": "string" },
+        "requestIdPath": { "type": "string" },
+        "timestampField": { "type": "string", "minLength": 1 },
+        "sortOrder": { "enum": ["asc", "desc"] },
+        "identityField": { "type": "string", "minLength": 1 },
+        "imageRef": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["bucketField", "objectKeyField", "mimeField"],
+          "properties": {
+            "bucketField": { "type": "string" },
+            "objectKeyField": { "type": "string" },
+            "mimeField": { "type": "string" }
+          }
+        },
+        "fields": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/outputField" } }
+      }
+    },
+    "datasourceLimits": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["maxResults", "pageSize"],
+      "properties": {
+        "maxResults": { "type": "integer", "minimum": 1 },
+        "pageSize": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "datasourceEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "name", "type", "enabled", "permissionCode", "transport", "input", "output"],
+      "properties": {
+        "code": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]*$" },
+        "name": { "type": "string", "minLength": 1 },
+        "description": { "type": "string" },
+        "type": { "enum": ["info", "image"] },
+        "enabled": { "type": "boolean" },
+        "permissionCode": { "type": "string", "pattern": "^api:[a-z0-9_]+$" },
+        "transport": { "$ref": "#/$defs/transport" },
+        "input": { "$ref": "#/$defs/datasourceInput" },
+        "output": { "$ref": "#/$defs/datasourceOutput" },
+        "limits": { "$ref": "#/$defs/datasourceLimits" }
+      }
+    }
+  }
+}

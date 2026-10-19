@@ -1,0 +1,209 @@
+# Production stack — separate from docker-compose.yml (dev/local, which
+# exposes a Postgres port directly for local tooling).
+#
+# Usage: `docker compose -f docker-compose.prod.yml --env-file .env.prod up -d --build`
+# The explicit --env-file is required: it makes `.env.prod` the source for
+# BOTH the ${VAR} interpolation below AND (via each service's `env_file:`)
+# the actual container runtime environment, so there is exactly one prod
+# secrets file to manage (never committed, see docs/deployment-guide.md).
+#
+# Prereqs (see docs/deployment-guide.md):
+#   - `.env.prod` next to this file, `chmod 600`, NEVER committed.
+#   - `config/config.json` present (bind-mounted read-only into api — add a
+#     new datasource by editing this file + `docker compose restart api`,
+#     no image rebuild).
+#   - No TLS of its own: `web`'s nginx (docker/nginx.conf) serves plain HTTP
+#     on `WEB_PORT` (default 80) and is the single entry point (it also
+#     reverse-proxies /api/v1/* to `api`). Put this behind an org-owned
+#     TLS-terminating proxy/gateway, or only run it on a trusted LAN/VPN.
+#     See docs/deployment-guide.md.
+#   - Postgres is OPTIONAL (`profiles: [local-db]` on the `postgres` service
+#     below): the default `.env.prod` sets `COMPOSE_PROFILES=local-db,db-setup`,
+#     so plain `up -d` is self-contained exactly like before. To plug into an
+#     org-owned Postgres instead, clear that var and point `DATABASE_URL` at
+#     it — see docs/deployment-guide.md "Về Postgres".
+name: app-tra-cuu-du-lieu-prod
+
+services:
+  # Only starts when the `local-db` profile is active (default — see
+  # `COMPOSE_PROFILES` in .env.prod). To plug into an org-owned Postgres
+  # instead (our `app` Prisma schema becomes a schema inside THEIR database,
+  # not a separate server): clear `COMPOSE_PROFILES` in .env.prod and point
+  # `DATABASE_URL` at the external instance — this service then never
+  # starts, and `migrate`/`api` connect straight to the external one. See
+  # docs/deployment-guide.md.
+  postgres:
+    profiles: ['local-db']
+    image: postgres:16-alpine
+    restart: unless-stopped
+    env_file: [.env.prod]
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    # No published ports: only reachable from other containers on the
+    # compose network, never the public interface.
+    networks: [backend]
+    deploy:
+      resources:
+        limits: { cpus: '1', memory: 512M}
+
+  # One-shot migration job — runs `prisma migrate deploy` and exits. Only
+  # auto-runs when `db-setup` is active (default — bundled with `local-db` in
+  # .env.prod's COMPOSE_PROFILES). Connecting to an org-owned Postgres
+  # instead: clear COMPOSE_PROFILES so this never touches that database
+  # automatically — hand `apps/api/prisma/migrations/*/migration.sql` + a
+  # short doc to whoever owns it, so a DBA applies it on their own terms.
+  # The schema is identical either way (same SQL, no Prisma-specific magic).
+  # This service stays available on demand even then: `docker compose
+  # --profile db-setup -f docker-compose.prod.yml --env-file .env.prod run
+  # --rm migrate` — never forced on a database you don't fully control.
+  migrate:
+    profiles: ['db-setup']
+    # `image:` alongside `build:` — `docker compose up` (no `--build`) uses the
+    # pulled/local image as-is; `docker compose build`/`up --build` still
+    # rebuilds from source. Lets a reviewer who only has this compose file +
+    # .env.prod (no source checkout) run `docker compose pull && up -d`.
+    image: gthanh/app_tra_cuu:api-v5
+    build:
+      context: .
+      dockerfile: docker/api.Dockerfile
+    env_file: [.env.prod]
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+    # /usr/bin/tini: api.Dockerfile's runtime base is Debian slim (apt's tini
+    # path), not Alpine (apk's /sbin/tini) — see that Dockerfile's `base`
+    # stage comment for why (undici@8 needs Node >=22.19, which drove the
+    # glibc switch too).
+    entrypoint: ['/usr/bin/tini', '--']
+    # `.bin/prisma` is a pnpm-generated shell-script shim (parses `$0`,
+    # NODE_PATH, etc.) — invoking it via `node` tries to parse that shell
+    # script as JavaScript and fails immediately ("SyntaxError: missing )
+    # after argument list"). Invoke the CLI's actual JS entry point directly
+    # instead (found by reading the shim's own `exec "$basedir/node" ...`
+    # line) — confirmed by actually running this command, not just reading it.
+    command:
+      ['node', 'apps/api/node_modules/prisma/build/index.js', 'migrate', 'deploy', '--schema=apps/api/prisma/schema.prisma']
+    depends_on:
+      # `required: false`: when `local-db` isn't active, the `postgres`
+      # service doesn't exist in this project at all — without this, Compose
+      # refuses to start ANY service ("depends on undefined service").
+      postgres:
+        condition: service_healthy
+        required: false
+    networks: [backend]
+    restart: 'no'
+
+  # One-shot bootstrap job — creates the ADMIN/OPERATOR/AUDITOR roles, syncs
+  # api:* permissions, and creates the `admin` user (BOOTSTRAP_ADMIN_PASSWORD)
+  # if missing. Idempotent (`upsert`, safe to re-run) — writes to the DB, so
+  # same `db-setup` profile as `migrate` (never fires unasked against an
+  # org-owned Postgres). Run on demand any time: `docker compose --profile
+  # db-setup -f docker-compose.prod.yml --env-file .env.prod run --rm seed`.
+  seed:
+    profiles: ['db-setup']
+    image: gthanh/app_tra_cuu:api-v5
+    build:
+      context: .
+      dockerfile: docker/api.Dockerfile
+    working_dir: /repo/apps/api
+    env_file: [.env.prod]
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+    entrypoint: ['/usr/bin/tini', '--']
+    command:
+      ['sh', '-c', 'PATH="/repo/apps/api/node_modules/.bin:$$PATH" node node_modules/prisma/build/index.js db seed --schema=prisma/schema.prisma']
+    depends_on:
+      # required: false — `seed` only needs the TABLES to exist (plain
+      # Prisma Client queries), not Prisma's own migration bookkeeping, so a
+      # schema applied by hand (DBA ran migration.sql directly, see
+      # `migrate`'s comment) must still let `seed` run. A hard dependency
+      # here would make `seed` impossible whenever `migrate` correctly fails
+      # with P3005 ("schema not empty") against such a database.
+      migrate:
+        condition: service_completed_successfully
+        required: false
+    networks: [backend]
+    restart: 'no'
+
+  api:
+    image: gthanh/app_tra_cuu:api-v5
+    build:
+      context: .
+      dockerfile: docker/api.Dockerfile
+    restart: unless-stopped
+    env_file: [.env.prod]
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+    volumes:
+      # Config-driven requirement (spec): adding a datasource is a config
+      # edit + restart, never a rebuild.
+      - ./config:/repo/config:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+        required: false # see `migrate`'s depends_on comment above
+      # required: false on both — `db-setup` not active means neither
+      # service exists in this project; the schema is then assumed already
+      # applied some other way (see `migrate`'s comment). When `db-setup`
+      # IS active, Compose still waits for them in order either way.
+      seed:
+        condition: service_completed_successfully
+        required: false
+      migrate:
+        condition: service_completed_successfully
+        required: false
+    healthcheck:
+      test: ['CMD', 'curl', '-fsS', 'http://127.0.0.1:3000/api/v1/health']
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    networks: [backend, frontend]
+    logging:
+      driver: json-file
+      options: { max-size: '10m', max-file: '5' }
+    deploy:
+      resources:
+        limits: { cpus: '1', memory: 512M}
+
+  # Serves the SPA AND reverse-proxies /api/v1/* to `api` (docker/nginx.conf)
+  # — the single entry point for the whole app. No TLS of its own (Caddy
+  # removed, see docs/deployment-guide.md): this deploy is plain HTTP,
+  # intended to sit behind an org-owned proxy/gateway that owns TLS, or on a
+  # trusted LAN/VPN with no TLS at all.
+  web:
+    image: gthanh/app_tra_cuu:web-v10
+    build:
+      context: .
+      dockerfile: docker/web.Dockerfile
+    restart: unless-stopped
+    ports:
+      - '${WEB_PORT:-80}:8080'
+    depends_on:
+      api:
+        condition: service_healthy
+    networks: [frontend]
+    logging:
+      driver: json-file
+      options: { max-size: '10m', max-file: '5' }
+    deploy:
+      resources:
+        limits: { cpus: '0.5', memory: 128M}
+
+networks:
+  # Postgres only reachable from `backend`; the public-facing `web`
+  # only sits on `frontend`. `api` bridges both (needs the DB, not exposed).
+  backend:
+  frontend:
+
+volumes:
+  postgres-data:

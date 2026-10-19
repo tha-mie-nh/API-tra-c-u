@@ -1,0 +1,26 @@
+[
+  {
+    "citizen_id": "001099001234",
+    "full_name": "Nguyễn Văn A",
+    "ho_khau_so": "HK001122",
+    "dia_chi_thuong_tru": "12 Lê Lợi, Hoàn Kiếm, Hà Nội",
+    "loai_dang_ky": "TT",
+    "ngay_dang_ky": "2020-03-01T00:00:00Z"
+  },
+  {
+    "citizen_id": "001099001234",
+    "full_name": "Nguyễn Văn A",
+    "ho_khau_so": "HK005566",
+    "dia_chi_thuong_tru": "78 Nguyễn Trãi, Thanh Xuân, Hà Nội",
+    "loai_dang_ky": "TT2",
+    "ngay_dang_ky": "2025-09-10T00:00:00Z"
+  },
+  {
+    "citizen_id": "001099009999",
+    "full_name": "Trần Thị B",
+    "ho_khau_so": "HK003344",
+    "dia_chi_thuong_tru": "9 Hai Bà Trưng, Hoàn Kiếm, Hà Nội",
+    "loai_dang_ky": "TT",
+    "ngay_dang_ky": "2019-07-22T00:00:00Z"
+  }
+]
