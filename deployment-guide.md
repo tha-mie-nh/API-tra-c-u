@@ -100,6 +100,11 @@ Mở trình duyệt `http://<IP-server>` → thấy trang đăng nhập.
 - Mật khẩu: `grep BOOTSTRAP_ADMIN_PASSWORD .env.prod`
 - Bắt buộc đổi mật khẩu lần đầu.
 
+**Tài liệu API (Swagger)**: `http://<IP-server>/api/v1/docs` — sinh tự động từ code, luôn khớp
+API thật. Bấm "Authorize" rồi dán access token (lấy từ response của `POST /api/v1/auth/login`,
+hoặc copy từ devtools trình duyệt sau khi đăng nhập qua giao diện) để test được cả route cần
+đăng nhập.
+
 ## Về Postgres — tự chứa hay dùng PG có sẵn
 
 2 chế độ, chọn bằng biến `COMPOSE_PROFILES` trong `.env.prod`.

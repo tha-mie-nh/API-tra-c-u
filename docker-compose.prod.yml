@@ -71,7 +71,7 @@ services:
     # pulled/local image as-is; `docker compose build`/`up --build` still
     # rebuilds from source. Lets a reviewer who only has this compose file +
     # .env.prod (no source checkout) run `docker compose pull && up -d`.
-    image: gthanh/app_tra_cuu:api-v5
+    image: gthanh/app_tra_cuu:api-v6
     build:
       context: .
       dockerfile: docker/api.Dockerfile
@@ -109,7 +109,7 @@ services:
   # db-setup -f docker-compose.prod.yml --env-file .env.prod run --rm seed`.
   seed:
     profiles: ['db-setup']
-    image: gthanh/app_tra_cuu:api-v5
+    image: gthanh/app_tra_cuu:api-v6
     build:
       context: .
       dockerfile: docker/api.Dockerfile
@@ -134,7 +134,7 @@ services:
     restart: 'no'
 
   api:
-    image: gthanh/app_tra_cuu:api-v5
+    image: gthanh/app_tra_cuu:api-v6
     build:
       context: .
       dockerfile: docker/api.Dockerfile
