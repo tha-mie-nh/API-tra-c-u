@@ -173,10 +173,42 @@ không dùng tới — chỉ là input cho container `postgres` tự chứa, kh�
 | `IMMIGRATION_HISTORY_*`/`PASSPORT_INFO_*`/`DRIVER_LICENSE_*`/`FACE_PHOTO_*` | `BASE_URL`/`API_KEY` của 4 API thật, đang mock | Chỉ khi có API thật |
 | `ALLOW_MOCK_DATASOURCES` | Cho phép chạy datasource mock | `false` khi hết mock |
 
-**4 API thật**: điền `BASE_URL`/`API_KEY` tự làm được. Nhưng đổi `config/config.json` sang API
-thật không chỉ là gõ `"kind": "http"` — cả khối `transport` phải viết lại đúng hình dạng (`path`,
-`method`, tên header xác thực...) khớp tài liệu API thật, và chưa từng chạy thử với API thật nào
-— cần người viết + test đoạn `transport` trước khi bật.
+**4 API thật — cách bật, tự làm được, không cần xem code:**
+
+1. Điền `BASE_URL`/`API_KEY` của 4 biến trên trong `.env.prod`.
+2. Trong `config/config.json`, tìm đúng datasource (`IMMIGRATION_HISTORY`, `PASSPORT_INFO`,
+   `DRIVER_LICENSE`, hoặc `FACE_PHOTO`), sửa khối `"transport"` từ:
+   ```json
+   "transport": { "kind": "mock", "dataFile": "mock-data/immigration-history.json", "timeoutMs": 10000 }
+   ```
+   thành:
+   ```json
+   "transport": {
+     "kind": "http",
+     "baseUrl": "${IMMIGRATION_HISTORY_BASE_URL}",
+     "path": "/duong-dan-that-cua-api",
+     "method": "POST",
+     "headers": { "X-ReqType": "gia-tri-header-co-dinh-theo-tai-lieu-API-that" },
+     "auth": { "kind": "apiKeyHeader", "header": "X-Access", "valueEnv": "IMMIGRATION_HISTORY_API_KEY" },
+     "timeoutMs": 10000
+   }
+   ```
+   - `baseUrl`: luôn viết `${TÊN_BIẾN_BASE_URL}` — tự lấy giá trị từ `.env.prod`, không ghi URL
+     thẳng vào đây.
+   - `path`/`method`: copy đúng từ tài liệu API thật (đường dẫn, GET hay POST).
+   - `headers`: mọi header **cố định, không đổi** theo tài liệu — điền bao nhiêu cặp tùy ý,
+     tên key chính là tên header thật (vd `X-ReqType`).
+   - `auth.header`: tên header **xác thực** theo tài liệu (`X-Access`, `X-Api-Key`... tùy API
+     thật đặt tên gì, điền đúng tên đó). `auth.valueEnv`: tên biến env chứa giá trị thật (đã có
+     sẵn, vd `IMMIGRATION_HISTORY_API_KEY`) — không ghi giá trị thật vào `config.json`.
+3. `docker compose -f docker-compose.prod.yml --env-file .env.prod restart api` — không cần
+   pull/rebuild.
+4. Test thử ngay qua Swagger (`/api/v1/docs`) → gọi `POST /api/v1/query/IMMIGRATION_HISTORY` với
+   tham số thật, xem có trả đúng dữ liệu không.
+
+Toàn bộ chỉ sửa `config.json` + `.env.prod` — **không cần xem/sửa code, không cần build lại
+image**. Nếu tài liệu API thật có gì mà mẫu trên chưa khớp (vd cần ký request, header đặc biệt
+khác) thì báo lại, lúc đó mới cần đội dev sửa code/đẩy image mới.
 
 ## Về HTTPS
 
