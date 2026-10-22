@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "defaults": { "maxResults": 100, "pageSize": 20, "timeoutMs": 5000, "retry": { "attempts": 1, "backoffMs": 100 } },
+  "datasources": [
+    {
+      "code": "BAD_DS",
+      "name": "Bad datasource",
+      "type": "info",
+      "enabled": true,
+      "permissionCode": "api:bad_ds",
+      "transport": { "kind": "mock", "dataFile": "mock-data/sample.json" },
+      "input": {
+        "fields": [{ "name": "id", "label": "ID", "type": "string", "required": true }]
+      },
+      "output": {
+        "sortOrder": "desc",
+        "identityField": "id",
+        "fields": [{ "name": "id", "label": "ID", "from": "id", "type": "string" }]
+      }
+    }
+  ]
+}

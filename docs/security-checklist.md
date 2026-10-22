@@ -1,0 +1,36 @@
+# Security Checklist
+
+Maps the spec's security/deploy requirement (g) — *"Đóng gói và triển khai docker, sẽ được quét
+malware trước khi deploy"* plus HTTPS — and general hardening to where each is implemented. For the
+customer's review before go-live.
+
+| Requirement | Status | Where |
+|---|---|---|
+| Docker packaging | Done | `docker/api.Dockerfile`, `docker/web.Dockerfile` — multi-stage, non-root runtime user, `tini`/PID 1 signal handling, `HEALTHCHECK`. |
+| Malware scan before deploy | Done, run against the real built images (see phase-09 completion report for the report filenames/verdict) | `scripts/scan-image-malware.sh` (ClamAV via official Docker image, real scan — not simulated) + `.github/workflows/build-and-scan.yml` runs it on every build, uploads the report as a build artifact. Scanner choice (ClamAV) is an assumption — **confirm with ops** if the company mandates a specific tool/report format. |
+| Vulnerability scan | Done, run against the real built images | Trivy in `build-and-scan.yml`, `--severity HIGH,CRITICAL`, fails the build. `pnpm audit --audit-level=high` also gates `ci.yml`. Real scan result: **web image 0 HIGH/CRITICAL**; **api image 0 in its own JS dependency tree** (fixed 3 real issues found by scanning, not by inspection — see phase-09 completion report: (1) a trailing `RUN chown -R /repo` layer duplicating ~350MB, (2) the base image's own unused bundled `npm`/`corepack` + corepack's re-fetched pnpm cache carrying old vendored `tar`/`glob`/`minimatch`/etc, both stripped from the runtime stage; (3) `pnpm.overrides` added for our own tree's `tar`/`brace-expansion`/`glob`/`ip-address`/`minimatch`/`pacote`/`picomatch`/`sigstore`). 3 Debian OS packages remain flagged in the api image (`bsdutils`, `perl-base`, `zlib1g`) — Debian upstream has **no fix available yet** for any of them (`affected`/`fix_deferred`/`will_not_fix`), and none of the 3 vulnerable code paths (mount, perl execution, zip-archive creation) are ever exercised by this container — accepted as residual risk, re-check on next base image rebuild. |
+| HTTPS / HSTS | **Not done here by design** — this app no longer terminates TLS itself | Caddy removed (ops requirement: this deploy sits behind an org-owned proxy/gateway that already has its own TLS). `web`'s nginx (`docker/nginx.conf`) serves plain HTTP and sets CSP/`X-Frame-Options`/`X-Content-Type-Options`/`Referrer-Policy`, but no HSTS (would be a lie coming from a container that never does TLS). The refresh-token cookie's `Secure` flag is `COOKIE_SECURE` (default `false`) — **must** flip to `true` once whatever sits in front actually terminates TLS, see `docs/deployment-guide.md` "Về HTTPS". |
+| Non-root containers | Done | `api` runs as the `node` image's built-in unprivileged user; `web` runs as `nginx`'s built-in unprivileged user on port 8080 (not 80, which needs root). |
+| Secrets never baked into image layers | Done | Secrets only ever injected via `env_file` at container runtime (`docker-compose.prod.yml`); `.dockerignore` excludes `.env*`; `build-and-scan.yml` greps `docker history` for secret-shaped `ENV`/`ARG` strings and fails the build if found. |
+| Security headers on API responses | Done | `helmet()` in `apps/api/src/main.ts` (CSP left to the edge proxy, which serves the actual HTML). |
+| CORS allow-list | Done (pre-existing, verified) | `apps/api/src/main.ts` — explicit origin list from `CORS_ORIGIN` env var, never `*`; required for the httpOnly refresh-cookie flow (`credentials: true`). |
+| Rate limiting | Done (pre-existing, verified) | `@nestjs/throttler` named limiters in `app.module.ts`: `default` (100/min global), `login` (env-configurable, tight in prod), `query` (per-user). |
+| No stack traces / upstream URLs leaked in error responses | Done (pre-existing, verified) | `HttpExceptionFilter` returns only `{code, message, requestId}`; stack traces are logged server-side only for 5xx, never returned to the client. |
+| Mock datasources blocked in production | Done (pre-existing, verified) | `DatasourceConfigLoaderService.enforceNoMockInProduction()` refuses to boot with `NODE_ENV=production` + an enabled `transport.kind: mock` datasource unless `ALLOW_MOCK_DATASOURCES=true` is explicitly set. |
+| Postgres/MinIO not on public interfaces | Done | `docker-compose.prod.yml` — both on the internal `backend` network only, no `ports:` mapping. |
+| MinIO credentials scoped | **Not done** — root account still used | `.env.example`'s `MINIO_ROOT_USER`/`MINIO_ROOT_PASSWORD` are the MinIO root account. Phase-09 called for a bucket-scoped service account; deferred as a post-go-live hardening task (root creds work but are broader than needed — YAGNI'd for the 50-user internal launch, **flag for follow-up**). |
+| Structured logs + rotation | Done | `PinoLoggerService` (JSON to stdout) + Docker `json-file` driver, `max-size: 10m`, `max-file: 5` in `docker-compose.prod.yml`. |
+| Liveness + readiness probes | Done | `GET /api/v1/health` (liveness) and `GET /api/v1/health/ready` (readiness, checks DB) — wired to Docker `HEALTHCHECK` / compose `condition: service_healthy`. |
+| Migrations never race on restart | Done | One-shot `migrate` service in `docker-compose.prod.yml`, `api` depends on `condition: service_completed_successfully`; app never runs migrations on its own boot path. |
+| Backup + tested restore | Done | `scripts/backup-postgres.sh` + `scripts/restore-postgres.sh` (replays into a scratch DB to prove restorability, not just that a dump file exists). **MinIO backup ownership unresolved** — see deployment guide. |
+
+## Explicitly out of scope / deferred (YAGNI at 50 users)
+
+- No Kubernetes, no autoscaling, no Prometheus/Grafana — single host + Docker Compose is the right
+  answer at this scale (phase-09 Key Insights).
+- No WAF/IDS/TLS in this stack — out of scope now that it sits behind an org-owned proxy/gateway
+  that owns that layer; not justified to duplicate for an internal 50-user tool.
+
+## Unresolved before go-live (cannot be decided by the dev team)
+
+See the phase-09 completion report for the consolidated list across all 9 phases.

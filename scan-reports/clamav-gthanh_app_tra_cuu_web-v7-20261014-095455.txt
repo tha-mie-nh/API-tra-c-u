@@ -1,0 +1,1947 @@
+/scan/lib/apk/db/scripts.tar: OK
+/scan/lib/apk/db/triggers: OK
+/scan/lib/apk/db/installed: OK
+/scan/lib/apk/db/lock: Empty file
+/scan/lib/ld-musl-x86_64.so.1: OK
+/scan/lib/libc.musl-x86_64.so.1: Symbolic link
+/scan/docker-entrypoint.sh: OK
+/scan/etc/alpine-release: OK
+/scan/etc/issue: OK
+/scan/etc/busybox-paths.d/busybox: OK
+/scan/etc/hosts: Empty file
+/scan/etc/modules: OK
+/scan/etc/securetty: OK
+/scan/etc/resolv.conf: Empty file
+/scan/etc/os-release: Symbolic link
+/scan/etc/terminfo/g/gnome-256color: OK
+/scan/etc/terminfo/g/gnome: OK
+/scan/etc/terminfo/p/putty-256color: OK
+/scan/etc/terminfo/p/putty: OK
+/scan/etc/terminfo/t/terminology-1.0.0: OK
+/scan/etc/terminfo/t/terminology-0.6.1: OK
+/scan/etc/terminfo/t/terminator: OK
+/scan/etc/terminfo/t/tmux-256color: OK
+/scan/etc/terminfo/t/terminology-1.8.1: OK
+/scan/etc/terminfo/t/tmux: OK
+/scan/etc/terminfo/t/terminology: OK
+/scan/etc/terminfo/v/vt100: OK
+/scan/etc/terminfo/v/vt52: OK
+/scan/etc/terminfo/v/vt200: Symbolic link
+/scan/etc/terminfo/v/vte-256color: OK
+/scan/etc/terminfo/v/vte: OK
+/scan/etc/terminfo/v/vt102: OK
+/scan/etc/terminfo/v/vt220: OK
+/scan/etc/terminfo/l/linux: OK
+/scan/etc/terminfo/d/dumb: OK
+/scan/etc/terminfo/k/konsole-256color: OK
+/scan/etc/terminfo/k/konsole: OK
+/scan/etc/terminfo/k/konsole-linux: OK
+/scan/etc/terminfo/s/screen: OK
+/scan/etc/terminfo/s/st-direct: OK
+/scan/etc/terminfo/s/st-0.6: OK
+/scan/etc/terminfo/s/st-0.8: OK
+/scan/etc/terminfo/s/st-0.7: OK
+/scan/etc/terminfo/s/st-16color: OK
+/scan/etc/terminfo/s/sun: OK
+/scan/etc/terminfo/s/st-256color: OK
+/scan/etc/terminfo/s/screen-256color: OK
+/scan/etc/terminfo/a/alacritty: OK
+/scan/etc/terminfo/a/ansi: OK
+/scan/etc/terminfo/r/rxvt: OK
+/scan/etc/terminfo/r/rxvt-256color: OK
+/scan/etc/terminfo/x/xterm-color: OK
+/scan/etc/terminfo/x/xterm-256color: OK
+/scan/etc/terminfo/x/xterm: OK
+/scan/etc/terminfo/x/xterm-xfree86: OK
+/scan/etc/nginx/modules: Symbolic link
+/scan/etc/nginx/nginx.conf: OK
+/scan/etc/nginx/conf.d/default.conf: OK
+/scan/etc/nginx/fastcgi_params: OK
+/scan/etc/nginx/uwsgi_params: OK
+/scan/etc/nginx/mime.types: OK
+/scan/etc/nginx/fastcgi.conf: OK
+/scan/etc/nginx/scgi_params: OK
+/scan/etc/apk/arch: OK
+/scan/etc/apk/protected_paths.d/ca-certificates.list: OK
+/scan/etc/apk/world: OK
+/scan/etc/apk/repositories: OK
+/scan/etc/apk/keys/alpine-devel@lists.alpinelinux.org-5243ef4b.rsa.pub: OK
+/scan/etc/apk/keys/alpine-devel@lists.alpinelinux.org-5261cecb.rsa.pub: OK
+/scan/etc/apk/keys/nginx_signing.rsa.pub: OK
+/scan/etc/apk/keys/alpine-devel@lists.alpinelinux.org-61666e3f.rsa.pub: OK
+/scan/etc/apk/keys/alpine-devel@lists.alpinelinux.org-4a6a0840.rsa.pub: OK
+/scan/etc/apk/keys/alpine-devel@lists.alpinelinux.org-6165ee59.rsa.pub: OK
+/scan/etc/profile: OK
+/scan/etc/shells: OK
+/scan/etc/group-: OK
+/scan/etc/fstab: OK
+/scan/etc/services: OK
+/scan/etc/hostname: Empty file
+/scan/etc/sysctl.conf: OK
+/scan/etc/udhcpc/udhcpc.conf: OK
+/scan/etc/shadow: OK
+/scan/etc/protocols: OK
+/scan/etc/group: OK
+/scan/etc/profile.d/color_prompt.sh.disabled: OK
+/scan/etc/profile.d/README: OK
+/scan/etc/profile.d/20locale.sh: OK
+/scan/etc/shadow-: OK
+/scan/etc/ssl1.1/cert.pem: Symbolic link
+/scan/etc/ssl1.1/certs: Symbolic link
+/scan/etc/passwd: OK
+/scan/etc/inittab: OK
+/scan/etc/passwd-: OK
+/scan/etc/ca-certificates.conf: OK
+/scan/etc/network/if-up.d/dad: OK
+/scan/etc/crontabs/root: OK
+/scan/etc/secfixes.d/alpine: OK
+/scan/etc/init.d/nginx: OK
+/scan/etc/init.d/nginx-debug: OK
+/scan/etc/modprobe.d/aliases.conf: OK
+/scan/etc/modprobe.d/kms.conf: OK
+/scan/etc/modprobe.d/i386.conf: OK
+/scan/etc/modprobe.d/blacklist.conf: OK
+/scan/etc/ca-certificates/update.d/certhash: OK
+/scan/etc/ssl/openssl.cnf.dist: OK
+/scan/etc/ssl/cert.pem: Symbolic link
+/scan/etc/ssl/ct_log_list.cnf.dist: OK
+/scan/etc/ssl/openssl.cnf: OK
+/scan/etc/ssl/certs/ca-cert-D-TRUST_Root_Class_3_CA_2_2009.pem: Symbolic link
+/scan/etc/ssl/certs/ca-cert-Buypass_Class_3_Root_CA.pem: Symbolic link
+/scan/etc/ssl/certs/a09a51ae.0: Symbolic link
+/scan/etc/ssl/certs/30e1580d.0: Symbolic link
+/scan/etc/ssl/certs/ca-cert-COMODO_ECC_Certification_Authority.pem: Symbolic link
+/scan/etc/ssl/certs/f30dd6ad.0: Symbolic link
+/scan/etc/ssl/certs/ca-cert-T-TeleSec_GlobalRoot_Class_3.pem: Symbolic link
+/scan/etc/ssl/certs/0179095f.0: Symbolic link
+/scan/etc/ssl/certs/ca-cert-Izenpe.com.pem: Symbolic link
+/scan/etc/ssl/certs/4bfab552.0: Symbolic link
+/scan/etc/ssl/certs/062cdee6.0: Symbolic link
+/scan/etc/ssl/certs/0bf05006.0: Symbolic link
+/scan/etc/ssl/certs/eed8c118.0: Symbolic link
+/scan/etc/ssl/certs/ca-cert-Microsec_e-Szigno_Root_CA_2009.pem: Symbolic link
+/scan/etc/ssl/certs/ca-cert-ACCVRAIZ1.pem: Symbolic link
+/scan/etc/ssl/certs/878d9bca.0: Symbolic link
+/scan/etc/ssl/certs/ca-cert-D-TRUST_EV_Root_CA_1_2020.pem: Symbolic link
+/scan/etc/ssl/certs/988a38cb.0: Symbolic link
+/scan/etc/ssl/certs/ca-cert-Autoridad_de_Certificacion_Firmaprofesional_CIF_A62634068.pem: Symbolic link
+/scan/etc/ssl/certs/865fbdf9.0: Symbolic link
+/scan/etc/ssl/certs/ca-cert-SecureSign_Root_CA15.pem: Symbolic link
+/scan/etc/ssl/certs/ecccd8db.0: Symbolic link
+/scan/etc/ssl/certs/de6d66f3.0: Symbolic link
+/scan/etc/ssl/certs/e35234b1.0: Symbolic link
+/scan/etc/ssl/certs/7a780d93.0: Symbolic link
+/scan/etc/ssl/certs/ca-cert-GlobalSign_ECC_Root_CA_-_R5.pem: Symbolic link
+/scan/etc/ssl/certs/1e08bfd1.0: Symbolic link
+/scan/etc/ssl/certs/6fa5da56.0: Symbolic link
+/scan/etc/ssl/certs/ca-cert-SSL.com_TLS_ECC_Root_CA_2022.pem: Symbolic link
+/scan/etc/ssl/certs/ca-cert-HARICA_TLS_RSA_Root_CA_2021.pem: Symbolic link
+/scan/etc/ssl/certs/ca-cert-UCA_Extended_Validation_Root.pem: Symbolic link
+/scan/etc/ssl/certs/ca-cert-emSign_ECC_Root_CA_-_G3.pem: Symbolic link
+/scan/etc/ssl/certs/ca-cert-ISRG_Root_X1.pem: Symbolic link
+/scan/etc/ssl/certs/14bc7599.0: Symbolic link
+/scan/etc/ssl/certs/ca-cert-HARICA_TLS_ECC_Root_CA_2021.pem: Symbolic link
+/scan/etc/ssl/certs/ca-cert-Microsoft_RSA_Root_Certificate_Authority_2017.pem: Symbolic link
+/scan/etc/ssl/certs/36c6b318.0: Symbolic link
+/scan/etc/ssl/certs/ca-cert-OISTE_WISeKey_Global_Root_GC_CA.pem: Symbolic link
+/scan/etc/ssl/certs/bf53fb88.0: Symbolic link
+/scan/etc/ssl/certs/b7a5b843.0: Symbolic link
+/scan/etc/ssl/certs/ca-cert-vTrus_ECC_Root_CA.pem: Symbolic link
+/scan/etc/ssl/certs/ffdd40f9.0: Symbolic link
+/scan/etc/ssl/certs/ca-cert-Starfield_Root_Certificate_Authority_-_G2.pem: Symbolic link
+/scan/etc/ssl/certs/ce5e74ef.0: Symbolic link
+/scan/etc/ssl/certs/d6325660.0: Symbolic link
+/scan/etc/ssl/certs/ca-cert-Hongkong_Post_Root_CA_3.pem: Symbolic link
+/scan/etc/ssl/certs/ca-cert-DigiCert_TLS_ECC_P384_Root_G5.pem: Symbolic link
+/scan/etc/ssl/certs/b8d25de6.0: Symbolic link
+/scan/etc/ssl/certs/ca-cert-OISTE_Server_Root_ECC_G1.pem: Symbolic link
+/scan/etc/ssl/certs/ca-cert-Hellenic_Academic_and_Research_Institutions_ECC_RootCA_2015.pem: Symbolic link
+/scan/etc/ssl/certs/ca-cert-D-TRUST_EV_Root_CA_2_2023.pem: Symbolic link
+/scan/etc/ssl/certs/1cef98f5.0: Symbolic link
+/scan/etc/ssl/certs/ca-cert-TWCA_Root_Certification_Authority.pem: Symbolic link
+/scan/etc/ssl/certs/5f15c80c.0: Symbolic link
+/scan/etc/ssl/certs/ca-cert-NAVER_Global_Root_Certification_Authority.pem: Symbolic link
+/scan/etc/ssl/certs/ca-cert-GlobalSign_ECC_Root_CA_-_R4.pem: Symbolic link
+/scan/etc/ssl/certs/ca-cert-QuoVadis_Root_CA_3_G3.pem: Symbolic link
+/scan/etc/ssl/certs/ca-cert-GlobalSign_Root_E46.pem: Symbolic link
+/scan/etc/ssl/certs/ed858448.0: Symbolic link
+/scan/etc/ssl/certs/ca-cert-DigiCert_Assured_ID_Root_G3.pem: Symbolic link
+/scan/etc/ssl/certs/a94d09e5.0: Symbolic link
+/scan/etc/ssl/certs/002c0b4f.0: Symbolic link
+/scan/etc/ssl/certs/c28a8a30.0: Symbolic link
+/scan/etc/ssl/certs/2ccbdda3.0: Symbolic link
+/scan/etc/ssl/certs/ca-cert-SSL.com_EV_Root_Certification_Authority_RSA_R2.pem: Symbolic link
+/scan/etc/ssl/certs/9846683b.0: Symbolic link
+/scan/etc/ssl/certs/ca-cert-certSIGN_Root_CA_G2.pem: Symbolic link
+/scan/etc/ssl/certs/6d41d539.0: Symbolic link
+/scan/etc/ssl/certs/ca-cert-SwissSign_RSA_TLS_Root_CA_2022_-_1.pem: Symbolic link
+/scan/etc/ssl/certs/064e0aa9.0: Symbolic link
+/scan/etc/ssl/certs/0a775a30.0: Symbolic link
+/scan/etc/ssl/certs/ca-cert-emSign_ECC_Root_CA_-_C3.pem: Symbolic link
+/scan/etc/ssl/certs/ca-cert-Certum_Trusted_Network_CA_2.pem: Symbolic link
+/scan/etc/ssl/certs/cd58d51e.0: Symbolic link
+/scan/etc/ssl/certs/ca-cert-CA_Disig_Root_R2.pem: Symbolic link
+/scan/etc/ssl/certs/ca-cert-Certum_EC-384_CA.pem: Symbolic link
+/scan/etc/ssl/certs/ca-cert-Security_Communication_RootCA2.pem: Symbolic link
+/scan/etc/ssl/certs/ca-cert-Go_Daddy_Root_Certificate_Authority_-_G2.pem: Symbolic link
+/scan/etc/ssl/certs/4042bcee.0: Symbolic link
+/scan/etc/ssl/certs/7f3d5d1d.0: Symbolic link
+/scan/etc/ssl/certs/ca-cert-Amazon_Root_CA_3.pem: Symbolic link
+/scan/etc/ssl/certs/ca-cert-IdenTrust_Public_Sector_Root_CA_1.pem: Symbolic link
+/scan/etc/ssl/certs/a89d74c2.0: Symbolic link
+/scan/etc/ssl/certs/b0e59380.0: Symbolic link
+/scan/etc/ssl/certs/1e09d511.0: Symbolic link
+/scan/etc/ssl/certs/b433981b.0: Symbolic link
+/scan/etc/ssl/certs/c01eb047.0: Symbolic link
+/scan/etc/ssl/certs/8d89cda1.0: Symbolic link
+/scan/etc/ssl/certs/0b9bc432.0: Symbolic link
+/scan/etc/ssl/certs/ca-cert-OISTE_WISeKey_Global_Root_GB_CA.pem: Symbolic link
+/scan/etc/ssl/certs/6805c744.0: Symbolic link
+/scan/etc/ssl/certs/ca-cert-NetLock_Arany_=Class_Gold=_Főtanúsítvány.pem: Symbolic link
+/scan/etc/ssl/certs/4b718d9b.0: Symbolic link
+/scan/etc/ssl/certs/0f6fa695.0: Symbolic link
+/scan/etc/ssl/certs/ca-cert-Security_Communication_ECC_RootCA1.pem: Symbolic link
+/scan/etc/ssl/certs/ca-cert-Certum_Trusted_Root_CA.pem: Symbolic link
+/scan/etc/ssl/certs/5860aaa6.0: Symbolic link
+/scan/etc/ssl/certs/09789157.0: Symbolic link
+/scan/etc/ssl/certs/9b46e03d.0: Symbolic link
+/scan/etc/ssl/certs/3fb36b73.0: Symbolic link
+/scan/etc/ssl/certs/ca-cert-Hellenic_Academic_and_Research_Institutions_RootCA_2015.pem: Symbolic link
+/scan/etc/ssl/certs/ca-cert-DigiCert_Global_Root_G2.pem: Symbolic link
+/scan/etc/ssl/certs/ca-cert-QuoVadis_Root_CA_1_G3.pem: Symbolic link
+/scan/etc/ssl/certs/ca-cert-SSL.com_EV_Root_Certification_Authority_ECC.pem: Symbolic link
+/scan/etc/ssl/certs/ca-cert-Telia_Root_CA_v2.pem: Symbolic link
+/scan/etc/ssl/certs/9482e63a.0: Symbolic link
+/scan/etc/ssl/certs/b0d5255e.0: Symbolic link
+/scan/etc/ssl/certs/ca-cert-Atos_TrustedRoot_Root_CA_RSA_TLS_2021.pem: Symbolic link
+/scan/etc/ssl/certs/7fa05551.0: Symbolic link
+/scan/etc/ssl/certs/ca-cert-AC_RAIZ_FNMT-RCM_SERVIDORES_SEGUROS.pem: Symbolic link
+/scan/etc/ssl/certs/3e359ba6.0: Symbolic link
+/scan/etc/ssl/certs/ef954a4e.0: Symbolic link
+/scan/etc/ssl/certs/ca-cert-AC_RAIZ_FNMT-RCM.pem: Symbolic link
+/scan/etc/ssl/certs/ca-cert-UCA_Global_G2_Root.pem: Symbolic link
+/scan/etc/ssl/certs/cc450945.0: Symbolic link
+/scan/etc/ssl/certs/7a3adc42.0: Symbolic link
+/scan/etc/ssl/certs/ca-cert-TrustAsia_Global_Root_CA_G3.pem: Symbolic link
+/scan/etc/ssl/certs/9f727ac7.0: Symbolic link
+/scan/etc/ssl/certs/0b1b94ef.0: Symbolic link
+/scan/etc/ssl/certs/ca-cert-Certainly_Root_E1.pem: Symbolic link
+/scan/etc/ssl/certs/fd64f3fc.0: Symbolic link
+/scan/etc/ssl/certs/8160b96c.0: Symbolic link
+/scan/etc/ssl/certs/cbf06781.0: Symbolic link
+/scan/etc/ssl/certs/9e654b62.0: Symbolic link
+/scan/etc/ssl/certs/da0cfd1d.0: Symbolic link
+/scan/etc/ssl/certs/ca-cert-Atos_TrustedRoot_Root_CA_ECC_TLS_2021.pem: Symbolic link
+/scan/etc/ssl/certs/ca-cert-TUBITAK_Kamu_SM_SSL_Kok_Sertifikasi_-_Surum_1.pem: Symbolic link
+/scan/etc/ssl/certs/ca-cert-Amazon_Root_CA_2.pem: Symbolic link
+/scan/etc/ssl/certs/ca-cert-DigiCert_TLS_RSA4096_Root_G5.pem: Symbolic link
+/scan/etc/ssl/certs/ca-cert-TrustAsia_Global_Root_CA_G4.pem: Symbolic link
+/scan/etc/ssl/certs/ca-cert-Certum_Trusted_Network_CA.pem: Symbolic link
+/scan/etc/ssl/certs/ca-cert-TunTrust_Root_CA.pem: Symbolic link
+/scan/etc/ssl/certs/f0c70a8d.0: Symbolic link
+/scan/etc/ssl/certs/ca-cert-Telia_EC_TLS_Root_CA_v3.pem: Symbolic link
+/scan/etc/ssl/certs/0f5dc4f3.0: Symbolic link
+/scan/etc/ssl/certs/422cf4bf.0: Symbolic link
+/scan/etc/ssl/certs/ddcda989.0: Symbolic link
+/scan/etc/ssl/certs/ca-cert-Microsoft_ECC_Root_Certificate_Authority_2017.pem: Symbolic link
+/scan/etc/ssl/certs/ff34af3f.0: Symbolic link
+/scan/etc/ssl/certs/ca-cert-D-TRUST_Root_Class_3_CA_2_EV_2009.pem: Symbolic link
+/scan/etc/ssl/certs/7719f463.0: Symbolic link
+/scan/etc/ssl/certs/ca-cert-DigiCert_Assured_ID_Root_G2.pem: Symbolic link
+/scan/etc/ssl/certs/ca-cert-OISTE_Server_Root_RSA_G1.pem: Symbolic link
+/scan/etc/ssl/certs/ca-cert-GlobalSign_Root_CA_-_R3.pem: Symbolic link
+/scan/etc/ssl/certs/ca-cert-COMODO_RSA_Certification_Authority.pem: Symbolic link
+/scan/etc/ssl/certs/a3418fda.0: Symbolic link
+/scan/etc/ssl/certs/ca-cert-Actalis_Authentication_Root_CA.pem: Symbolic link
+/scan/etc/ssl/certs/ca-cert-Starfield_Services_Root_Certificate_Authority_-_G2.pem: Symbolic link
+/scan/etc/ssl/certs/ca-cert-TrustAsia_TLS_ECC_Root_CA.pem: Symbolic link
+/scan/etc/ssl/certs/feffd413.0: Symbolic link
+/scan/etc/ssl/certs/fb717492.0: Symbolic link
+/scan/etc/ssl/certs/1d3472b9.0: Symbolic link
+/scan/etc/ssl/certs/ca-cert-D-TRUST_BR_Root_CA_2_2023.pem: Symbolic link
+/scan/etc/ssl/certs/ca-cert-HiPKI_Root_CA_-_G1.pem: Symbolic link
+/scan/etc/ssl/certs/ca-cert-TWCA_Global_Root_CA.pem: Symbolic link
+/scan/etc/ssl/certs/ca-cert-SecureSign_Root_CA14.pem: Symbolic link
+/scan/etc/ssl/certs/ca-cert-ANF_Secure_Server_Root_CA.pem: Symbolic link
+/scan/etc/ssl/certs/ca-cert-SSL.com_Root_Certification_Authority_RSA.pem: Symbolic link
+/scan/etc/ssl/certs/ca-cert-DigiCert_Trusted_Root_G4.pem: Symbolic link
+/scan/etc/ssl/certs/2923b3f9.0: Symbolic link
+/scan/etc/ssl/certs/06dc52d5.0: Symbolic link
+/scan/etc/ssl/certs/54657681.0: Symbolic link
+/scan/etc/ssl/certs/ca-cert-GlobalSign_Root_R46.pem: Symbolic link
+/scan/etc/ssl/certs/ca-cert-Sectigo_Public_Server_Authentication_Root_E46.pem: Symbolic link
+/scan/etc/ssl/certs/9bf03295.0: Symbolic link
+/scan/etc/ssl/certs/ca-cert-BJCA_Global_Root_CA1.pem: Symbolic link
+/scan/etc/ssl/certs/ca-cert-IdenTrust_Commercial_Root_CA_1.pem: Symbolic link
+/scan/etc/ssl/certs/d52c538d.0: Symbolic link
+/scan/etc/ssl/certs/9cd9d94b.0: Symbolic link
+/scan/etc/ssl/certs/ca-cert-Telia_RSA_TLS_Root_CA_v3.pem: Symbolic link
+/scan/etc/ssl/certs/ca-cert-GTS_Root_R1.pem: Symbolic link
+/scan/etc/ssl/certs/ca-cert-GTS_Root_R4.pem: Symbolic link
+/scan/etc/ssl/certs/cd8c0d63.0: Symbolic link
+/scan/etc/ssl/certs/ca-cert-TWCA_CYBER_Root_CA.pem: Symbolic link
+/scan/etc/ssl/certs/ca-cert-Telekom_Security_TLS_RSA_Root_2023.pem: Symbolic link
+/scan/etc/ssl/certs/e8de2f56.0: Symbolic link
+/scan/etc/ssl/certs/ca-cert-Amazon_Root_CA_1.pem: Symbolic link
+/scan/etc/ssl/certs/ca-certificates.crt: OK
+/scan/etc/ssl/certs/ca-cert-ISRG_Root_X2.pem: Symbolic link
+/scan/etc/ssl/certs/d4dae3dd.0: Symbolic link
+/scan/etc/ssl/certs/e18bfb83.0: Symbolic link
+/scan/etc/ssl/certs/ca-cert-GDCA_TrustAUTH_R5_ROOT.pem: Symbolic link
+/scan/etc/ssl/certs/3bde41ac.0: Symbolic link
+/scan/etc/ssl/certs/ca-cert-Telekom_Security_TLS_ECC_Root_2020.pem: Symbolic link
+/scan/etc/ssl/certs/ca-cert-e-Szigno_Root_CA_2017.pem: Symbolic link
+/scan/etc/ssl/certs/ca-cert-Buypass_Class_2_Root_CA.pem: Symbolic link
+/scan/etc/ssl/certs/ca-cert-SECOM_TLS_RSA_Root_CA_2024.pem: Symbolic link
+/scan/etc/ssl/certs/9ef4a08a.0: Symbolic link
+/scan/etc/ssl/certs/ca-cert-Certigna_Root_CA.pem: Symbolic link
+/scan/etc/ssl/certs/ca-cert-SZAFIR_ROOT_CA2.pem: Symbolic link
+/scan/etc/ssl/certs/ca-cert-Certainly_Root_R1.pem: Symbolic link
+/scan/etc/ssl/certs/ca-cert-e-Szigno_TLS_Root_CA_2023.pem: Symbolic link
+/scan/etc/ssl/certs/ca-cert-USERTrust_ECC_Certification_Authority.pem: Symbolic link
+/scan/etc/ssl/certs/ca-cert-CFCA_EV_ROOT.pem: Symbolic link
+/scan/etc/ssl/certs/ca-cert-emSign_Root_CA_-_C1.pem: Symbolic link
+/scan/etc/ssl/certs/2ae6433e.0: Symbolic link
+/scan/etc/ssl/certs/1001acf7.0: Symbolic link
+/scan/etc/ssl/certs/dc4d6a89.0: Symbolic link
+/scan/etc/ssl/certs/ca-cert-SSL.com_TLS_RSA_Root_CA_2022.pem: Symbolic link
+/scan/etc/ssl/certs/f51bb24c.0: Symbolic link
+/scan/etc/ssl/certs/8508e720.0: Symbolic link
+/scan/etc/ssl/certs/48bec511.0: Symbolic link
+/scan/etc/ssl/certs/ca-cert-T-TeleSec_GlobalRoot_Class_2.pem: Symbolic link
+/scan/etc/ssl/certs/75d1b2ed.0: Symbolic link
+/scan/etc/ssl/certs/e868b802.0: Symbolic link
+/scan/etc/ssl/certs/ca-cert-SSL.com_Root_Certification_Authority_ECC.pem: Symbolic link
+/scan/etc/ssl/certs/6a9bdba3.0: Symbolic link
+/scan/etc/ssl/certs/ca-cert-TrustAsia_TLS_RSA_Root_CA.pem: Symbolic link
+/scan/etc/ssl/certs/faf4fe6b.0: Symbolic link
+/scan/etc/ssl/certs/ca-cert-Sectigo_Public_Server_Authentication_Root_R46.pem: Symbolic link
+/scan/etc/ssl/certs/749e9e03.0: Symbolic link
+/scan/etc/ssl/certs/40193066.0: Symbolic link
+/scan/etc/ssl/certs/ca-cert-SECOM_TLS_ECC_Root_CA_2024.pem: Symbolic link
+/scan/etc/ssl/certs/930ac5d2.0: Symbolic link
+/scan/etc/ssl/certs/ca-cert-USERTrust_RSA_Certification_Authority.pem: Symbolic link
+/scan/etc/ssl/certs/ca-cert-Amazon_Root_CA_4.pem: Symbolic link
+/scan/etc/ssl/certs/ca-cert-GTS_Root_R3.pem: Symbolic link
+/scan/etc/ssl/certs/ca-cert-emSign_Root_CA_-_G1.pem: Symbolic link
+/scan/etc/ssl/certs/5f618aec.0: Symbolic link
+/scan/etc/ssl/certs/b81b93f0.0: Symbolic link
+/scan/etc/ssl/certs/fe8a2cd8.0: Symbolic link
+/scan/etc/ssl/certs/ca-cert-D-TRUST_BR_Root_CA_1_2020.pem: Symbolic link
+/scan/etc/ssl/certs/5443e9e3.0: Symbolic link
+/scan/etc/ssl/certs/dd8e9d41.0: Symbolic link
+/scan/etc/ssl/certs/e73d606e.0: Symbolic link
+/scan/etc/ssl/certs/f44703f1.0: Symbolic link
+/scan/etc/ssl/certs/9046744a.0: Symbolic link
+/scan/etc/ssl/certs/8f103249.0: Symbolic link
+/scan/etc/ssl/certs/ca-cert-QuoVadis_Root_CA_2_G3.pem: Symbolic link
+/scan/etc/ssl/certs/ca-cert-vTrus_Root_CA.pem: Symbolic link
+/scan/etc/ssl/certs/ca-cert-BJCA_Global_Root_CA2.pem: Symbolic link
+/scan/etc/ssl/certs/5931b5bc.0: Symbolic link
+/scan/etc/ssl/certs/32888f65.0: Symbolic link
+/scan/etc/ssl/certs/406c9bb1.0: Symbolic link
+/scan/etc/ssl/certs/fc5a8f99.0: Symbolic link
+/scan/etc/ssl/certs/8cb5ee0f.0: Symbolic link
+/scan/etc/ssl/certs/9d04f354.0: Symbolic link
+/scan/etc/ssl/certs/773e07ad.0: Symbolic link
+/scan/etc/ssl/certs/ca-cert-DigiCert_Global_Root_G3.pem: Symbolic link
+/scan/etc/ssl/certs/607986c7.0: Symbolic link
+/scan/etc/ssl/certs/ca-cert-GlobalSign_Root_CA_-_R6.pem: Symbolic link
+/scan/etc/ssl/certs/90c5a3c8.0: Symbolic link
+/scan/etc/ssl/certs/68dd7389.0: Symbolic link
+/scan/etc/ssl/ct_log_list.cnf: OK
+/scan/etc/mtab: Symbolic link
+/scan/etc/motd: OK
+/scan/etc/nsswitch.conf: OK
+/scan/etc/fonts/conf.d/10-hinting-slight.conf: Symbolic link
+/scan/etc/fonts/conf.d/51-local.conf: Symbolic link
+/scan/etc/fonts/conf.d/45-generic.conf: Symbolic link
+/scan/etc/fonts/conf.d/80-delicious.conf: Symbolic link
+/scan/etc/fonts/conf.d/65-fonts-persian.conf: Symbolic link
+/scan/etc/fonts/conf.d/50-user.conf: Symbolic link
+/scan/etc/fonts/conf.d/45-latin.conf: Symbolic link
+/scan/etc/fonts/conf.d/20-unhint-small-vera.conf: Symbolic link
+/scan/etc/fonts/conf.d/90-synthetic.conf: Symbolic link
+/scan/etc/fonts/conf.d/40-nonlatin.conf: Symbolic link
+/scan/etc/fonts/conf.d/10-sub-pixel-none.conf: Symbolic link
+/scan/etc/fonts/conf.d/60-latin.conf: Symbolic link
+/scan/etc/fonts/conf.d/10-yes-antialias.conf: Symbolic link
+/scan/etc/fonts/conf.d/30-metric-aliases.conf: Symbolic link
+/scan/etc/fonts/conf.d/49-sansserif.conf: Symbolic link
+/scan/etc/fonts/conf.d/10-scale-bitmap-fonts.conf: Symbolic link
+/scan/etc/fonts/conf.d/README: OK
+/scan/etc/fonts/conf.d/11-lcdfilter-default.conf: Symbolic link
+/scan/etc/fonts/conf.d/69-unifont.conf: Symbolic link
+/scan/etc/fonts/conf.d/60-generic.conf: Symbolic link
+/scan/etc/fonts/conf.d/65-nonlatin.conf: Symbolic link
+/scan/etc/fonts/conf.d/48-spacing.conf: Symbolic link
+/scan/etc/fonts/fonts.conf: OK
+/scan/etc/logrotate.d/nginx: OK
+/scan/etc/logrotate.d/acpid: OK
+/scan/bin/mount: Symbolic link
+/scan/bin/arch: Symbolic link
+/scan/bin/rev: Symbolic link
+/scan/bin/usleep: Symbolic link
+/scan/bin/true: Symbolic link
+/scan/bin/printenv: Symbolic link
+/scan/bin/tar: Symbolic link
+/scan/bin/linux64: Symbolic link
+/scan/bin/ps: Symbolic link
+/scan/bin/lzop: Symbolic link
+/scan/bin/ls: Symbolic link
+/scan/bin/dnsdomainname: Symbolic link
+/scan/bin/fdflush: Symbolic link
+/scan/bin/df: Symbolic link
+/scan/bin/chmod: Symbolic link
+/scan/bin/more: Symbolic link
+/scan/bin/chgrp: Symbolic link
+/scan/bin/ash: Symbolic link
+/scan/bin/false: Symbolic link
+/scan/bin/mv: Symbolic link
+/scan/bin/sync: Symbolic link
+/scan/bin/makemime: Symbolic link
+/scan/bin/rm: Symbolic link
+/scan/bin/touch: Symbolic link
+/scan/bin/mktemp: Symbolic link
+/scan/bin/dd: Symbolic link
+/scan/bin/ping: Symbolic link
+/scan/bin/reformime: Symbolic link
+/scan/bin/login: Symbolic link
+/scan/bin/stty: Symbolic link
+/scan/bin/dmesg: Symbolic link
+/scan/bin/pidof: Symbolic link
+/scan/bin/dumpkmap: Symbolic link
+/scan/bin/pwd: Symbolic link
+/scan/bin/mkdir: Symbolic link
+/scan/bin/chown: Symbolic link
+/scan/bin/sed: Symbolic link
+/scan/bin/date: Symbolic link
+/scan/bin/netstat: Symbolic link
+/scan/bin/hostname: Symbolic link
+/scan/bin/su: Symbolic link
+/scan/bin/sleep: Symbolic link
+/scan/bin/gzip: Symbolic link
+/scan/bin/sh: Symbolic link
+/scan/bin/cat: Symbolic link
+/scan/bin/grep: Symbolic link
+/scan/bin/pipe_progress: Symbolic link
+/scan/bin/stat: Symbolic link
+/scan/bin/ipcalc: Symbolic link
+/scan/bin/kbd_mode: Symbolic link
+/scan/bin/ping6: Symbolic link
+/scan/bin/gunzip: Symbolic link
+/scan/bin/mknod: Symbolic link
+/scan/bin/getopt: Symbolic link
+/scan/bin/mpstat: Symbolic link
+/scan/bin/echo: Symbolic link
+/scan/bin/run-parts: Symbolic link
+/scan/bin/mountpoint: Symbolic link
+/scan/bin/fsync: Symbolic link
+/scan/bin/setpriv: Symbolic link
+/scan/bin/chattr: Symbolic link
+/scan/bin/linux32: Symbolic link
+/scan/bin/ln: Symbolic link
+/scan/bin/cp: Symbolic link
+/scan/bin/base64: Symbolic link
+/scan/bin/egrep: Symbolic link
+/scan/bin/nice: Symbolic link
+/scan/bin/ionice: Symbolic link
+/scan/bin/zcat: Symbolic link
+/scan/bin/lsattr: Symbolic link
+/scan/bin/uname: Symbolic link
+/scan/bin/watch: Symbolic link
+/scan/bin/fatattr: Symbolic link
+/scan/bin/bbconfig: Symbolic link
+/scan/bin/rmdir: Symbolic link
+/scan/bin/setserial: Symbolic link
+/scan/bin/link: Symbolic link
+/scan/bin/fgrep: Symbolic link
+/scan/bin/umount: Symbolic link
+/scan/bin/kill: Symbolic link
+/scan/bin/busybox: OK
+/scan/bin/iostat: Symbolic link
+/scan/dev/console: Empty file
+/scan/.dockerenv: Empty file
+/scan/usr/lib/libxcb.so.1: Symbolic link
+/scan/usr/lib/libmd.so.0: Symbolic link
+/scan/usr/lib/libxcb-randr.so.0: Symbolic link
+/scan/usr/lib/libxcb-screensaver.so.0.0.0: OK
+/scan/usr/lib/libSM.so.6: Symbolic link
+/scan/usr/lib/libgcrypt.so.20: Symbolic link
+/scan/usr/lib/libpcre2-posix.so.3.0.5: OK
+/scan/usr/lib/libcrypto.so.3: OK
+/scan/usr/lib/libbrotlienc.so.1: Symbolic link
+/scan/usr/lib/libsharpyuv.so.0: Symbolic link
+/scan/usr/lib/libxcb-sync.so.1.0.0: OK
+/scan/usr/lib/libdav1d.so.7: Symbolic link
+/scan/usr/lib/libXau.so.6: Symbolic link
+/scan/usr/lib/libxml2.so.2: Symbolic link
+/scan/usr/lib/libexslt.so.0.8.23: OK
+/scan/usr/lib/libX11.so.6: Symbolic link
+/scan/usr/lib/libunistring.so.5.1.0: OK
+/scan/usr/lib/libxcb-dri3.so.0: Symbolic link
+/scan/usr/lib/libxcb-dbe.so.0: Symbolic link
+/scan/usr/lib/libxml2.so.2.13.9: OK
+/scan/usr/lib/libxcb-dpms.so.0: Symbolic link
+/scan/usr/lib/libxcb-xvmc.so.0: Symbolic link
+/scan/usr/lib/sysctl.d/00-alpine.conf: OK
+/scan/usr/lib/libxcb-shm.so.0.0.0: OK
+/scan/usr/lib/libxcb-glx.so.0: Symbolic link
+/scan/usr/lib/libXext.so.6: Symbolic link
+/scan/usr/lib/libxcb-glx.so.0.0.0: OK
+/scan/usr/lib/libavif.so.16.0.4: OK
+/scan/usr/lib/libxcb-xf86dri.so.0.0.0: OK
+/scan/usr/lib/libxcb-xinerama.so.0: Symbolic link
+/scan/usr/lib/libfontconfig.so.1: Symbolic link
+/scan/usr/lib/libzstd.so.1: Symbolic link
+/scan/usr/lib/os-release: OK
+/scan/usr/lib/libfontconfig.so.1.12.1: OK
+/scan/usr/lib/libICE.so.6: Symbolic link
+/scan/usr/lib/libxcb-xtest.so.0: Symbolic link
+/scan/usr/lib/libxcb-randr.so.0.1.0: OK
+/scan/usr/lib/nginx/modules/ngx_stream_js_module-debug.so: OK
+/scan/usr/lib/nginx/modules/ngx_http_xslt_filter_module-debug.so: OK
+/scan/usr/lib/nginx/modules/ngx_http_geoip_module-debug.so: OK
+/scan/usr/lib/nginx/modules/ngx_stream_geoip_module.so: OK
+/scan/usr/lib/nginx/modules/ngx_http_image_filter_module-debug.so: OK
+/scan/usr/lib/nginx/modules/ngx_http_xslt_filter_module.so: OK
+/scan/usr/lib/nginx/modules/ngx_http_image_filter_module.so: OK
+/scan/usr/lib/nginx/modules/ngx_http_js_module-debug.so: OK
+/scan/usr/lib/nginx/modules/ngx_stream_geoip_module-debug.so: OK
+/scan/usr/lib/nginx/modules/ngx_http_geoip_module.so: OK
+/scan/usr/lib/nginx/modules/ngx_http_js_module.so: OK
+/scan/usr/lib/nginx/modules/ngx_stream_js_module.so: OK
+/scan/usr/lib/libxcb-shape.so.0.0.0: OK
+/scan/usr/lib/libidn2.so.0: Symbolic link
+/scan/usr/lib/libexpat.so.1.12.4: OK
+/scan/usr/lib/libxcb-present.so.0.0.0: OK
+/scan/usr/lib/libpcre2-8.so.0: Symbolic link
+/scan/usr/lib/libnghttp2.so.14: Symbolic link
+/scan/usr/lib/libbrotlidec.so.1: Symbolic link
+/scan/usr/lib/libGeoIP.so.1: Symbolic link
+/scan/usr/lib/libxcb-dpms.so.0.0.0: OK
+/scan/usr/lib/libz.so.1: Symbolic link
+/scan/usr/lib/libwebp.so.7.1.9: OK
+/scan/usr/lib/libxcb-res.so.0.0.0: OK
+/scan/usr/lib/libX11.so.6.4.0: OK
+/scan/usr/lib/libxcb-dri3.so.0.1.0: OK
+/scan/usr/lib/libxcb-damage.so.0.0.0: OK
+/scan/usr/lib/libpcre2-8.so.0.12.0: OK
+/scan/usr/lib/libtiff.so.6.2.0: OK
+/scan/usr/lib/libxcb-dbe.so.0.0.0: OK
+/scan/usr/lib/libxcb-xv.so.0: Symbolic link
+/scan/usr/lib/libXext.so.6.4.0: OK
+/scan/usr/lib/libcares.so.2.19.7: OK
+/scan/usr/lib/libxslt.so.1.1.42: OK
+/scan/usr/lib/libxcb-sync.so.1: Symbolic link
+/scan/usr/lib/libXdmcp.so.6: Symbolic link
+/scan/usr/lib/libbrotlicommon.so.1.1.0: OK
+/scan/usr/lib/libmd.so.0.1.0: OK
+/scan/usr/lib/libpsl.so.5: Symbolic link
+/scan/usr/lib/libxcb-shm.so.0: Symbolic link
+/scan/usr/lib/libxcb-xinput.so.0: Symbolic link
+/scan/usr/lib/libdav1d.so.7.0.0: OK
+/scan/usr/lib/libxcb-damage.so.0: Symbolic link
+/scan/usr/lib/libcares.so.2: Symbolic link
+/scan/usr/lib/libpsl.so.5.3.5: OK
+/scan/usr/lib/libaom.so.3: Symbolic link
+/scan/usr/lib/libbz2.so.1: Symbolic link
+/scan/usr/lib/libintl.so.8.4.0: OK
+/scan/usr/lib/libxcb-xinput.so.0.1.0: OK
+/scan/usr/lib/libavif.so.16: Symbolic link
+/scan/usr/lib/libuuid.so.1.3.0: OK
+/scan/usr/lib/libX11-xcb.so.1: Symbolic link
+/scan/usr/lib/libbrotlidec.so.1.1.0: OK
+/scan/usr/lib/libICE.so.6.3.0: OK
+/scan/usr/lib/libgd.so.3.0.11: OK
+/scan/usr/lib/libXt.so.6.0.0: OK
+/scan/usr/lib/libxcb-dri2.so.0.0.0: OK
+/scan/usr/lib/libSM.so.6.0.1: OK
+/scan/usr/lib/libxcb-xkb.so.1: Symbolic link
+/scan/usr/lib/libxcb-record.so.0: Symbolic link
+/scan/usr/lib/libxcb-present.so.0: Symbolic link
+/scan/usr/lib/liblzma.so.5.8.4: OK
+/scan/usr/lib/libxcb-xvmc.so.0.0.0: OK
+/scan/usr/lib/engines-3/capi.so: OK
+/scan/usr/lib/engines-3/afalg.so: OK
+/scan/usr/lib/engines-3/loader_attic.so: OK
+/scan/usr/lib/engines-3/padlock.so: OK
+/scan/usr/lib/libbrotlienc.so.1.1.0: OK
+/scan/usr/lib/libwebp.so.7: Symbolic link
+/scan/usr/lib/libgpg-error.so.0: Symbolic link
+/scan/usr/lib/libGeoIP.so.1.6.12: OK
+/scan/usr/lib/libexslt.so.0: Symbolic link
+/scan/usr/lib/libxcb-res.so.0: Symbolic link
+/scan/usr/lib/libcurl.so.4: Symbolic link
+/scan/usr/lib/libxcb-record.so.0.0.0: OK
+/scan/usr/lib/libxcb-screensaver.so.0: Symbolic link
+/scan/usr/lib/libbz2.so.1.0.8: OK
+/scan/usr/lib/libexpat.so.1: Symbolic link
+/scan/usr/lib/libintl.so.8: Symbolic link
+/scan/usr/lib/libxcb-xinerama.so.0.0.0: OK
+/scan/usr/lib/libgd.so.3: Symbolic link
+/scan/usr/lib/libX11-xcb.so.1.0.0: OK
+/scan/usr/lib/libxcb-xfixes.so.0: Symbolic link
+/scan/usr/lib/libxslt.so.1: Symbolic link
+/scan/usr/lib/libxcb-xf86dri.so.0: Symbolic link
+/scan/usr/lib/libxcb-dri2.so.0: Symbolic link
+/scan/usr/lib/libxcb-xfixes.so.0.0.0: OK
+/scan/usr/lib/libxcb-xtest.so.0.0.0: OK
+/scan/usr/lib/libXt.so.6: Symbolic link
+/scan/usr/lib/libncursesw.so.6: Symbolic link
+/scan/usr/lib/libaom.so.3.11.0: OK
+/scan/usr/lib/libfreetype.so.6: Symbolic link
+/scan/usr/lib/libzstd.so.1.5.6: OK
+/scan/usr/lib/libpng16.so.16.57.0: OK
+/scan/usr/lib/libedit.so.0.0.74: OK
+/scan/usr/lib/libsharpyuv.so.0.1.0: OK
+/scan/usr/lib/liblzma.so.5: Symbolic link
+/scan/usr/lib/libbrotlicommon.so.1: Symbolic link
+/scan/usr/lib/libidn2.so.0.4.0: OK
+/scan/usr/lib/libxcb-composite.so.0: Symbolic link
+/scan/usr/lib/libnghttp2.so.14.29.4: OK
+/scan/usr/lib/libedit.so.0: Symbolic link
+/scan/usr/lib/libxcb-render.so.0: Symbolic link
+/scan/usr/lib/libjpeg.so.8: Symbolic link
+/scan/usr/lib/libxcb-composite.so.0.0.0: OK
+/scan/usr/lib/libz.so.1.3.2: OK
+/scan/usr/lib/libxcb-xv.so.0.0.0: OK
+/scan/usr/lib/libtiff.so.6: Symbolic link
+/scan/usr/lib/libjpeg.so.8.3.2: OK
+/scan/usr/lib/libncursesw.so.6.5: OK
+/scan/usr/lib/ossl-modules/legacy.so: OK
+/scan/usr/lib/libbsd.so.0: Symbolic link
+/scan/usr/lib/libxcb-xkb.so.1.0.0: OK
+/scan/usr/lib/libssl.so.3: OK
+/scan/usr/lib/libXpm.so.4.11.0: OK
+/scan/usr/lib/libxcb-render.so.0.0.0: OK
+/scan/usr/lib/libXau.so.6.0.0: OK
+/scan/usr/lib/libbsd.so.0.12.2: OK
+/scan/usr/lib/libxcb.so.1.1.0: OK
+/scan/usr/lib/libcurl.so.4.8.0: OK
+/scan/usr/lib/libuuid.so.1: Symbolic link
+/scan/usr/lib/libapk.so.2.14.0: OK
+/scan/usr/lib/libfreetype.so.6.20.2: OK
+/scan/usr/lib/libunistring.so.5: Symbolic link
+/scan/usr/lib/libXdmcp.so.6.0.0: OK
+/scan/usr/lib/libpcre2-posix.so.3: Symbolic link
+/scan/usr/lib/libpng16.so.16: Symbolic link
+/scan/usr/lib/libxcb-shape.so.0: Symbolic link
+/scan/usr/lib/libgcrypt.so.20.4.3: OK
+/scan/usr/lib/libXpm.so.4: Symbolic link
+/scan/usr/lib/libgpg-error.so.0.38.0: OK
+/scan/usr/share/fontconfig/conf.avail/10-hinting-slight.conf: OK
+/scan/usr/share/fontconfig/conf.avail/09-autohint-if-no-hinting.conf: OK
+/scan/usr/share/fontconfig/conf.avail/51-local.conf: OK
+/scan/usr/share/fontconfig/conf.avail/45-generic.conf: OK
+/scan/usr/share/fontconfig/conf.avail/80-delicious.conf: OK
+/scan/usr/share/fontconfig/conf.avail/10-hinting-full.conf: OK
+/scan/usr/share/fontconfig/conf.avail/05-reset-dirs-sample.conf: OK
+/scan/usr/share/fontconfig/conf.avail/65-fonts-persian.conf: OK
+/scan/usr/share/fontconfig/conf.avail/10-sub-pixel-vbgr.conf: OK
+/scan/usr/share/fontconfig/conf.avail/50-user.conf: OK
+/scan/usr/share/fontconfig/conf.avail/11-lcdfilter-legacy.conf: OK
+/scan/usr/share/fontconfig/conf.avail/10-unhinted.conf: OK
+/scan/usr/share/fontconfig/conf.avail/45-latin.conf: OK
+/scan/usr/share/fontconfig/conf.avail/20-unhint-small-vera.conf: OK
+/scan/usr/share/fontconfig/conf.avail/10-no-antialias.conf: OK
+/scan/usr/share/fontconfig/conf.avail/10-sub-pixel-rgb.conf: OK
+/scan/usr/share/fontconfig/conf.avail/70-no-bitmaps.conf: OK
+/scan/usr/share/fontconfig/conf.avail/90-synthetic.conf: OK
+/scan/usr/share/fontconfig/conf.avail/10-hinting-none.conf: OK
+/scan/usr/share/fontconfig/conf.avail/40-nonlatin.conf: OK
+/scan/usr/share/fontconfig/conf.avail/10-sub-pixel-none.conf: OK
+/scan/usr/share/fontconfig/conf.avail/60-latin.conf: OK
+/scan/usr/share/fontconfig/conf.avail/10-autohint.conf: OK
+/scan/usr/share/fontconfig/conf.avail/10-yes-antialias.conf: OK
+/scan/usr/share/fontconfig/conf.avail/30-metric-aliases.conf: OK
+/scan/usr/share/fontconfig/conf.avail/70-yes-bitmaps.conf: OK
+/scan/usr/share/fontconfig/conf.avail/49-sansserif.conf: OK
+/scan/usr/share/fontconfig/conf.avail/10-scale-bitmap-fonts.conf: OK
+/scan/usr/share/fontconfig/conf.avail/10-sub-pixel-vrgb.conf: OK
+/scan/usr/share/fontconfig/conf.avail/10-hinting-medium.conf: OK
+/scan/usr/share/fontconfig/conf.avail/35-lang-normalize.conf: OK
+/scan/usr/share/fontconfig/conf.avail/11-lcdfilter-none.conf: OK
+/scan/usr/share/fontconfig/conf.avail/11-lcdfilter-default.conf: OK
+/scan/usr/share/fontconfig/conf.avail/69-unifont.conf: OK
+/scan/usr/share/fontconfig/conf.avail/25-unhint-nonlatin.conf: OK
+/scan/usr/share/fontconfig/conf.avail/60-generic.conf: OK
+/scan/usr/share/fontconfig/conf.avail/10-sub-pixel-bgr.conf: OK
+/scan/usr/share/fontconfig/conf.avail/65-nonlatin.conf: OK
+/scan/usr/share/fontconfig/conf.avail/11-lcdfilter-light.conf: OK
+/scan/usr/share/fontconfig/conf.avail/48-spacing.conf: OK
+/scan/usr/share/fontconfig/conf.avail/65-khmer.conf: OK
+/scan/usr/share/doc/nginx-module-njs/CHANGES: OK
+/scan/usr/share/xml/fontconfig/fonts.dtd: OK
+/scan/usr/share/nginx/html/assets/hooks-DZbYz0qM.js: OK
+/scan/usr/share/nginx/html/assets/geist-latin-wght-normal-BgDaEnEv.woff2: OK
+/scan/usr/share/nginx/html/assets/roles-api-CeSlDBfU.js: OK
+/scan/usr/share/nginx/html/assets/geist-cyrillic-wght-normal-BEAKL7Jp.woff2: OK
+/scan/usr/share/nginx/html/assets/audit-log-page-KYp2MziC.js: OK
+/scan/usr/share/nginx/html/assets/users-page-KwK4nTe1.js: OK
+/scan/usr/share/nginx/html/assets/query-page-BtFfbC7L.js: OK
+/scan/usr/share/nginx/html/assets/label-BUoyqYda.js: OK
+/scan/usr/share/nginx/html/assets/forbidden-page-o-TYrGYE.js: OK
+/scan/usr/share/nginx/html/assets/index-DdQuXust.js: OK
+/scan/usr/share/nginx/html/assets/roles-page-1zaByacB.js: OK
+/scan/usr/share/nginx/html/assets/checkbox-BYuXTqtG.js: OK
+/scan/usr/share/nginx/html/assets/schemas-Cj_ZxVuI.js: OK
+/scan/usr/share/nginx/html/assets/query-page-Du3uL6IP.css: OK
+/scan/usr/share/nginx/html/assets/select-wZPMc1Lk.js: OK
+/scan/usr/share/nginx/html/assets/components-CQbGlC5Q.js: OK
+/scan/usr/share/nginx/html/assets/geist-cyrillic-ext-wght-normal-DjL33-gN.woff2: OK
+/scan/usr/share/nginx/html/assets/skeleton-C6R86LO5.js: OK
+/scan/usr/share/nginx/html/assets/list-pagination-ZXmETM4H.js: OK
+/scan/usr/share/nginx/html/assets/index-D3BiEZj3.css: OK
+/scan/usr/share/nginx/html/assets/check-DAPVMSEk.js: OK
+/scan/usr/share/nginx/html/assets/dialog-BSRDGbrj.js: OK
+/scan/usr/share/nginx/html/assets/vi-D1tdHpVL.js: OK
+/scan/usr/share/nginx/html/assets/change-password-page-KMe2YA7n.js: OK
+/scan/usr/share/nginx/html/assets/format-DX4xq3XG.js: OK
+/scan/usr/share/nginx/html/assets/api-client-BWGCLOEf.js: OK
+/scan/usr/share/nginx/html/assets/login-page-B_WGoeie.js: OK
+/scan/usr/share/nginx/html/assets/table-DW1wxrR5.js: OK
+/scan/usr/share/nginx/html/assets/history-page-NmaXXOIX.js: OK
+/scan/usr/share/nginx/html/assets/forgot-password-page-DUyttEXN.js: OK
+/scan/usr/share/nginx/html/assets/geist-latin-ext-wght-normal-DC-KSUi6.woff2: OK
+/scan/usr/share/nginx/html/assets/badge-DNjd5MvO.js: OK
+/scan/usr/share/nginx/html/assets/geist-vietnamese-wght-normal-6IgcOCM7.woff2: OK
+/scan/usr/share/nginx/html/favicon.svg: OK
+/scan/usr/share/nginx/html/50x.html: OK
+/scan/usr/share/nginx/html/index.html: OK
+/scan/usr/share/apk/keys/riscv64/alpine-devel@lists.alpinelinux.org-60ac2099.rsa.pub: Symbolic link
+/scan/usr/share/apk/keys/riscv64/alpine-devel@lists.alpinelinux.org-616db30d.rsa.pub: Symbolic link
+/scan/usr/share/apk/keys/alpine-devel@lists.alpinelinux.org-5243ef4b.rsa.pub: OK
+/scan/usr/share/apk/keys/alpine-devel@lists.alpinelinux.org-616ac3bc.rsa.pub: OK
+/scan/usr/share/apk/keys/mips64/alpine-devel@lists.alpinelinux.org-5e69ca50.rsa.pub: Symbolic link
+/scan/usr/share/apk/keys/x86/alpine-devel@lists.alpinelinux.org-5243ef4b.rsa.pub: Symbolic link
+/scan/usr/share/apk/keys/x86/alpine-devel@lists.alpinelinux.org-61666e3f.rsa.pub: Symbolic link
+/scan/usr/share/apk/keys/x86/alpine-devel@lists.alpinelinux.org-4a6a0840.rsa.pub: Symbolic link
+/scan/usr/share/apk/keys/alpine-devel@lists.alpinelinux.org-616ae350.rsa.pub: OK
+/scan/usr/share/apk/keys/alpine-devel@lists.alpinelinux.org-5261cecb.rsa.pub: OK
+/scan/usr/share/apk/keys/ppc64le/alpine-devel@lists.alpinelinux.org-58cbb476.rsa.pub: Symbolic link
+/scan/usr/share/apk/keys/ppc64le/alpine-devel@lists.alpinelinux.org-616abc23.rsa.pub: Symbolic link
+/scan/usr/share/apk/keys/alpine-devel@lists.alpinelinux.org-58cbb476.rsa.pub: OK
+/scan/usr/share/apk/keys/alpine-devel@lists.alpinelinux.org-5e69ca50.rsa.pub: OK
+/scan/usr/share/apk/keys/alpine-devel@lists.alpinelinux.org-61666e3f.rsa.pub: OK
+/scan/usr/share/apk/keys/alpine-devel@lists.alpinelinux.org-4a6a0840.rsa.pub: OK
+/scan/usr/share/apk/keys/alpine-devel@lists.alpinelinux.org-66ba20fe.rsa.pub: OK
+/scan/usr/share/apk/keys/armhf/alpine-devel@lists.alpinelinux.org-616a9724.rsa.pub: Symbolic link
+/scan/usr/share/apk/keys/armhf/alpine-devel@lists.alpinelinux.org-524d27bb.rsa.pub: Symbolic link
+/scan/usr/share/apk/keys/armv7/alpine-devel@lists.alpinelinux.org-616adfeb.rsa.pub: Symbolic link
+/scan/usr/share/apk/keys/armv7/alpine-devel@lists.alpinelinux.org-524d27bb.rsa.pub: Symbolic link
+/scan/usr/share/apk/keys/x86_64/alpine-devel@lists.alpinelinux.org-5261cecb.rsa.pub: Symbolic link
+/scan/usr/share/apk/keys/x86_64/alpine-devel@lists.alpinelinux.org-4a6a0840.rsa.pub: Symbolic link
+/scan/usr/share/apk/keys/x86_64/alpine-devel@lists.alpinelinux.org-6165ee59.rsa.pub: Symbolic link
+/scan/usr/share/apk/keys/alpine-devel@lists.alpinelinux.org-58e4f17d.rsa.pub: OK
+/scan/usr/share/apk/keys/alpine-devel@lists.alpinelinux.org-616adfeb.rsa.pub: OK
+/scan/usr/share/apk/keys/alpine-devel@lists.alpinelinux.org-616abc23.rsa.pub: OK
+/scan/usr/share/apk/keys/alpine-devel@lists.alpinelinux.org-616a9724.rsa.pub: OK
+/scan/usr/share/apk/keys/alpine-devel@lists.alpinelinux.org-60ac2099.rsa.pub: OK
+/scan/usr/share/apk/keys/loongarch64/alpine-devel@lists.alpinelinux.org-66ba20fe.rsa.pub: Symbolic link
+/scan/usr/share/apk/keys/alpine-devel@lists.alpinelinux.org-58199dcc.rsa.pub: OK
+/scan/usr/share/apk/keys/alpine-devel@lists.alpinelinux.org-616db30d.rsa.pub: OK
+/scan/usr/share/apk/keys/alpine-devel@lists.alpinelinux.org-6165ee59.rsa.pub: OK
+/scan/usr/share/apk/keys/s390x/alpine-devel@lists.alpinelinux.org-616ac3bc.rsa.pub: Symbolic link
+/scan/usr/share/apk/keys/s390x/alpine-devel@lists.alpinelinux.org-58e4f17d.rsa.pub: Symbolic link
+/scan/usr/share/apk/keys/alpine-devel@lists.alpinelinux.org-524d27bb.rsa.pub: OK
+/scan/usr/share/apk/keys/aarch64/alpine-devel@lists.alpinelinux.org-616ae350.rsa.pub: Symbolic link
+/scan/usr/share/apk/keys/aarch64/alpine-devel@lists.alpinelinux.org-58199dcc.rsa.pub: Symbolic link
+/scan/usr/share/man/man8/nginx.8.gz: OK
+/scan/usr/share/zoneinfo/zone1970.tab: OK
+/scan/usr/share/zoneinfo/UTC: OK
+/scan/usr/share/zoneinfo/MET: OK
+/scan/usr/share/zoneinfo/Australia/Lord_Howe: OK
+/scan/usr/share/zoneinfo/Australia/Hobart: OK
+/scan/usr/share/zoneinfo/Australia/Broken_Hill: OK
+/scan/usr/share/zoneinfo/Australia/Brisbane: OK
+/scan/usr/share/zoneinfo/Australia/South: OK
+/scan/usr/share/zoneinfo/Australia/North: OK
+/scan/usr/share/zoneinfo/Australia/Eucla: OK
+/scan/usr/share/zoneinfo/Australia/Currie: OK
+/scan/usr/share/zoneinfo/Australia/Sydney: OK
+/scan/usr/share/zoneinfo/Australia/Darwin: OK
+/scan/usr/share/zoneinfo/Australia/NSW: OK
+/scan/usr/share/zoneinfo/Australia/Adelaide: OK
+/scan/usr/share/zoneinfo/Australia/LHI: OK
+/scan/usr/share/zoneinfo/Australia/West: OK
+/scan/usr/share/zoneinfo/Australia/Tasmania: OK
+/scan/usr/share/zoneinfo/Australia/Melbourne: OK
+/scan/usr/share/zoneinfo/Australia/Yancowinna: OK
+/scan/usr/share/zoneinfo/Australia/Perth: OK
+/scan/usr/share/zoneinfo/Australia/Queensland: OK
+/scan/usr/share/zoneinfo/Australia/Canberra: OK
+/scan/usr/share/zoneinfo/Australia/ACT: OK
+/scan/usr/share/zoneinfo/Australia/Victoria: OK
+/scan/usr/share/zoneinfo/Australia/Lindeman: OK
+/scan/usr/share/zoneinfo/Egypt: OK
+/scan/usr/share/zoneinfo/WET: OK
+/scan/usr/share/zoneinfo/Asia/Ashkhabad: OK
+/scan/usr/share/zoneinfo/Asia/Ujung_Pandang: OK
+/scan/usr/share/zoneinfo/Asia/Brunei: OK
+/scan/usr/share/zoneinfo/Asia/Hebron: OK
+/scan/usr/share/zoneinfo/Asia/Thimphu: OK
+/scan/usr/share/zoneinfo/Asia/Nicosia: OK
+/scan/usr/share/zoneinfo/Asia/Makassar: OK
+/scan/usr/share/zoneinfo/Asia/Kabul: OK
+/scan/usr/share/zoneinfo/Asia/Yekaterinburg: OK
+/scan/usr/share/zoneinfo/Asia/Atyrau: OK
+/scan/usr/share/zoneinfo/Asia/Tehran: OK
+/scan/usr/share/zoneinfo/Asia/Novosibirsk: OK
+/scan/usr/share/zoneinfo/Asia/Calcutta: OK
+/scan/usr/share/zoneinfo/Asia/Kamchatka: OK
+/scan/usr/share/zoneinfo/Asia/Beirut: OK
+/scan/usr/share/zoneinfo/Asia/Ho_Chi_Minh: OK
+/scan/usr/share/zoneinfo/Asia/Yakutsk: OK
+/scan/usr/share/zoneinfo/Asia/Ust-Nera: OK
+/scan/usr/share/zoneinfo/Asia/Pyongyang: OK
+/scan/usr/share/zoneinfo/Asia/Samarkand: OK
+/scan/usr/share/zoneinfo/Asia/Choibalsan: OK
+/scan/usr/share/zoneinfo/Asia/Ashgabat: OK
+/scan/usr/share/zoneinfo/Asia/Tashkent: OK
+/scan/usr/share/zoneinfo/Asia/Hong_Kong: OK
+/scan/usr/share/zoneinfo/Asia/Dubai: OK
+/scan/usr/share/zoneinfo/Asia/Magadan: OK
+/scan/usr/share/zoneinfo/Asia/Istanbul: OK
+/scan/usr/share/zoneinfo/Asia/Phnom_Penh: OK
+/scan/usr/share/zoneinfo/Asia/Kuala_Lumpur: OK
+/scan/usr/share/zoneinfo/Asia/Dacca: OK
+/scan/usr/share/zoneinfo/Asia/Baku: OK
+/scan/usr/share/zoneinfo/Asia/Yangon: OK
+/scan/usr/share/zoneinfo/Asia/Bangkok: OK
+/scan/usr/share/zoneinfo/Asia/Vladivostok: OK
+/scan/usr/share/zoneinfo/Asia/Chongqing: OK
+/scan/usr/share/zoneinfo/Asia/Taipei: OK
+/scan/usr/share/zoneinfo/Asia/Tomsk: OK
+/scan/usr/share/zoneinfo/Asia/Khandyga: OK
+/scan/usr/share/zoneinfo/Asia/Qatar: OK
+/scan/usr/share/zoneinfo/Asia/Thimbu: OK
+/scan/usr/share/zoneinfo/Asia/Kolkata: OK
+/scan/usr/share/zoneinfo/Asia/Tbilisi: OK
+/scan/usr/share/zoneinfo/Asia/Kathmandu: OK
+/scan/usr/share/zoneinfo/Asia/Jerusalem: OK
+/scan/usr/share/zoneinfo/Asia/Baghdad: OK
+/scan/usr/share/zoneinfo/Asia/Hovd: OK
+/scan/usr/share/zoneinfo/Asia/Novokuznetsk: OK
+/scan/usr/share/zoneinfo/Asia/Famagusta: OK
+/scan/usr/share/zoneinfo/Asia/Qyzylorda: OK
+/scan/usr/share/zoneinfo/Asia/Katmandu: OK
+/scan/usr/share/zoneinfo/Asia/Karachi: OK
+/scan/usr/share/zoneinfo/Asia/Riyadh: OK
+/scan/usr/share/zoneinfo/Asia/Damascus: OK
+/scan/usr/share/zoneinfo/Asia/Oral: OK
+/scan/usr/share/zoneinfo/Asia/Jakarta: OK
+/scan/usr/share/zoneinfo/Asia/Ulan_Bator: OK
+/scan/usr/share/zoneinfo/Asia/Gaza: OK
+/scan/usr/share/zoneinfo/Asia/Tokyo: OK
+/scan/usr/share/zoneinfo/Asia/Bishkek: OK
+/scan/usr/share/zoneinfo/Asia/Yerevan: OK
+/scan/usr/share/zoneinfo/Asia/Dhaka: OK
+/scan/usr/share/zoneinfo/Asia/Muscat: OK
+/scan/usr/share/zoneinfo/Asia/Aden: OK
+/scan/usr/share/zoneinfo/Asia/Kuwait: OK
+/scan/usr/share/zoneinfo/Asia/Vientiane: OK
+/scan/usr/share/zoneinfo/Asia/Rangoon: OK
+/scan/usr/share/zoneinfo/Asia/Macao: OK
+/scan/usr/share/zoneinfo/Asia/Shanghai: OK
+/scan/usr/share/zoneinfo/Asia/Chita: OK
+/scan/usr/share/zoneinfo/Asia/Kashgar: OK
+/scan/usr/share/zoneinfo/Asia/Dushanbe: OK
+/scan/usr/share/zoneinfo/Asia/Krasnoyarsk: OK
+/scan/usr/share/zoneinfo/Asia/Srednekolymsk: OK
+/scan/usr/share/zoneinfo/Asia/Omsk: OK
+/scan/usr/share/zoneinfo/Asia/Saigon: OK
+/scan/usr/share/zoneinfo/Asia/Kuching: OK
+/scan/usr/share/zoneinfo/Asia/Jayapura: OK
+/scan/usr/share/zoneinfo/Asia/Anadyr: OK
+/scan/usr/share/zoneinfo/Asia/Ulaanbaatar: OK
+/scan/usr/share/zoneinfo/Asia/Macau: OK
+/scan/usr/share/zoneinfo/Asia/Seoul: OK
+/scan/usr/share/zoneinfo/Asia/Amman: OK
+/scan/usr/share/zoneinfo/Asia/Bahrain: OK
+/scan/usr/share/zoneinfo/Asia/Qostanay: OK
+/scan/usr/share/zoneinfo/Asia/Urumqi: OK
+/scan/usr/share/zoneinfo/Asia/Aqtau: OK
+/scan/usr/share/zoneinfo/Asia/Aqtobe: OK
+/scan/usr/share/zoneinfo/Asia/Irkutsk: OK
+/scan/usr/share/zoneinfo/Asia/Harbin: OK
+/scan/usr/share/zoneinfo/Asia/Chungking: OK
+/scan/usr/share/zoneinfo/Asia/Almaty: OK
+/scan/usr/share/zoneinfo/Asia/Tel_Aviv: OK
+/scan/usr/share/zoneinfo/Asia/Pontianak: OK
+/scan/usr/share/zoneinfo/Asia/Singapore: OK
+/scan/usr/share/zoneinfo/Asia/Manila: OK
+/scan/usr/share/zoneinfo/Asia/Barnaul: OK
+/scan/usr/share/zoneinfo/Asia/Colombo: OK
+/scan/usr/share/zoneinfo/Asia/Sakhalin: OK
+/scan/usr/share/zoneinfo/Asia/Dili: OK
+/scan/usr/share/zoneinfo/Japan: OK
+/scan/usr/share/zoneinfo/Atlantic/St_Helena: OK
+/scan/usr/share/zoneinfo/Atlantic/Bermuda: OK
+/scan/usr/share/zoneinfo/Atlantic/South_Georgia: OK
+/scan/usr/share/zoneinfo/Atlantic/Canary: OK
+/scan/usr/share/zoneinfo/Atlantic/Cape_Verde: OK
+/scan/usr/share/zoneinfo/Atlantic/Stanley: OK
+/scan/usr/share/zoneinfo/Atlantic/Faeroe: OK
+/scan/usr/share/zoneinfo/Atlantic/Reykjavik: OK
+/scan/usr/share/zoneinfo/Atlantic/Azores: OK
+/scan/usr/share/zoneinfo/Atlantic/Madeira: OK
+/scan/usr/share/zoneinfo/Atlantic/Faroe: OK
+/scan/usr/share/zoneinfo/Atlantic/Jan_Mayen: OK
+/scan/usr/share/zoneinfo/MST7MDT: OK
+/scan/usr/share/zoneinfo/Navajo: OK
+/scan/usr/share/zoneinfo/W-SU: OK
+/scan/usr/share/zoneinfo/Mexico/General: OK
+/scan/usr/share/zoneinfo/Mexico/BajaNorte: OK
+/scan/usr/share/zoneinfo/Mexico/BajaSur: OK
+/scan/usr/share/zoneinfo/EST5EDT: OK
+/scan/usr/share/zoneinfo/iso3166.tab: OK
+/scan/usr/share/zoneinfo/Iran: OK
+/scan/usr/share/zoneinfo/Turkey: OK
+/scan/usr/share/zoneinfo/Brazil/East: OK
+/scan/usr/share/zoneinfo/Brazil/West: OK
+/scan/usr/share/zoneinfo/Brazil/DeNoronha: OK
+/scan/usr/share/zoneinfo/Brazil/Acre: OK
+/scan/usr/share/zoneinfo/GMT: OK
+/scan/usr/share/zoneinfo/Canada/Central: OK
+/scan/usr/share/zoneinfo/Canada/Atlantic: OK
+/scan/usr/share/zoneinfo/Canada/Eastern: OK
+/scan/usr/share/zoneinfo/Canada/Saskatchewan: OK
+/scan/usr/share/zoneinfo/Canada/Newfoundland: OK
+/scan/usr/share/zoneinfo/Canada/Pacific: OK
+/scan/usr/share/zoneinfo/Canada/Yukon: OK
+/scan/usr/share/zoneinfo/Canada/Mountain: OK
+/scan/usr/share/zoneinfo/Zulu: OK
+/scan/usr/share/zoneinfo/UCT: OK
+/scan/usr/share/zoneinfo/Pacific/Honolulu: OK
+/scan/usr/share/zoneinfo/Pacific/Guadalcanal: OK
+/scan/usr/share/zoneinfo/Pacific/Tarawa: OK
+/scan/usr/share/zoneinfo/Pacific/Nauru: OK
+/scan/usr/share/zoneinfo/Pacific/Marquesas: OK
+/scan/usr/share/zoneinfo/Pacific/Majuro: OK
+/scan/usr/share/zoneinfo/Pacific/Noumea: OK
+/scan/usr/share/zoneinfo/Pacific/Rarotonga: OK
+/scan/usr/share/zoneinfo/Pacific/Fiji: OK
+/scan/usr/share/zoneinfo/Pacific/Niue: OK
+/scan/usr/share/zoneinfo/Pacific/Truk: OK
+/scan/usr/share/zoneinfo/Pacific/Wallis: OK
+/scan/usr/share/zoneinfo/Pacific/Efate: OK
+/scan/usr/share/zoneinfo/Pacific/Enderbury: OK
+/scan/usr/share/zoneinfo/Pacific/Samoa: OK
+/scan/usr/share/zoneinfo/Pacific/Bougainville: OK
+/scan/usr/share/zoneinfo/Pacific/Galapagos: OK
+/scan/usr/share/zoneinfo/Pacific/Chatham: OK
+/scan/usr/share/zoneinfo/Pacific/Pago_Pago: OK
+/scan/usr/share/zoneinfo/Pacific/Ponape: OK
+/scan/usr/share/zoneinfo/Pacific/Fakaofo: OK
+/scan/usr/share/zoneinfo/Pacific/Midway: OK
+/scan/usr/share/zoneinfo/Pacific/Tongatapu: OK
+/scan/usr/share/zoneinfo/Pacific/Pohnpei: OK
+/scan/usr/share/zoneinfo/Pacific/Funafuti: OK
+/scan/usr/share/zoneinfo/Pacific/Kwajalein: OK
+/scan/usr/share/zoneinfo/Pacific/Yap: OK
+/scan/usr/share/zoneinfo/Pacific/Tahiti: OK
+/scan/usr/share/zoneinfo/Pacific/Easter: OK
+/scan/usr/share/zoneinfo/Pacific/Saipan: OK
+/scan/usr/share/zoneinfo/Pacific/Port_Moresby: OK
+/scan/usr/share/zoneinfo/Pacific/Kosrae: OK
+/scan/usr/share/zoneinfo/Pacific/Johnston: OK
+/scan/usr/share/zoneinfo/Pacific/Chuuk: OK
+/scan/usr/share/zoneinfo/Pacific/Gambier: OK
+/scan/usr/share/zoneinfo/Pacific/Apia: OK
+/scan/usr/share/zoneinfo/Pacific/Auckland: OK
+/scan/usr/share/zoneinfo/Pacific/Pitcairn: OK
+/scan/usr/share/zoneinfo/Pacific/Kiritimati: OK
+/scan/usr/share/zoneinfo/Pacific/Wake: OK
+/scan/usr/share/zoneinfo/Pacific/Kanton: OK
+/scan/usr/share/zoneinfo/Pacific/Palau: OK
+/scan/usr/share/zoneinfo/Pacific/Guam: OK
+/scan/usr/share/zoneinfo/Pacific/Norfolk: OK
+/scan/usr/share/zoneinfo/Universal: OK
+/scan/usr/share/zoneinfo/GB: OK
+/scan/usr/share/zoneinfo/Greenwich: OK
+/scan/usr/share/zoneinfo/PRC: OK
+/scan/usr/share/zoneinfo/posixrules: OK
+/scan/usr/share/zoneinfo/EST: OK
+/scan/usr/share/zoneinfo/leap-seconds.list: OK
+/scan/usr/share/zoneinfo/CST6CDT: OK
+/scan/usr/share/zoneinfo/GMT-0: OK
+/scan/usr/share/zoneinfo/NZ-CHAT: OK
+/scan/usr/share/zoneinfo/US/Indiana-Starke: OK
+/scan/usr/share/zoneinfo/US/Central: OK
+/scan/usr/share/zoneinfo/US/Aleutian: OK
+/scan/usr/share/zoneinfo/US/Arizona: OK
+/scan/usr/share/zoneinfo/US/Eastern: OK
+/scan/usr/share/zoneinfo/US/Hawaii: OK
+/scan/usr/share/zoneinfo/US/Samoa: OK
+/scan/usr/share/zoneinfo/US/Alaska: OK
+/scan/usr/share/zoneinfo/US/Pacific: OK
+/scan/usr/share/zoneinfo/US/Michigan: OK
+/scan/usr/share/zoneinfo/US/Mountain: OK
+/scan/usr/share/zoneinfo/US/East-Indiana: OK
+/scan/usr/share/zoneinfo/EET: OK
+/scan/usr/share/zoneinfo/GMT+0: OK
+/scan/usr/share/zoneinfo/MST: OK
+/scan/usr/share/zoneinfo/PST8PDT: OK
+/scan/usr/share/zoneinfo/Hongkong: OK
+/scan/usr/share/zoneinfo/GB-Eire: OK
+/scan/usr/share/zoneinfo/Kwajalein: OK
+/scan/usr/share/zoneinfo/NZ: OK
+/scan/usr/share/zoneinfo/Cuba: OK
+/scan/usr/share/zoneinfo/ROC: OK
+/scan/usr/share/zoneinfo/CET: OK
+/scan/usr/share/zoneinfo/Libya: OK
+/scan/usr/share/zoneinfo/Jamaica: OK
+/scan/usr/share/zoneinfo/Eire: OK
+/scan/usr/share/zoneinfo/Chile/Continental: OK
+/scan/usr/share/zoneinfo/Chile/EasterIsland: OK
+/scan/usr/share/zoneinfo/Factory: OK
+/scan/usr/share/zoneinfo/Antarctica/Macquarie: OK
+/scan/usr/share/zoneinfo/Antarctica/Troll: OK
+/scan/usr/share/zoneinfo/Antarctica/Syowa: OK
+/scan/usr/share/zoneinfo/Antarctica/South_Pole: OK
+/scan/usr/share/zoneinfo/Antarctica/Rothera: OK
+/scan/usr/share/zoneinfo/Antarctica/Casey: OK
+/scan/usr/share/zoneinfo/Antarctica/DumontDUrville: OK
+/scan/usr/share/zoneinfo/Antarctica/Mawson: OK
+/scan/usr/share/zoneinfo/Antarctica/Palmer: OK
+/scan/usr/share/zoneinfo/Antarctica/Davis: OK
+/scan/usr/share/zoneinfo/Antarctica/McMurdo: OK
+/scan/usr/share/zoneinfo/Antarctica/Vostok: OK
+/scan/usr/share/zoneinfo/Iceland: OK
+/scan/usr/share/zoneinfo/Portugal: OK
+/scan/usr/share/zoneinfo/Israel: OK
+/scan/usr/share/zoneinfo/Europe/Dublin: OK
+/scan/usr/share/zoneinfo/Europe/Jersey: OK
+/scan/usr/share/zoneinfo/Europe/Nicosia: OK
+/scan/usr/share/zoneinfo/Europe/Podgorica: OK
+/scan/usr/share/zoneinfo/Europe/Vaduz: OK
+/scan/usr/share/zoneinfo/Europe/Athens: OK
+/scan/usr/share/zoneinfo/Europe/Belgrade: OK
+/scan/usr/share/zoneinfo/Europe/Skopje: OK
+/scan/usr/share/zoneinfo/Europe/Isle_of_Man: OK
+/scan/usr/share/zoneinfo/Europe/Tirane: OK
+/scan/usr/share/zoneinfo/Europe/Moscow: OK
+/scan/usr/share/zoneinfo/Europe/Ljubljana: OK
+/scan/usr/share/zoneinfo/Europe/Helsinki: OK
+/scan/usr/share/zoneinfo/Europe/Minsk: OK
+/scan/usr/share/zoneinfo/Europe/Samara: OK
+/scan/usr/share/zoneinfo/Europe/Warsaw: OK
+/scan/usr/share/zoneinfo/Europe/Istanbul: OK
+/scan/usr/share/zoneinfo/Europe/Andorra: OK
+/scan/usr/share/zoneinfo/Europe/Lisbon: OK
+/scan/usr/share/zoneinfo/Europe/Zurich: OK
+/scan/usr/share/zoneinfo/Europe/Guernsey: OK
+/scan/usr/share/zoneinfo/Europe/Chisinau: OK
+/scan/usr/share/zoneinfo/Europe/Budapest: OK
+/scan/usr/share/zoneinfo/Europe/Belfast: OK
+/scan/usr/share/zoneinfo/Europe/Sarajevo: OK
+/scan/usr/share/zoneinfo/Europe/Uzhgorod: OK
+/scan/usr/share/zoneinfo/Europe/Copenhagen: OK
+/scan/usr/share/zoneinfo/Europe/Simferopol: OK
+/scan/usr/share/zoneinfo/Europe/Bratislava: OK
+/scan/usr/share/zoneinfo/Europe/London: OK
+/scan/usr/share/zoneinfo/Europe/Oslo: OK
+/scan/usr/share/zoneinfo/Europe/Astrakhan: OK
+/scan/usr/share/zoneinfo/Europe/Stockholm: OK
+/scan/usr/share/zoneinfo/Europe/Bucharest: OK
+/scan/usr/share/zoneinfo/Europe/Madrid: OK
+/scan/usr/share/zoneinfo/Europe/Volgograd: OK
+/scan/usr/share/zoneinfo/Europe/Sofia: OK
+/scan/usr/share/zoneinfo/Europe/Vienna: OK
+/scan/usr/share/zoneinfo/Europe/Saratov: OK
+/scan/usr/share/zoneinfo/Europe/Monaco: OK
+/scan/usr/share/zoneinfo/Europe/Gibraltar: OK
+/scan/usr/share/zoneinfo/Europe/Ulyanovsk: OK
+/scan/usr/share/zoneinfo/Europe/Riga: OK
+/scan/usr/share/zoneinfo/Europe/Kirov: OK
+/scan/usr/share/zoneinfo/Europe/San_Marino: OK
+/scan/usr/share/zoneinfo/Europe/Vilnius: OK
+/scan/usr/share/zoneinfo/Europe/Malta: OK
+/scan/usr/share/zoneinfo/Europe/Brussels: OK
+/scan/usr/share/zoneinfo/Europe/Zagreb: OK
+/scan/usr/share/zoneinfo/Europe/Tiraspol: OK
+/scan/usr/share/zoneinfo/Europe/Kiev: OK
+/scan/usr/share/zoneinfo/Europe/Tallinn: OK
+/scan/usr/share/zoneinfo/Europe/Zaporozhye: OK
+/scan/usr/share/zoneinfo/Europe/Busingen: OK
+/scan/usr/share/zoneinfo/Europe/Prague: OK
+/scan/usr/share/zoneinfo/Europe/Rome: OK
+/scan/usr/share/zoneinfo/Europe/Vatican: OK
+/scan/usr/share/zoneinfo/Europe/Berlin: OK
+/scan/usr/share/zoneinfo/Europe/Kyiv: OK
+/scan/usr/share/zoneinfo/Europe/Paris: OK
+/scan/usr/share/zoneinfo/Europe/Luxembourg: OK
+/scan/usr/share/zoneinfo/Europe/Kaliningrad: OK
+/scan/usr/share/zoneinfo/Europe/Amsterdam: OK
+/scan/usr/share/zoneinfo/Europe/Mariehamn: OK
+/scan/usr/share/zoneinfo/Etc/GMT-1: OK
+/scan/usr/share/zoneinfo/Etc/GMT-7: OK
+/scan/usr/share/zoneinfo/Etc/UTC: OK
+/scan/usr/share/zoneinfo/Etc/GMT+9: OK
+/scan/usr/share/zoneinfo/Etc/GMT+6: OK
+/scan/usr/share/zoneinfo/Etc/GMT-3: OK
+/scan/usr/share/zoneinfo/Etc/GMT-5: OK
+/scan/usr/share/zoneinfo/Etc/GMT+7: OK
+/scan/usr/share/zoneinfo/Etc/GMT-14: OK
+/scan/usr/share/zoneinfo/Etc/GMT: OK
+/scan/usr/share/zoneinfo/Etc/Zulu: OK
+/scan/usr/share/zoneinfo/Etc/GMT-13: OK
+/scan/usr/share/zoneinfo/Etc/UCT: OK
+/scan/usr/share/zoneinfo/Etc/Universal: OK
+/scan/usr/share/zoneinfo/Etc/GMT+2: OK
+/scan/usr/share/zoneinfo/Etc/GMT-12: OK
+/scan/usr/share/zoneinfo/Etc/GMT-10: OK
+/scan/usr/share/zoneinfo/Etc/Greenwich: OK
+/scan/usr/share/zoneinfo/Etc/GMT+4: OK
+/scan/usr/share/zoneinfo/Etc/GMT+3: OK
+/scan/usr/share/zoneinfo/Etc/GMT-0: OK
+/scan/usr/share/zoneinfo/Etc/GMT-4: OK
+/scan/usr/share/zoneinfo/Etc/GMT+0: OK
+/scan/usr/share/zoneinfo/Etc/GMT+11: OK
+/scan/usr/share/zoneinfo/Etc/GMT+12: OK
+/scan/usr/share/zoneinfo/Etc/GMT+1: OK
+/scan/usr/share/zoneinfo/Etc/GMT-9: OK
+/scan/usr/share/zoneinfo/Etc/GMT-2: OK
+/scan/usr/share/zoneinfo/Etc/GMT-6: OK
+/scan/usr/share/zoneinfo/Etc/GMT-8: OK
+/scan/usr/share/zoneinfo/Etc/GMT+5: OK
+/scan/usr/share/zoneinfo/Etc/GMT-11: OK
+/scan/usr/share/zoneinfo/Etc/GMT0: OK
+/scan/usr/share/zoneinfo/Etc/GMT+8: OK
+/scan/usr/share/zoneinfo/Etc/GMT+10: OK
+/scan/usr/share/zoneinfo/America/Halifax: OK
+/scan/usr/share/zoneinfo/America/Porto_Velho: OK
+/scan/usr/share/zoneinfo/America/Danmarkshavn: OK
+/scan/usr/share/zoneinfo/America/Godthab: OK
+/scan/usr/share/zoneinfo/America/Shiprock: OK
+/scan/usr/share/zoneinfo/America/Puerto_Rico: OK
+/scan/usr/share/zoneinfo/America/Whitehorse: OK
+/scan/usr/share/zoneinfo/America/Anguilla: OK
+/scan/usr/share/zoneinfo/America/Edmonton: OK
+/scan/usr/share/zoneinfo/America/Dawson: OK
+/scan/usr/share/zoneinfo/America/Nome: OK
+/scan/usr/share/zoneinfo/America/Guyana: OK
+/scan/usr/share/zoneinfo/America/Costa_Rica: OK
+/scan/usr/share/zoneinfo/America/Buenos_Aires: OK
+/scan/usr/share/zoneinfo/America/Montevideo: OK
+/scan/usr/share/zoneinfo/America/Cayenne: OK
+/scan/usr/share/zoneinfo/America/Ensenada: OK
+/scan/usr/share/zoneinfo/America/Sitka: OK
+/scan/usr/share/zoneinfo/America/Bahia: OK
+/scan/usr/share/zoneinfo/America/Fort_Wayne: OK
+/scan/usr/share/zoneinfo/America/Blanc-Sablon: OK
+/scan/usr/share/zoneinfo/America/Yakutat: OK
+/scan/usr/share/zoneinfo/America/Hermosillo: OK
+/scan/usr/share/zoneinfo/America/Nuuk: OK
+/scan/usr/share/zoneinfo/America/Port_of_Spain: OK
+/scan/usr/share/zoneinfo/America/Chicago: OK
+/scan/usr/share/zoneinfo/America/Santarem: OK
+/scan/usr/share/zoneinfo/America/Caracas: OK
+/scan/usr/share/zoneinfo/America/Sao_Paulo: OK
+/scan/usr/share/zoneinfo/America/St_Vincent: OK
+/scan/usr/share/zoneinfo/America/Thule: OK
+/scan/usr/share/zoneinfo/America/Louisville: OK
+/scan/usr/share/zoneinfo/America/Atka: OK
+/scan/usr/share/zoneinfo/America/Juneau: OK
+/scan/usr/share/zoneinfo/America/Lima: OK
+/scan/usr/share/zoneinfo/America/Curacao: OK
+/scan/usr/share/zoneinfo/America/Chihuahua: OK
+/scan/usr/share/zoneinfo/America/Manaus: OK
+/scan/usr/share/zoneinfo/America/Glace_Bay: OK
+/scan/usr/share/zoneinfo/America/Metlakatla: OK
+/scan/usr/share/zoneinfo/America/Rainy_River: OK
+/scan/usr/share/zoneinfo/America/Tortola: OK
+/scan/usr/share/zoneinfo/America/Cordoba: OK
+/scan/usr/share/zoneinfo/America/Panama: OK
+/scan/usr/share/zoneinfo/America/Kralendijk: OK
+/scan/usr/share/zoneinfo/America/Antigua: OK
+/scan/usr/share/zoneinfo/America/Bogota: OK
+/scan/usr/share/zoneinfo/America/El_Salvador: OK
+/scan/usr/share/zoneinfo/America/Iqaluit: OK
+/scan/usr/share/zoneinfo/America/Anchorage: OK
+/scan/usr/share/zoneinfo/America/Creston: OK
+/scan/usr/share/zoneinfo/America/Belem: OK
+/scan/usr/share/zoneinfo/America/Port-au-Prince: OK
+/scan/usr/share/zoneinfo/America/St_Johns: OK
+/scan/usr/share/zoneinfo/America/Guayaquil: OK
+/scan/usr/share/zoneinfo/America/Managua: OK
+/scan/usr/share/zoneinfo/America/Resolute: OK
+/scan/usr/share/zoneinfo/America/Scoresbysund: OK
+/scan/usr/share/zoneinfo/America/Mendoza: OK
+/scan/usr/share/zoneinfo/America/Santiago: OK
+/scan/usr/share/zoneinfo/America/Kentucky/Louisville: OK
+/scan/usr/share/zoneinfo/America/Kentucky/Monticello: OK
+/scan/usr/share/zoneinfo/America/Merida: OK
+/scan/usr/share/zoneinfo/America/Maceio: OK
+/scan/usr/share/zoneinfo/America/Ciudad_Juarez: OK
+/scan/usr/share/zoneinfo/America/New_York: OK
+/scan/usr/share/zoneinfo/America/Detroit: OK
+/scan/usr/share/zoneinfo/America/Cancun: OK
+/scan/usr/share/zoneinfo/America/Belize: OK
+/scan/usr/share/zoneinfo/America/Montserrat: OK
+/scan/usr/share/zoneinfo/America/Guatemala: OK
+/scan/usr/share/zoneinfo/America/Cayman: OK
+/scan/usr/share/zoneinfo/America/North_Dakota/Beulah: OK
+/scan/usr/share/zoneinfo/America/North_Dakota/Center: OK
+/scan/usr/share/zoneinfo/America/North_Dakota/New_Salem: OK
+/scan/usr/share/zoneinfo/America/Santa_Isabel: OK
+/scan/usr/share/zoneinfo/America/Los_Angeles: OK
+/scan/usr/share/zoneinfo/America/Phoenix: OK
+/scan/usr/share/zoneinfo/America/Vancouver: OK
+/scan/usr/share/zoneinfo/America/Swift_Current: OK
+/scan/usr/share/zoneinfo/America/Fortaleza: OK
+/scan/usr/share/zoneinfo/America/Recife: OK
+/scan/usr/share/zoneinfo/America/Tegucigalpa: OK
+/scan/usr/share/zoneinfo/America/Ojinaga: OK
+/scan/usr/share/zoneinfo/America/Yellowknife: OK
+/scan/usr/share/zoneinfo/America/Fort_Nelson: OK
+/scan/usr/share/zoneinfo/America/Lower_Princes: OK
+/scan/usr/share/zoneinfo/America/Paramaribo: OK
+/scan/usr/share/zoneinfo/America/Noronha: OK
+/scan/usr/share/zoneinfo/America/Campo_Grande: OK
+/scan/usr/share/zoneinfo/America/Cambridge_Bay: OK
+/scan/usr/share/zoneinfo/America/Winnipeg: OK
+/scan/usr/share/zoneinfo/America/Argentina/San_Luis: OK
+/scan/usr/share/zoneinfo/America/Argentina/Buenos_Aires: OK
+/scan/usr/share/zoneinfo/America/Argentina/Cordoba: OK
+/scan/usr/share/zoneinfo/America/Argentina/La_Rioja: OK
+/scan/usr/share/zoneinfo/America/Argentina/Mendoza: OK
+/scan/usr/share/zoneinfo/America/Argentina/Rio_Gallegos: OK
+/scan/usr/share/zoneinfo/America/Argentina/Tucuman: OK
+/scan/usr/share/zoneinfo/America/Argentina/Ushuaia: OK
+/scan/usr/share/zoneinfo/America/Argentina/Salta: OK
+/scan/usr/share/zoneinfo/America/Argentina/Jujuy: OK
+/scan/usr/share/zoneinfo/America/Argentina/San_Juan: OK
+/scan/usr/share/zoneinfo/America/Argentina/Catamarca: OK
+/scan/usr/share/zoneinfo/America/Argentina/ComodRivadavia: OK
+/scan/usr/share/zoneinfo/America/Asuncion: OK
+/scan/usr/share/zoneinfo/America/Menominee: OK
+/scan/usr/share/zoneinfo/America/Barbados: OK
+/scan/usr/share/zoneinfo/America/Adak: OK
+/scan/usr/share/zoneinfo/America/Atikokan: OK
+/scan/usr/share/zoneinfo/America/Marigot: OK
+/scan/usr/share/zoneinfo/America/Indianapolis: OK
+/scan/usr/share/zoneinfo/America/Coyhaique: OK
+/scan/usr/share/zoneinfo/America/Grand_Turk: OK
+/scan/usr/share/zoneinfo/America/Monterrey: OK
+/scan/usr/share/zoneinfo/America/Toronto: OK
+/scan/usr/share/zoneinfo/America/Indiana/Marengo: OK
+/scan/usr/share/zoneinfo/America/Indiana/Tell_City: OK
+/scan/usr/share/zoneinfo/America/Indiana/Vevay: OK
+/scan/usr/share/zoneinfo/America/Indiana/Petersburg: OK
+/scan/usr/share/zoneinfo/America/Indiana/Winamac: OK
+/scan/usr/share/zoneinfo/America/Indiana/Vincennes: OK
+/scan/usr/share/zoneinfo/America/Indiana/Indianapolis: OK
+/scan/usr/share/zoneinfo/America/Indiana/Knox: OK
+/scan/usr/share/zoneinfo/America/Nassau: OK
+/scan/usr/share/zoneinfo/America/Cuiaba: OK
+/scan/usr/share/zoneinfo/America/Dawson_Creek: OK
+/scan/usr/share/zoneinfo/America/Coral_Harbour: OK
+/scan/usr/share/zoneinfo/America/Mazatlan: OK
+/scan/usr/share/zoneinfo/America/Regina: OK
+/scan/usr/share/zoneinfo/America/Jujuy: OK
+/scan/usr/share/zoneinfo/America/Porto_Acre: OK
+/scan/usr/share/zoneinfo/America/Rankin_Inlet: OK
+/scan/usr/share/zoneinfo/America/Miquelon: OK
+/scan/usr/share/zoneinfo/America/Havana: OK
+/scan/usr/share/zoneinfo/America/Mexico_City: OK
+/scan/usr/share/zoneinfo/America/Goose_Bay: OK
+/scan/usr/share/zoneinfo/America/Grenada: OK
+/scan/usr/share/zoneinfo/America/Virgin: OK
+/scan/usr/share/zoneinfo/America/Inuvik: OK
+/scan/usr/share/zoneinfo/America/Matamoros: OK
+/scan/usr/share/zoneinfo/America/Punta_Arenas: OK
+/scan/usr/share/zoneinfo/America/Pangnirtung: OK
+/scan/usr/share/zoneinfo/America/Jamaica: OK
+/scan/usr/share/zoneinfo/America/Rosario: OK
+/scan/usr/share/zoneinfo/America/Bahia_Banderas: OK
+/scan/usr/share/zoneinfo/America/Boise: OK
+/scan/usr/share/zoneinfo/America/Tijuana: OK
+/scan/usr/share/zoneinfo/America/Denver: OK
+/scan/usr/share/zoneinfo/America/Guadeloupe: OK
+/scan/usr/share/zoneinfo/America/St_Lucia: OK
+/scan/usr/share/zoneinfo/America/Martinique: OK
+/scan/usr/share/zoneinfo/America/Dominica: OK
+/scan/usr/share/zoneinfo/America/Catamarca: OK
+/scan/usr/share/zoneinfo/America/Thunder_Bay: OK
+/scan/usr/share/zoneinfo/America/St_Thomas: OK
+/scan/usr/share/zoneinfo/America/Moncton: OK
+/scan/usr/share/zoneinfo/America/Eirunepe: OK
+/scan/usr/share/zoneinfo/America/Rio_Branco: OK
+/scan/usr/share/zoneinfo/America/Araguaina: OK
+/scan/usr/share/zoneinfo/America/Knox_IN: OK
+/scan/usr/share/zoneinfo/America/Santo_Domingo: OK
+/scan/usr/share/zoneinfo/America/Montreal: OK
+/scan/usr/share/zoneinfo/America/Aruba: OK
+/scan/usr/share/zoneinfo/America/St_Barthelemy: OK
+/scan/usr/share/zoneinfo/America/La_Paz: OK
+/scan/usr/share/zoneinfo/America/St_Kitts: OK
+/scan/usr/share/zoneinfo/America/Boa_Vista: OK
+/scan/usr/share/zoneinfo/America/Nipigon: OK
+/scan/usr/share/zoneinfo/Arctic/Longyearbyen: OK
+/scan/usr/share/zoneinfo/Indian/Cocos: OK
+/scan/usr/share/zoneinfo/Indian/Maldives: OK
+/scan/usr/share/zoneinfo/Indian/Mauritius: OK
+/scan/usr/share/zoneinfo/Indian/Mahe: OK
+/scan/usr/share/zoneinfo/Indian/Comoro: OK
+/scan/usr/share/zoneinfo/Indian/Kerguelen: OK
+/scan/usr/share/zoneinfo/Indian/Chagos: OK
+/scan/usr/share/zoneinfo/Indian/Antananarivo: OK
+/scan/usr/share/zoneinfo/Indian/Christmas: OK
+/scan/usr/share/zoneinfo/Indian/Reunion: OK
+/scan/usr/share/zoneinfo/Indian/Mayotte: OK
+/scan/usr/share/zoneinfo/ROK: OK
+/scan/usr/share/zoneinfo/GMT0: OK
+/scan/usr/share/zoneinfo/HST: OK
+/scan/usr/share/zoneinfo/Singapore: OK
+/scan/usr/share/zoneinfo/zone.tab: OK
+/scan/usr/share/zoneinfo/Poland: OK
+/scan/usr/share/zoneinfo/Africa/Casablanca: OK
+/scan/usr/share/zoneinfo/Africa/Tripoli: OK
+/scan/usr/share/zoneinfo/Africa/Brazzaville: OK
+/scan/usr/share/zoneinfo/Africa/Ndjamena: OK
+/scan/usr/share/zoneinfo/Africa/Cairo: OK
+/scan/usr/share/zoneinfo/Africa/Mbabane: OK
+/scan/usr/share/zoneinfo/Africa/Dar_es_Salaam: OK
+/scan/usr/share/zoneinfo/Africa/Freetown: OK
+/scan/usr/share/zoneinfo/Africa/Kampala: OK
+/scan/usr/share/zoneinfo/Africa/Juba: OK
+/scan/usr/share/zoneinfo/Africa/Harare: OK
+/scan/usr/share/zoneinfo/Africa/Lusaka: OK
+/scan/usr/share/zoneinfo/Africa/Lubumbashi: OK
+/scan/usr/share/zoneinfo/Africa/Maseru: OK
+/scan/usr/share/zoneinfo/Africa/Gaborone: OK
+/scan/usr/share/zoneinfo/Africa/Lagos: OK
+/scan/usr/share/zoneinfo/Africa/Bissau: OK
+/scan/usr/share/zoneinfo/Africa/Niamey: OK
+/scan/usr/share/zoneinfo/Africa/Bamako: OK
+/scan/usr/share/zoneinfo/Africa/Asmera: OK
+/scan/usr/share/zoneinfo/Africa/Djibouti: OK
+/scan/usr/share/zoneinfo/Africa/Bujumbura: OK
+/scan/usr/share/zoneinfo/Africa/Khartoum: OK
+/scan/usr/share/zoneinfo/Africa/Nairobi: OK
+/scan/usr/share/zoneinfo/Africa/Ceuta: OK
+/scan/usr/share/zoneinfo/Africa/Asmara: OK
+/scan/usr/share/zoneinfo/Africa/Timbuktu: OK
+/scan/usr/share/zoneinfo/Africa/Tunis: OK
+/scan/usr/share/zoneinfo/Africa/Malabo: OK
+/scan/usr/share/zoneinfo/Africa/Nouakchott: OK
+/scan/usr/share/zoneinfo/Africa/Porto-Novo: OK
+/scan/usr/share/zoneinfo/Africa/Accra: OK
+/scan/usr/share/zoneinfo/Africa/Banjul: OK
+/scan/usr/share/zoneinfo/Africa/Libreville: OK
+/scan/usr/share/zoneinfo/Africa/Monrovia: OK
+/scan/usr/share/zoneinfo/Africa/Kigali: OK
+/scan/usr/share/zoneinfo/Africa/Sao_Tome: OK
+/scan/usr/share/zoneinfo/Africa/Ouagadougou: OK
+/scan/usr/share/zoneinfo/Africa/Bangui: OK
+/scan/usr/share/zoneinfo/Africa/Abidjan: OK
+/scan/usr/share/zoneinfo/Africa/Addis_Ababa: OK
+/scan/usr/share/zoneinfo/Africa/Lome: OK
+/scan/usr/share/zoneinfo/Africa/Johannesburg: OK
+/scan/usr/share/zoneinfo/Africa/Kinshasa: OK
+/scan/usr/share/zoneinfo/Africa/Mogadishu: OK
+/scan/usr/share/zoneinfo/Africa/Windhoek: OK
+/scan/usr/share/zoneinfo/Africa/Luanda: OK
+/scan/usr/share/zoneinfo/Africa/Maputo: OK
+/scan/usr/share/zoneinfo/Africa/Dakar: OK
+/scan/usr/share/zoneinfo/Africa/El_Aaiun: OK
+/scan/usr/share/zoneinfo/Africa/Blantyre: OK
+/scan/usr/share/zoneinfo/Africa/Douala: OK
+/scan/usr/share/zoneinfo/Africa/Conakry: OK
+/scan/usr/share/zoneinfo/Africa/Algiers: OK
+/scan/usr/share/licenses/nginx/COPYRIGHT: OK
+/scan/usr/share/licenses/nginx-module-xslt/COPYRIGHT: OK
+/scan/usr/share/licenses/nginx-module-geoip/COPYRIGHT: OK
+/scan/usr/share/licenses/nginx-module-image-filter/COPYRIGHT: OK
+/scan/usr/share/licenses/nginx-module-njs/COPYRIGHT: OK
+/scan/usr/share/udhcpc/default.script: OK
+/scan/usr/share/ca-certificates/mozilla/USERTrust_ECC_Certification_Authority.crt: OK
+/scan/usr/share/ca-certificates/mozilla/Autoridad_de_Certificacion_Firmaprofesional_CIF_A62634068.crt: OK
+/scan/usr/share/ca-certificates/mozilla/Certum_Trusted_Network_CA_2.crt: OK
+/scan/usr/share/ca-certificates/mozilla/TUBITAK_Kamu_SM_SSL_Kok_Sertifikasi_-_Surum_1.crt: OK
+/scan/usr/share/ca-certificates/mozilla/SecureSign_Root_CA14.crt: OK
+/scan/usr/share/ca-certificates/mozilla/NetLock_Arany_=Class_Gold=_Főtanúsítvány.crt: OK
+/scan/usr/share/ca-certificates/mozilla/GDCA_TrustAUTH_R5_ROOT.crt: OK
+/scan/usr/share/ca-certificates/mozilla/GlobalSign_Root_R46.crt: OK
+/scan/usr/share/ca-certificates/mozilla/HARICA_TLS_ECC_Root_CA_2021.crt: OK
+/scan/usr/share/ca-certificates/mozilla/QuoVadis_Root_CA_2_G3.crt: OK
+/scan/usr/share/ca-certificates/mozilla/Telia_RSA_TLS_Root_CA_v3.crt: OK
+/scan/usr/share/ca-certificates/mozilla/vTrus_ECC_Root_CA.crt: OK
+/scan/usr/share/ca-certificates/mozilla/SECOM_TLS_RSA_Root_CA_2024.crt: OK
+/scan/usr/share/ca-certificates/mozilla/DigiCert_Assured_ID_Root_G2.crt: OK
+/scan/usr/share/ca-certificates/mozilla/Atos_TrustedRoot_Root_CA_RSA_TLS_2021.crt: OK
+/scan/usr/share/ca-certificates/mozilla/GlobalSign_ECC_Root_CA_-_R5.crt: OK
+/scan/usr/share/ca-certificates/mozilla/emSign_Root_CA_-_C1.crt: OK
+/scan/usr/share/ca-certificates/mozilla/certSIGN_Root_CA_G2.crt: OK
+/scan/usr/share/ca-certificates/mozilla/NAVER_Global_Root_Certification_Authority.crt: OK
+/scan/usr/share/ca-certificates/mozilla/AC_RAIZ_FNMT-RCM.crt: OK
+/scan/usr/share/ca-certificates/mozilla/BJCA_Global_Root_CA1.crt: OK
+/scan/usr/share/ca-certificates/mozilla/D-TRUST_BR_Root_CA_1_2020.crt: OK
+/scan/usr/share/ca-certificates/mozilla/GTS_Root_R4.crt: OK
+/scan/usr/share/ca-certificates/mozilla/D-TRUST_EV_Root_CA_1_2020.crt: OK
+/scan/usr/share/ca-certificates/mozilla/SSL.com_TLS_RSA_Root_CA_2022.crt: OK
+/scan/usr/share/ca-certificates/mozilla/DigiCert_Global_Root_G2.crt: OK
+/scan/usr/share/ca-certificates/mozilla/Security_Communication_RootCA2.crt: OK
+/scan/usr/share/ca-certificates/mozilla/Actalis_Authentication_Root_CA.crt: OK
+/scan/usr/share/ca-certificates/mozilla/Certum_EC-384_CA.crt: OK
+/scan/usr/share/ca-certificates/mozilla/COMODO_ECC_Certification_Authority.crt: OK
+/scan/usr/share/ca-certificates/mozilla/TrustAsia_Global_Root_CA_G3.crt: OK
+/scan/usr/share/ca-certificates/mozilla/OISTE_WISeKey_Global_Root_GC_CA.crt: OK
+/scan/usr/share/ca-certificates/mozilla/SSL.com_Root_Certification_Authority_ECC.crt: OK
+/scan/usr/share/ca-certificates/mozilla/Microsoft_ECC_Root_Certificate_Authority_2017.crt: OK
+/scan/usr/share/ca-certificates/mozilla/SSL.com_Root_Certification_Authority_RSA.crt: OK
+/scan/usr/share/ca-certificates/mozilla/Telia_Root_CA_v2.crt: OK
+/scan/usr/share/ca-certificates/mozilla/CA_Disig_Root_R2.crt: OK
+/scan/usr/share/ca-certificates/mozilla/Telekom_Security_TLS_RSA_Root_2023.crt: OK
+/scan/usr/share/ca-certificates/mozilla/CFCA_EV_ROOT.crt: OK
+/scan/usr/share/ca-certificates/mozilla/Go_Daddy_Root_Certificate_Authority_-_G2.crt: OK
+/scan/usr/share/ca-certificates/mozilla/T-TeleSec_GlobalRoot_Class_2.crt: OK
+/scan/usr/share/ca-certificates/mozilla/QuoVadis_Root_CA_3_G3.crt: OK
+/scan/usr/share/ca-certificates/mozilla/UCA_Global_G2_Root.crt: OK
+/scan/usr/share/ca-certificates/mozilla/emSign_ECC_Root_CA_-_C3.crt: OK
+/scan/usr/share/ca-certificates/mozilla/Buypass_Class_2_Root_CA.crt: OK
+/scan/usr/share/ca-certificates/mozilla/Hellenic_Academic_and_Research_Institutions_RootCA_2015.crt: OK
+/scan/usr/share/ca-certificates/mozilla/D-TRUST_BR_Root_CA_2_2023.crt: OK
+/scan/usr/share/ca-certificates/mozilla/e-Szigno_Root_CA_2017.crt: OK
+/scan/usr/share/ca-certificates/mozilla/QuoVadis_Root_CA_1_G3.crt: OK
+/scan/usr/share/ca-certificates/mozilla/DigiCert_Assured_ID_Root_G3.crt: OK
+/scan/usr/share/ca-certificates/mozilla/SecureSign_Root_CA15.crt: OK
+/scan/usr/share/ca-certificates/mozilla/Sectigo_Public_Server_Authentication_Root_R46.crt: OK
+/scan/usr/share/ca-certificates/mozilla/Certum_Trusted_Root_CA.crt: OK
+/scan/usr/share/ca-certificates/mozilla/GlobalSign_Root_CA_-_R3.crt: OK
+/scan/usr/share/ca-certificates/mozilla/Starfield_Root_Certificate_Authority_-_G2.crt: OK
+/scan/usr/share/ca-certificates/mozilla/T-TeleSec_GlobalRoot_Class_3.crt: OK
+/scan/usr/share/ca-certificates/mozilla/D-TRUST_Root_Class_3_CA_2_2009.crt: OK
+/scan/usr/share/ca-certificates/mozilla/TunTrust_Root_CA.crt: OK
+/scan/usr/share/ca-certificates/mozilla/ACCVRAIZ1.crt: OK
+/scan/usr/share/ca-certificates/mozilla/emSign_Root_CA_-_G1.crt: OK
+/scan/usr/share/ca-certificates/mozilla/SZAFIR_ROOT_CA2.crt: OK
+/scan/usr/share/ca-certificates/mozilla/TrustAsia_TLS_RSA_Root_CA.crt: OK
+/scan/usr/share/ca-certificates/mozilla/Amazon_Root_CA_3.crt: OK
+/scan/usr/share/ca-certificates/mozilla/IdenTrust_Public_Sector_Root_CA_1.crt: OK
+/scan/usr/share/ca-certificates/mozilla/GTS_Root_R1.crt: OK
+/scan/usr/share/ca-certificates/mozilla/vTrus_Root_CA.crt: OK
+/scan/usr/share/ca-certificates/mozilla/ISRG_Root_X1.crt: OK
+/scan/usr/share/ca-certificates/mozilla/DigiCert_Trusted_Root_G4.crt: OK
+/scan/usr/share/ca-certificates/mozilla/Buypass_Class_3_Root_CA.crt: OK
+/scan/usr/share/ca-certificates/mozilla/DigiCert_Global_Root_G3.crt: OK
+/scan/usr/share/ca-certificates/mozilla/SSL.com_EV_Root_Certification_Authority_RSA_R2.crt: OK
+/scan/usr/share/ca-certificates/mozilla/Amazon_Root_CA_2.crt: OK
+/scan/usr/share/ca-certificates/mozilla/ANF_Secure_Server_Root_CA.crt: OK
+/scan/usr/share/ca-certificates/mozilla/BJCA_Global_Root_CA2.crt: OK
+/scan/usr/share/ca-certificates/mozilla/ISRG_Root_X2.crt: OK
+/scan/usr/share/ca-certificates/mozilla/Certainly_Root_E1.crt: OK
+/scan/usr/share/ca-certificates/mozilla/OISTE_Server_Root_RSA_G1.crt: OK
+/scan/usr/share/ca-certificates/mozilla/DigiCert_TLS_ECC_P384_Root_G5.crt: OK
+/scan/usr/share/ca-certificates/mozilla/AC_RAIZ_FNMT-RCM_SERVIDORES_SEGUROS.crt: OK
+/scan/usr/share/ca-certificates/mozilla/Telia_EC_TLS_Root_CA_v3.crt: OK
+/scan/usr/share/ca-certificates/mozilla/Certigna_Root_CA.crt: OK
+/scan/usr/share/ca-certificates/mozilla/OISTE_WISeKey_Global_Root_GB_CA.crt: OK
+/scan/usr/share/ca-certificates/mozilla/SSL.com_EV_Root_Certification_Authority_ECC.crt: OK
+/scan/usr/share/ca-certificates/mozilla/Amazon_Root_CA_4.crt: OK
+/scan/usr/share/ca-certificates/mozilla/TWCA_CYBER_Root_CA.crt: OK
+/scan/usr/share/ca-certificates/mozilla/emSign_ECC_Root_CA_-_G3.crt: OK
+/scan/usr/share/ca-certificates/mozilla/Security_Communication_ECC_RootCA1.crt: OK
+/scan/usr/share/ca-certificates/mozilla/TrustAsia_Global_Root_CA_G4.crt: OK
+/scan/usr/share/ca-certificates/mozilla/SwissSign_RSA_TLS_Root_CA_2022_-_1.crt: OK
+/scan/usr/share/ca-certificates/mozilla/Telekom_Security_TLS_ECC_Root_2020.crt: OK
+/scan/usr/share/ca-certificates/mozilla/COMODO_RSA_Certification_Authority.crt: OK
+/scan/usr/share/ca-certificates/mozilla/TWCA_Root_Certification_Authority.crt: OK
+/scan/usr/share/ca-certificates/mozilla/D-TRUST_EV_Root_CA_2_2023.crt: OK
+/scan/usr/share/ca-certificates/mozilla/UCA_Extended_Validation_Root.crt: OK
+/scan/usr/share/ca-certificates/mozilla/Izenpe.com.crt: OK
+/scan/usr/share/ca-certificates/mozilla/Starfield_Services_Root_Certificate_Authority_-_G2.crt: OK
+/scan/usr/share/ca-certificates/mozilla/SECOM_TLS_ECC_Root_CA_2024.crt: OK
+/scan/usr/share/ca-certificates/mozilla/GlobalSign_Root_CA_-_R6.crt: OK
+/scan/usr/share/ca-certificates/mozilla/OISTE_Server_Root_ECC_G1.crt: OK
+/scan/usr/share/ca-certificates/mozilla/SSL.com_TLS_ECC_Root_CA_2022.crt: OK
+/scan/usr/share/ca-certificates/mozilla/Hongkong_Post_Root_CA_3.crt: OK
+/scan/usr/share/ca-certificates/mozilla/GlobalSign_Root_E46.crt: OK
+/scan/usr/share/ca-certificates/mozilla/GTS_Root_R3.crt: OK
+/scan/usr/share/ca-certificates/mozilla/Microsoft_RSA_Root_Certificate_Authority_2017.crt: OK
+/scan/usr/share/ca-certificates/mozilla/TrustAsia_TLS_ECC_Root_CA.crt: OK
+/scan/usr/share/ca-certificates/mozilla/Hellenic_Academic_and_Research_Institutions_ECC_RootCA_2015.crt: OK
+/scan/usr/share/ca-certificates/mozilla/TWCA_Global_Root_CA.crt: OK
+/scan/usr/share/ca-certificates/mozilla/Atos_TrustedRoot_Root_CA_ECC_TLS_2021.crt: OK
+/scan/usr/share/ca-certificates/mozilla/Sectigo_Public_Server_Authentication_Root_E46.crt: OK
+/scan/usr/share/ca-certificates/mozilla/USERTrust_RSA_Certification_Authority.crt: OK
+/scan/usr/share/ca-certificates/mozilla/D-TRUST_Root_Class_3_CA_2_EV_2009.crt: OK
+/scan/usr/share/ca-certificates/mozilla/Amazon_Root_CA_1.crt: OK
+/scan/usr/share/ca-certificates/mozilla/DigiCert_TLS_RSA4096_Root_G5.crt: OK
+/scan/usr/share/ca-certificates/mozilla/IdenTrust_Commercial_Root_CA_1.crt: OK
+/scan/usr/share/ca-certificates/mozilla/HARICA_TLS_RSA_Root_CA_2021.crt: OK
+/scan/usr/share/ca-certificates/mozilla/Certainly_Root_R1.crt: OK
+/scan/usr/share/ca-certificates/mozilla/HiPKI_Root_CA_-_G1.crt: OK
+/scan/usr/share/ca-certificates/mozilla/GlobalSign_ECC_Root_CA_-_R4.crt: OK
+/scan/usr/share/ca-certificates/mozilla/Microsec_e-Szigno_Root_CA_2009.crt: OK
+/scan/usr/share/ca-certificates/mozilla/Certum_Trusted_Network_CA.crt: OK
+/scan/usr/share/ca-certificates/mozilla/e-Szigno_TLS_Root_CA_2023.crt: OK
+/scan/usr/share/X11/Xcms.txt: OK
+/scan/usr/share/X11/XErrorDB: OK
+/scan/usr/share/X11/locale/georgian-academy/XI18N_OBJS: OK
+/scan/usr/share/X11/locale/georgian-academy/Compose: OK
+/scan/usr/share/X11/locale/georgian-academy/XLC_LOCALE: OK
+/scan/usr/share/X11/locale/ja.SJIS/XI18N_OBJS: OK
+/scan/usr/share/X11/locale/ja.SJIS/Compose: OK
+/scan/usr/share/X11/locale/ja.SJIS/XLC_LOCALE: OK
+/scan/usr/share/X11/locale/locale.alias: OK
+/scan/usr/share/X11/locale/zh_CN.UTF-8/XI18N_OBJS: OK
+/scan/usr/share/X11/locale/zh_CN.UTF-8/Compose: OK
+/scan/usr/share/X11/locale/zh_CN.UTF-8/XLC_LOCALE: OK
+/scan/usr/share/X11/locale/microsoft-cp1251/XI18N_OBJS: OK
+/scan/usr/share/X11/locale/microsoft-cp1251/Compose: Empty file
+/scan/usr/share/X11/locale/microsoft-cp1251/XLC_LOCALE: OK
+/scan/usr/share/X11/locale/C/XI18N_OBJS: OK
+/scan/usr/share/X11/locale/C/Compose: Empty file
+/scan/usr/share/X11/locale/C/XLC_LOCALE: OK
+/scan/usr/share/X11/locale/pt_PT.UTF-8/XI18N_OBJS: OK
+/scan/usr/share/X11/locale/pt_PT.UTF-8/Compose: OK
+/scan/usr/share/X11/locale/pt_PT.UTF-8/XLC_LOCALE: OK
+/scan/usr/share/X11/locale/iso8859-13/XI18N_OBJS: OK
+/scan/usr/share/X11/locale/iso8859-13/Compose: OK
+/scan/usr/share/X11/locale/iso8859-13/XLC_LOCALE: OK
+/scan/usr/share/X11/locale/tatar-cyr/XI18N_OBJS: OK
+/scan/usr/share/X11/locale/tatar-cyr/Compose: Empty file
+/scan/usr/share/X11/locale/tatar-cyr/XLC_LOCALE: OK
+/scan/usr/share/X11/locale/iso8859-14/XI18N_OBJS: OK
+/scan/usr/share/X11/locale/iso8859-14/Compose: OK
+/scan/usr/share/X11/locale/iso8859-14/XLC_LOCALE: OK
+/scan/usr/share/X11/locale/vi_VN.tcvn/XI18N_OBJS: OK
+/scan/usr/share/X11/locale/vi_VN.tcvn/Compose: OK
+/scan/usr/share/X11/locale/vi_VN.tcvn/XLC_LOCALE: OK
+/scan/usr/share/X11/locale/zh_CN/XI18N_OBJS: OK
+/scan/usr/share/X11/locale/zh_CN/Compose: OK
+/scan/usr/share/X11/locale/zh_CN/XLC_LOCALE: OK
+/scan/usr/share/X11/locale/th_TH/XI18N_OBJS: OK
+/scan/usr/share/X11/locale/th_TH/Compose: Empty file
+/scan/usr/share/X11/locale/th_TH/XLC_LOCALE: OK
+/scan/usr/share/X11/locale/microsoft-cp1255/XI18N_OBJS: OK
+/scan/usr/share/X11/locale/microsoft-cp1255/Compose: Empty file
+/scan/usr/share/X11/locale/microsoft-cp1255/XLC_LOCALE: OK
+/scan/usr/share/X11/locale/iso8859-5/XI18N_OBJS: OK
+/scan/usr/share/X11/locale/iso8859-5/Compose: OK
+/scan/usr/share/X11/locale/iso8859-5/XLC_LOCALE: OK
+/scan/usr/share/X11/locale/koi8-u/XI18N_OBJS: OK
+/scan/usr/share/X11/locale/koi8-u/Compose: OK
+/scan/usr/share/X11/locale/koi8-u/XLC_LOCALE: OK
+/scan/usr/share/X11/locale/zh_TW.UTF-8/XI18N_OBJS: OK
+/scan/usr/share/X11/locale/zh_TW.UTF-8/Compose: OK
+/scan/usr/share/X11/locale/zh_TW.UTF-8/XLC_LOCALE: OK
+/scan/usr/share/X11/locale/isiri-3342/XI18N_OBJS: OK
+/scan/usr/share/X11/locale/isiri-3342/Compose: Empty file
+/scan/usr/share/X11/locale/isiri-3342/XLC_LOCALE: OK
+/scan/usr/share/X11/locale/ko_KR.UTF-8/XI18N_OBJS: OK
+/scan/usr/share/X11/locale/ko_KR.UTF-8/Compose: OK
+/scan/usr/share/X11/locale/ko_KR.UTF-8/XLC_LOCALE: OK
+/scan/usr/share/X11/locale/iso8859-9/XI18N_OBJS: OK
+/scan/usr/share/X11/locale/iso8859-9/Compose: OK
+/scan/usr/share/X11/locale/iso8859-9/XLC_LOCALE: OK
+/scan/usr/share/X11/locale/zh_TW/XI18N_OBJS: OK
+/scan/usr/share/X11/locale/zh_TW/Compose: OK
+/scan/usr/share/X11/locale/zh_TW/XLC_LOCALE: OK
+/scan/usr/share/X11/locale/nokhchi-1/XI18N_OBJS: OK
+/scan/usr/share/X11/locale/nokhchi-1/Compose: Empty file
+/scan/usr/share/X11/locale/nokhchi-1/XLC_LOCALE: OK
+/scan/usr/share/X11/locale/microsoft-cp1256/XI18N_OBJS: OK
+/scan/usr/share/X11/locale/microsoft-cp1256/Compose: Empty file
+/scan/usr/share/X11/locale/microsoft-cp1256/XLC_LOCALE: OK
+/scan/usr/share/X11/locale/iso8859-7/XI18N_OBJS: OK
+/scan/usr/share/X11/locale/iso8859-7/Compose: OK
+/scan/usr/share/X11/locale/iso8859-7/XLC_LOCALE: OK
+/scan/usr/share/X11/locale/km_KH.UTF-8/XI18N_OBJS: OK
+/scan/usr/share/X11/locale/km_KH.UTF-8/Compose: OK
+/scan/usr/share/X11/locale/km_KH.UTF-8/XLC_LOCALE: Empty file
+/scan/usr/share/X11/locale/iso8859-3/XI18N_OBJS: OK
+/scan/usr/share/X11/locale/iso8859-3/Compose: OK
+/scan/usr/share/X11/locale/iso8859-3/XLC_LOCALE: OK
+/scan/usr/share/X11/locale/am_ET.UTF-8/XI18N_OBJS: Empty file
+/scan/usr/share/X11/locale/am_ET.UTF-8/Compose: OK
+/scan/usr/share/X11/locale/am_ET.UTF-8/XLC_LOCALE: Empty file
+/scan/usr/share/X11/locale/zh_TW.big5/XI18N_OBJS: OK
+/scan/usr/share/X11/locale/zh_TW.big5/Compose: OK
+/scan/usr/share/X11/locale/zh_TW.big5/XLC_LOCALE: OK
+/scan/usr/share/X11/locale/el_GR.UTF-8/XI18N_OBJS: Empty file
+/scan/usr/share/X11/locale/el_GR.UTF-8/Compose: OK
+/scan/usr/share/X11/locale/el_GR.UTF-8/XLC_LOCALE: Empty file
+/scan/usr/share/X11/locale/zh_HK.big5/XI18N_OBJS: OK
+/scan/usr/share/X11/locale/zh_HK.big5/Compose: OK
+/scan/usr/share/X11/locale/zh_HK.big5/XLC_LOCALE: OK
+/scan/usr/share/X11/locale/mulelao-1/XI18N_OBJS: OK
+/scan/usr/share/X11/locale/mulelao-1/Compose: OK
+/scan/usr/share/X11/locale/mulelao-1/XLC_LOCALE: OK
+/scan/usr/share/X11/locale/tscii-0/XI18N_OBJS: OK
+/scan/usr/share/X11/locale/tscii-0/Compose: Empty file
+/scan/usr/share/X11/locale/tscii-0/XLC_LOCALE: OK
+/scan/usr/share/X11/locale/ko/XI18N_OBJS: OK
+/scan/usr/share/X11/locale/ko/Compose: OK
+/scan/usr/share/X11/locale/ko/XLC_LOCALE: OK
+/scan/usr/share/X11/locale/ja_JP.UTF-8/XI18N_OBJS: OK
+/scan/usr/share/X11/locale/ja_JP.UTF-8/Compose: OK
+/scan/usr/share/X11/locale/ja_JP.UTF-8/XLC_LOCALE: OK
+/scan/usr/share/X11/locale/zh_HK.big5hkscs/XI18N_OBJS: OK
+/scan/usr/share/X11/locale/zh_HK.big5hkscs/Compose: OK
+/scan/usr/share/X11/locale/zh_HK.big5hkscs/XLC_LOCALE: OK
+/scan/usr/share/X11/locale/iso8859-4/XI18N_OBJS: OK
+/scan/usr/share/X11/locale/iso8859-4/Compose: OK
+/scan/usr/share/X11/locale/iso8859-4/XLC_LOCALE: OK
+/scan/usr/share/X11/locale/iso8859-9e/XI18N_OBJS: OK
+/scan/usr/share/X11/locale/iso8859-9e/Compose: OK
+/scan/usr/share/X11/locale/iso8859-9e/XLC_LOCALE: OK
+/scan/usr/share/X11/locale/iso8859-11/XI18N_OBJS: OK
+/scan/usr/share/X11/locale/iso8859-11/Compose: Empty file
+/scan/usr/share/X11/locale/iso8859-11/XLC_LOCALE: OK
+/scan/usr/share/X11/locale/zh_CN.gbk/XI18N_OBJS: OK
+/scan/usr/share/X11/locale/zh_CN.gbk/Compose: OK
+/scan/usr/share/X11/locale/zh_CN.gbk/XLC_LOCALE: OK
+/scan/usr/share/X11/locale/sr_RS.UTF-8/XI18N_OBJS: OK
+/scan/usr/share/X11/locale/sr_RS.UTF-8/Compose: OK
+/scan/usr/share/X11/locale/sr_RS.UTF-8/XLC_LOCALE: Empty file
+/scan/usr/share/X11/locale/iso8859-1/XI18N_OBJS: OK
+/scan/usr/share/X11/locale/iso8859-1/Compose: OK
+/scan/usr/share/X11/locale/iso8859-1/XLC_LOCALE: OK
+/scan/usr/share/X11/locale/compose.dir: OK
+/scan/usr/share/X11/locale/pt_BR.UTF-8/XI18N_OBJS: OK
+/scan/usr/share/X11/locale/pt_BR.UTF-8/Compose: OK
+/scan/usr/share/X11/locale/pt_BR.UTF-8/XLC_LOCALE: OK
+/scan/usr/share/X11/locale/iscii-dev/XI18N_OBJS: OK
+/scan/usr/share/X11/locale/iscii-dev/Compose: Empty file
+/scan/usr/share/X11/locale/iscii-dev/XLC_LOCALE: OK
+/scan/usr/share/X11/locale/iso8859-6/XI18N_OBJS: OK
+/scan/usr/share/X11/locale/iso8859-6/Compose: OK
+/scan/usr/share/X11/locale/iso8859-6/XLC_LOCALE: OK
+/scan/usr/share/X11/locale/zh_HK.UTF-8/XI18N_OBJS: OK
+/scan/usr/share/X11/locale/zh_HK.UTF-8/Compose: OK
+/scan/usr/share/X11/locale/zh_HK.UTF-8/XLC_LOCALE: OK
+/scan/usr/share/X11/locale/zh_CN.gb18030/XI18N_OBJS: OK
+/scan/usr/share/X11/locale/zh_CN.gb18030/Compose: OK
+/scan/usr/share/X11/locale/zh_CN.gb18030/XLC_LOCALE: OK
+/scan/usr/share/X11/locale/ja.JIS/XI18N_OBJS: OK
+/scan/usr/share/X11/locale/ja.JIS/Compose: OK
+/scan/usr/share/X11/locale/ja.JIS/XLC_LOCALE: OK
+/scan/usr/share/X11/locale/ja/XI18N_OBJS: OK
+/scan/usr/share/X11/locale/ja/Compose: OK
+/scan/usr/share/X11/locale/ja/XLC_LOCALE: OK
+/scan/usr/share/X11/locale/ibm-cp1133/XI18N_OBJS: OK
+/scan/usr/share/X11/locale/ibm-cp1133/Compose: OK
+/scan/usr/share/X11/locale/ibm-cp1133/XLC_LOCALE: OK
+/scan/usr/share/X11/locale/fi_FI.UTF-8/XI18N_OBJS: Empty file
+/scan/usr/share/X11/locale/fi_FI.UTF-8/Compose: OK
+/scan/usr/share/X11/locale/fi_FI.UTF-8/XLC_LOCALE: Empty file
+/scan/usr/share/X11/locale/koi8-r/XI18N_OBJS: OK
+/scan/usr/share/X11/locale/koi8-r/Compose: OK
+/scan/usr/share/X11/locale/koi8-r/XLC_LOCALE: OK
+/scan/usr/share/X11/locale/cs_CZ.UTF-8/XI18N_OBJS: Empty file
+/scan/usr/share/X11/locale/cs_CZ.UTF-8/Compose: OK
+/scan/usr/share/X11/locale/cs_CZ.UTF-8/XLC_LOCALE: Empty file
+/scan/usr/share/X11/locale/georgian-ps/XI18N_OBJS: OK
+/scan/usr/share/X11/locale/georgian-ps/Compose: OK
+/scan/usr/share/X11/locale/georgian-ps/XLC_LOCALE: OK
+/scan/usr/share/X11/locale/iso8859-2/XI18N_OBJS: OK
+/scan/usr/share/X11/locale/iso8859-2/Compose: OK
+/scan/usr/share/X11/locale/iso8859-2/XLC_LOCALE: OK
+/scan/usr/share/X11/locale/ru_RU.UTF-8/XI18N_OBJS: OK
+/scan/usr/share/X11/locale/ru_RU.UTF-8/Compose: OK
+/scan/usr/share/X11/locale/ru_RU.UTF-8/XLC_LOCALE: OK
+/scan/usr/share/X11/locale/iso8859-8/XI18N_OBJS: OK
+/scan/usr/share/X11/locale/iso8859-8/Compose: OK
+/scan/usr/share/X11/locale/iso8859-8/XLC_LOCALE: OK
+/scan/usr/share/X11/locale/iso8859-15/XI18N_OBJS: OK
+/scan/usr/share/X11/locale/iso8859-15/Compose: OK
+/scan/usr/share/X11/locale/iso8859-15/XLC_LOCALE: OK
+/scan/usr/share/X11/locale/th_TH.UTF-8/XI18N_OBJS: OK
+/scan/usr/share/X11/locale/th_TH.UTF-8/Compose: OK
+/scan/usr/share/X11/locale/th_TH.UTF-8/XLC_LOCALE: OK
+/scan/usr/share/X11/locale/iso8859-10/XI18N_OBJS: OK
+/scan/usr/share/X11/locale/iso8859-10/Compose: OK
+/scan/usr/share/X11/locale/iso8859-10/XLC_LOCALE: OK
+/scan/usr/share/X11/locale/en_US.UTF-8/XI18N_OBJS: OK
+/scan/usr/share/X11/locale/en_US.UTF-8/Compose: OK
+/scan/usr/share/X11/locale/en_US.UTF-8/XLC_LOCALE: OK
+/scan/usr/share/X11/locale/armscii-8/XI18N_OBJS: OK
+/scan/usr/share/X11/locale/armscii-8/Compose: OK
+/scan/usr/share/X11/locale/armscii-8/XLC_LOCALE: OK
+/scan/usr/share/X11/locale/koi8-c/XI18N_OBJS: OK
+/scan/usr/share/X11/locale/koi8-c/Compose: OK
+/scan/usr/share/X11/locale/koi8-c/XLC_LOCALE: OK
+/scan/usr/share/X11/locale/locale.dir: OK
+/scan/usr/share/X11/locale/vi_VN.viscii/XI18N_OBJS: OK
+/scan/usr/share/X11/locale/vi_VN.viscii/Compose: OK
+/scan/usr/share/X11/locale/vi_VN.viscii/XLC_LOCALE: OK
+/scan/usr/bin/tee: Symbolic link
+/scan/usr/bin/mesg: Symbolic link
+/scan/usr/bin/unlzop: Symbolic link
+/scan/usr/bin/which: Symbolic link
+/scan/usr/bin/od: Symbolic link
+/scan/usr/bin/expand: Symbolic link
+/scan/usr/bin/env: Symbolic link
+/scan/usr/bin/fallocate: Symbolic link
+/scan/usr/bin/unxz: Symbolic link
+/scan/usr/bin/fc-list: OK
+/scan/usr/bin/geoiplookup6: OK
+/scan/usr/bin/xargs: Symbolic link
+/scan/usr/bin/xxd: Symbolic link
+/scan/usr/bin/microcom: Symbolic link
+/scan/usr/bin/diff: Symbolic link
+/scan/usr/bin/cut: Symbolic link
+/scan/usr/bin/getent: OK
+/scan/usr/bin/cpio: Symbolic link
+/scan/usr/bin/resize: Symbolic link
+/scan/usr/bin/bc: Symbolic link
+/scan/usr/bin/hd: Symbolic link
+/scan/usr/bin/uptime: Symbolic link
+/scan/usr/bin/bzcat: Symbolic link
+/scan/usr/bin/njs: OK
+/scan/usr/bin/ipcrm: Symbolic link
+/scan/usr/bin/install: Symbolic link
+/scan/usr/bin/unlink: Symbolic link
+/scan/usr/bin/paste: Symbolic link
+/scan/usr/bin/traceroute6: Symbolic link
+/scan/usr/bin/pscan: Symbolic link
+/scan/usr/bin/tr: Symbolic link
+/scan/usr/bin/unexpand: Symbolic link
+/scan/usr/bin/cryptpw: Symbolic link
+/scan/usr/bin/flock: Symbolic link
+/scan/usr/bin/clear: Symbolic link
+/scan/usr/bin/cksum: Symbolic link
+/scan/usr/bin/sha3sum: Symbolic link
+/scan/usr/bin/less: Symbolic link
+/scan/usr/bin/logger: Symbolic link
+/scan/usr/bin/nohup: Symbolic link
+/scan/usr/bin/comm: Symbolic link
+/scan/usr/bin/top: Symbolic link
+/scan/usr/bin/factor: Symbolic link
+/scan/usr/bin/du: Symbolic link
+/scan/usr/bin/yes: Symbolic link
+/scan/usr/bin/whoami: Symbolic link
+/scan/usr/bin/vi: Symbolic link
+/scan/usr/bin/fold: Symbolic link
+/scan/usr/bin/test: Symbolic link
+/scan/usr/bin/xzcat: Symbolic link
+/scan/usr/bin/uniq: Symbolic link
+/scan/usr/bin/dc: Symbolic link
+/scan/usr/bin/find: Symbolic link
+/scan/usr/bin/cmp: Symbolic link
+/scan/usr/bin/tree: Symbolic link
+/scan/usr/bin/sxpm: OK
+/scan/usr/bin/hexdump: Symbolic link
+/scan/usr/bin/deallocvt: Symbolic link
+/scan/usr/bin/lzopcat: Symbolic link
+/scan/usr/bin/showkey: Symbolic link
+/scan/usr/bin/volname: Symbolic link
+/scan/usr/bin/lsusb: Symbolic link
+/scan/usr/bin/scanelf: OK
+/scan/usr/bin/wc: Symbolic link
+/scan/usr/bin/truncate: Symbolic link
+/scan/usr/bin/dos2unix: Symbolic link
+/scan/usr/bin/seq: Symbolic link
+/scan/usr/bin/nl: Symbolic link
+/scan/usr/bin/eject: Symbolic link
+/scan/usr/bin/renice: Symbolic link
+/scan/usr/bin/tac: Symbolic link
+/scan/usr/bin/nc: Symbolic link
+/scan/usr/bin/envsubst: OK
+/scan/usr/bin/nproc: Symbolic link
+/scan/usr/bin/last: Symbolic link
+/scan/usr/bin/tail: Symbolic link
+/scan/usr/bin/id: Symbolic link
+/scan/usr/bin/time: Symbolic link
+/scan/usr/bin/geoiplookup: OK
+/scan/usr/bin/beep: Symbolic link
+/scan/usr/bin/killall: Symbolic link
+/scan/usr/bin/ssl_client: OK
+/scan/usr/bin/cxpm: OK
+/scan/usr/bin/gpg-error: OK
+/scan/usr/bin/head: Symbolic link
+/scan/usr/bin/split: Symbolic link
+/scan/usr/bin/c_rehash: OK
+/scan/usr/bin/nslookup: Symbolic link
+/scan/usr/bin/unix2dos: Symbolic link
+/scan/usr/bin/sha256sum: Symbolic link
+/scan/usr/bin/fc-pattern: OK
+/scan/usr/bin/[: Symbolic link
+/scan/usr/bin/pstree: Symbolic link
+/scan/usr/bin/lzma: Symbolic link
+/scan/usr/bin/sha1sum: Symbolic link
+/scan/usr/bin/wcurl: OK
+/scan/usr/bin/getconf: OK
+/scan/usr/bin/[[: Symbolic link
+/scan/usr/bin/pkill: Symbolic link
+/scan/usr/bin/passwd: Symbolic link
+/scan/usr/bin/ldd: OK
+/scan/usr/bin/strings: Symbolic link
+/scan/usr/bin/iconv: OK
+/scan/usr/bin/free: Symbolic link
+/scan/usr/bin/udhcpc6: Symbolic link
+/scan/usr/bin/fc-validate: OK
+/scan/usr/bin/unlzma: Symbolic link
+/scan/usr/bin/vlock: Symbolic link
+/scan/usr/bin/setkeycodes: Symbolic link
+/scan/usr/bin/unshare: Symbolic link
+/scan/usr/bin/uudecode: Symbolic link
+/scan/usr/bin/traceroute: Symbolic link
+/scan/usr/bin/mkfifo: Symbolic link
+/scan/usr/bin/printf: Symbolic link
+/scan/usr/bin/awk: Symbolic link
+/scan/usr/bin/uuencode: Symbolic link
+/scan/usr/bin/shred: Symbolic link
+/scan/usr/bin/wget: Symbolic link
+/scan/usr/bin/md5sum: Symbolic link
+/scan/usr/bin/pgrep: Symbolic link
+/scan/usr/bin/groups: Symbolic link
+/scan/usr/bin/dirname: Symbolic link
+/scan/usr/bin/who: Symbolic link
+/scan/usr/bin/basename: Symbolic link
+/scan/usr/bin/lzcat: Symbolic link
+/scan/usr/bin/reset: Symbolic link
+/scan/usr/bin/cal: Symbolic link
+/scan/usr/bin/fc-conflist: OK
+/scan/usr/bin/fuser: Symbolic link
+/scan/usr/bin/whois: Symbolic link
+/scan/usr/bin/sort: Symbolic link
+/scan/usr/bin/ipcs: Symbolic link
+/scan/usr/bin/sum: Symbolic link
+/scan/usr/bin/fc-query: OK
+/scan/usr/bin/xsltproc: OK
+/scan/usr/bin/shuf: Symbolic link
+/scan/usr/bin/timeout: Symbolic link
+/scan/usr/bin/nsenter: Symbolic link
+/scan/usr/bin/fc-cache: OK
+/scan/usr/bin/pmap: Symbolic link
+/scan/usr/bin/pwdx: Symbolic link
+/scan/usr/bin/setsid: Symbolic link
+/scan/usr/bin/readlink: Symbolic link
+/scan/usr/bin/chvt: Symbolic link
+/scan/usr/bin/sha512sum: Symbolic link
+/scan/usr/bin/unzip: Symbolic link
+/scan/usr/bin/crontab: Symbolic link
+/scan/usr/bin/tty: Symbolic link
+/scan/usr/bin/fc-cat: OK
+/scan/usr/bin/ttysize: Symbolic link
+/scan/usr/bin/expr: Symbolic link
+/scan/usr/bin/bunzip2: Symbolic link
+/scan/usr/bin/fc-scan: OK
+/scan/usr/bin/nmeter: Symbolic link
+/scan/usr/bin/openvt: Symbolic link
+/scan/usr/bin/mkpasswd: Symbolic link
+/scan/usr/bin/lsof: Symbolic link
+/scan/usr/bin/realpath: Symbolic link
+/scan/usr/bin/bzip2: Symbolic link
+/scan/usr/bin/fc-match: OK
+/scan/usr/bin/curl: OK
+/scan/usr/bin/hostid: Symbolic link
+/scan/usr/bin/blkdiscard: Symbolic link
+/scan/usr/sbin/nbd-client: Symbolic link
+/scan/usr/sbin/deluser: Symbolic link
+/scan/usr/sbin/ntpd: Symbolic link
+/scan/usr/sbin/remove-shell: Symbolic link
+/scan/usr/sbin/arping: Symbolic link
+/scan/usr/sbin/killall5: Symbolic link
+/scan/usr/sbin/chroot: Symbolic link
+/scan/usr/sbin/setlogcons: Symbolic link
+/scan/usr/sbin/partprobe: Symbolic link
+/scan/usr/sbin/delgroup: Symbolic link
+/scan/usr/sbin/loadfont: Symbolic link
+/scan/usr/sbin/nginx: OK
+/scan/usr/sbin/sendmail: Symbolic link
+/scan/usr/sbin/readahead: Symbolic link
+/scan/usr/sbin/ether-wake: Symbolic link
+/scan/usr/sbin/brctl: Symbolic link
+/scan/usr/sbin/update-ca-certificates: OK
+/scan/usr/sbin/rdev: Symbolic link
+/scan/usr/sbin/crond: Symbolic link
+/scan/usr/sbin/nanddump: Symbolic link
+/scan/usr/sbin/add-shell: Symbolic link
+/scan/usr/sbin/chpasswd: Symbolic link
+/scan/usr/sbin/fbset: Symbolic link
+/scan/usr/sbin/adduser: Symbolic link
+/scan/usr/sbin/rdate: Symbolic link
+/scan/usr/sbin/setfont: Symbolic link
+/scan/usr/sbin/nandwrite: Symbolic link
+/scan/usr/sbin/rfkill: Symbolic link
+/scan/usr/sbin/nginx-debug: OK
+/scan/usr/sbin/addgroup: Symbolic link
+/scan/sbin/hwclock: Symbolic link
+/scan/sbin/syslogd: Symbolic link
+/scan/sbin/halt: Symbolic link
+/scan/sbin/iprule: Symbolic link
+/scan/sbin/vconfig: Symbolic link
+/scan/sbin/insmod: Symbolic link
+/scan/sbin/ifup: Symbolic link
+/scan/sbin/fdisk: Symbolic link
+/scan/sbin/mkfs.vfat: Symbolic link
+/scan/sbin/fstrim: Symbolic link
+/scan/sbin/modprobe: Symbolic link
+/scan/sbin/watchdog: Symbolic link
+/scan/sbin/arp: Symbolic link
+/scan/sbin/setconsole: Symbolic link
+/scan/sbin/ifenslave: Symbolic link
+/scan/sbin/apk: OK
+/scan/sbin/klogd: Symbolic link
+/scan/sbin/init: Symbolic link
+/scan/sbin/sysctl: Symbolic link
+/scan/sbin/adjtimex: Symbolic link
+/scan/sbin/ldconfig: OK
+/scan/sbin/swapoff: Symbolic link
+/scan/sbin/iplink: Symbolic link
+/scan/sbin/iproute: Symbolic link
+/scan/sbin/mkdosfs: Symbolic link
+/scan/sbin/poweroff: Symbolic link
+/scan/sbin/pivot_root: Symbolic link
+/scan/sbin/udhcpc: Symbolic link
+/scan/sbin/swapon: Symbolic link
+/scan/sbin/raidautorun: Symbolic link
+/scan/sbin/tunctl: Symbolic link
+/scan/sbin/inotifyd: Symbolic link
+/scan/sbin/reboot: Symbolic link
+/scan/sbin/nologin: Symbolic link
+/scan/sbin/acpid: Symbolic link
+/scan/sbin/ipneigh: Symbolic link
+/scan/sbin/mkswap: Symbolic link
+/scan/sbin/ifconfig: Symbolic link
+/scan/sbin/modinfo: Symbolic link
+/scan/sbin/losetup: Symbolic link
+/scan/sbin/findfs: Symbolic link
+/scan/sbin/mdev: Symbolic link
+/scan/sbin/getty: Symbolic link
+/scan/sbin/fbsplash: Symbolic link
+/scan/sbin/rmmod: Symbolic link
+/scan/sbin/ipaddr: Symbolic link
+/scan/sbin/blkid: Symbolic link
+/scan/sbin/fsck: Symbolic link
+/scan/sbin/depmod: Symbolic link
+/scan/sbin/lsmod: Symbolic link
+/scan/sbin/logread: Symbolic link
+/scan/sbin/ifdown: Symbolic link
+/scan/sbin/ip: Symbolic link
+/scan/sbin/iptunnel: Symbolic link
+/scan/sbin/slattach: Symbolic link
+/scan/sbin/blockdev: Symbolic link
+/scan/sbin/zcip: Symbolic link
+/scan/sbin/switch_root: Symbolic link
+/scan/sbin/route: Symbolic link
+/scan/sbin/nameif: Symbolic link
+/scan/sbin/loadkmap: Symbolic link
+/scan/docker-entrypoint.d/30-tune-worker-processes.sh: OK
+/scan/docker-entrypoint.d/10-listen-on-ipv6-by-default.sh: OK
+/scan/docker-entrypoint.d/15-local-resolvers.envsh: OK
+/scan/docker-entrypoint.d/20-envsubst-on-templates.sh: OK
+/scan/var/run: Symbolic link
+/scan/var/spool/cron/crontabs: Symbolic link
+/scan/var/spool/mail: Symbolic link
+/scan/var/lock: Symbolic link
+/scan/var/log/nginx/error.log: Symbolic link
+/scan/var/log/nginx/access.log: Symbolic link
+
+----------- SCAN SUMMARY -----------
+Known viruses: 3628167
+Engine version: 1.5.4
+Scanned directories: 231
+Scanned files: 1234
+Infected files: 0
+Data scanned: 52.42 MiB
+Data read: 46.84 MiB (ratio 1.12:1)
+Time: 39.906 sec (0 m 39 s)
+Start Date: 2026:10:14 02:54:59
+End Date:   2026:10:14 02:55:39

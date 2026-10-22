@@ -1,0 +1,84 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    # Match .env.example's non-default ports exactly so `cp .env.example .env`
+    # (below) works unmodified — see .env.example's WSL2 port-conflict note.
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: app_user
+          POSTGRES_PASSWORD: app_password
+          POSTGRES_DB: app_tra_cuu
+        ports: ['55432:5432']
+        options: >-
+          --health-cmd "pg_isready -U app_user -d app_tra_cuu"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          # >=22.19.0: matches root package.json's engines.node — undici@8
+          # (apps/api's HTTP datasource adapter dep) requires it; see
+          # docker/api.Dockerfile's `base` stage comment for the full story.
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Prepare env file
+        run: cp .env.example .env
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Build
+        run: pnpm build
+
+      - name: Dependency audit (fail on HIGH/CRITICAL)
+        run: pnpm audit --audit-level=high
+
+      - name: Unit tests (api + web)
+        run: pnpm test
+
+      # MinIO isn't started via `services:` because GitHub Actions services
+      # can't override the image's command, and quay.io/minio/minio needs
+      # `server /data` args — run it as a plain container instead.
+      - name: Start MinIO
+        run: |
+          docker run -d --name minio -p 59000:9000 -p 59001:9001 \
+            -e MINIO_ROOT_USER=minio_admin -e MINIO_ROOT_PASSWORD=minio_password \
+            quay.io/minio/minio:RELEASE.2025-09-07T16-13-09Z server /data --console-address ":9001"
+          for i in $(seq 1 30); do
+            curl -fsS http://localhost:59000/minio/health/live && break
+            sleep 2
+          done
+
+      - name: Create MinIO bucket
+        run: |
+          docker run --rm --network host \
+            -e MC_HOST_local=http://minio_admin:minio_password@localhost:59000 \
+            minio/mc:latest mb --ignore-existing local/citizen-photos
+
+      - name: Apply database migrations
+        run: pnpm --filter api run db:migrate:deploy
+
+      - name: E2E tests (api)
+        run: pnpm --filter api run test:e2e

@@ -1,0 +1,36 @@
+node_modules
+**/node_modules
+.pnpm-store
+dist
+**/dist
+build
+**/build
+coverage
+**/coverage
+*.tsbuildinfo
+**/*.tsbuildinfo
+.git
+.github
+.husky
+.vscode
+.idea
+.env
+.env.*
+!.env.example
+*.log
+plans
+docs
+# NOTE: apps/api's own e2e test directory only (backend e2e fixtures — its
+# tsconfig.build.json already excludes "test" from the compile scope, so
+# leaving this dir out of the Docker context just trims build-context size).
+# Do NOT broaden this to a bare `test`/`**/test` pattern: apps/web/src/test/
+# holds shared test *infrastructure* (setup-tests.ts, importing
+# @testing-library/jest-dom for its global matcher type augmentation) that
+# apps/web's tsconfig.app.json does NOT exclude from `tsc -b` — excluding
+# that directory broke the web Docker build (tsc couldn't find the jest-dom
+# matcher types used by *.test.tsx files still in its compile scope).
+apps/api/test
+**/*.e2e-spec.ts
+minio-data
+postgres-data
+--full-page

@@ -1,0 +1,260 @@
+// Prisma schema — app DB (users/roles/history/audit). See:
+// plans/260920-2200-app-tra-cuu-du-lieu/reference-database-erd.md
+//
+// NOTE: the external "image DB" (citizen_photos) is a SEPARATE Postgres owned
+// by the data team. It is NOT modelled here — Phase 04 talks to it via a
+// plain `pg` connection defined in config.json, never through this client.
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  schemas    = ["app"]
+  extensions = [pgcrypto]
+}
+
+// ---------------------------------------------------------------------------
+// Enums
+// ---------------------------------------------------------------------------
+
+enum UserStatus {
+  ACTIVE   @map("active")
+  LOCKED   @map("locked")
+  DISABLED @map("disabled")
+
+  @@schema("app")
+}
+
+enum QueryStatus {
+  SUCCESS @map("success")
+  FAILED  @map("failed")
+  DENIED  @map("denied")
+
+  @@schema("app")
+}
+
+enum PermissionKind {
+  API     @map("api")
+  FEATURE @map("feature")
+
+  @@schema("app")
+}
+
+enum PasswordResetRequestStatus {
+  PENDING  @map("pending")
+  APPROVED @map("approved")
+  REJECTED @map("rejected")
+
+  @@schema("app")
+}
+
+// ---------------------------------------------------------------------------
+// Users, roles, permissions (spec b, c)
+// ---------------------------------------------------------------------------
+
+model User {
+  id                 String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  username           String     @unique @db.VarChar(100)
+  email              String?    @db.VarChar(255)
+  fullName           String     @map("full_name") @db.VarChar(255)
+  passwordHash       String     @map("password_hash") @db.VarChar(255)
+  status             UserStatus @default(ACTIVE)
+  mustChangePassword Boolean    @default(false) @map("must_change_password")
+  failedLoginCount   Int        @default(0) @map("failed_login_count")
+  lockedUntil        DateTime?  @map("locked_until") @db.Timestamptz
+  lastLoginAt        DateTime?  @map("last_login_at") @db.Timestamptz
+  createdAt          DateTime   @default(now()) @map("created_at") @db.Timestamptz
+  createdBy          String?    @map("created_by") @db.Uuid
+  updatedAt          DateTime   @updatedAt @map("updated_at") @db.Timestamptz
+  updatedBy          String?    @map("updated_by") @db.Uuid
+
+  createdByUser User? @relation("UserCreatedBy", fields: [createdBy], references: [id], onDelete: SetNull)
+  updatedByUser User? @relation("UserUpdatedBy", fields: [updatedBy], references: [id], onDelete: SetNull)
+  createdUsers  User[] @relation("UserCreatedBy")
+  updatedUsers  User[] @relation("UserUpdatedBy")
+
+  userRoles        UserRole[]     @relation("UserRoles")
+  grantedUserRoles UserRole[]     @relation("GrantedBy")
+  refreshTokens    RefreshToken[]
+  queryLogs        QueryLog[]
+  auditLogsActed   AuditLog[]     @relation("AuditActor")
+
+  passwordResetRequests         PasswordResetRequest[] @relation("PasswordResetOwner")
+  resolvedPasswordResetRequests PasswordResetRequest[] @relation("PasswordResetResolvedBy")
+
+  @@map("users")
+  @@schema("app")
+}
+
+model Role {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  code        String   @unique @db.VarChar(50)
+  name        String   @db.VarChar(150)
+  description String?
+  isSystem    Boolean  @default(false) @map("is_system")
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  userRoles       UserRole[]
+  rolePermissions RolePermission[]
+
+  @@map("roles")
+  @@schema("app")
+}
+
+model Permission {
+  id        String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  code      String         @unique @db.VarChar(100)
+  name      String         @db.VarChar(150)
+  kind      PermissionKind
+  createdAt DateTime       @default(now()) @map("created_at") @db.Timestamptz
+
+  rolePermissions RolePermission[]
+
+  @@map("permissions")
+  @@schema("app")
+}
+
+/// Explicit join model (not an implicit m-n) so we can keep granted_at/granted_by audit columns.
+model UserRole {
+  userId    String   @map("user_id") @db.Uuid
+  roleId    String   @map("role_id") @db.Uuid
+  grantedAt DateTime @default(now()) @map("granted_at") @db.Timestamptz
+  grantedBy String?  @map("granted_by") @db.Uuid
+
+  user          User  @relation("UserRoles", fields: [userId], references: [id], onDelete: Cascade)
+  role          Role  @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  grantedByUser User? @relation("GrantedBy", fields: [grantedBy], references: [id], onDelete: SetNull)
+
+  @@id([userId, roleId])
+  @@map("user_roles")
+  @@schema("app")
+}
+
+/// Explicit join model for role -> permission grants.
+model RolePermission {
+  roleId       String @map("role_id") @db.Uuid
+  permissionId String @map("permission_id") @db.Uuid
+
+  role       Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, permissionId])
+  @@map("role_permissions")
+  @@schema("app")
+}
+
+// ---------------------------------------------------------------------------
+// Refresh tokens (fast revocation on admin lock)
+// ---------------------------------------------------------------------------
+
+model RefreshToken {
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId     String    @map("user_id") @db.Uuid
+  /// SHA-256 hex digest of the refresh token. Raw token never touches the DB.
+  tokenHash  String    @unique @map("token_hash") @db.VarChar(64)
+  issuedAt   DateTime  @default(now()) @map("issued_at") @db.Timestamptz
+  expiresAt  DateTime  @map("expires_at") @db.Timestamptz
+  revokedAt  DateTime? @map("revoked_at") @db.Timestamptz
+  ip         String?   @db.Inet
+  userAgent  String?   @map("user_agent")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // NOTE: Prisma cannot express a partial index (`WHERE revoked_at IS NULL`)
+  // declaratively. This index is a placeholder that migration step hand-edits
+  // to add the partial predicate from reference-database-erd.md.
+  @@index([userId], map: "refresh_tokens_user_id_active_idx")
+  @@map("refresh_tokens")
+  @@schema("app")
+}
+
+// ---------------------------------------------------------------------------
+// Self-service "forgot password" requests — no email flow (spec: admin
+// resets passwords). A user submits a request by username; an admin approves
+// (re-using the existing reset-password temp-password flow) or rejects it.
+// ---------------------------------------------------------------------------
+
+model PasswordResetRequest {
+  id               String                      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId           String                      @map("user_id") @db.Uuid
+  /// Denormalized like QueryLog.usernameSnapshot — stays readable if the user row changes later.
+  usernameSnapshot String                      @map("username_snapshot") @db.VarChar(100)
+  status           PasswordResetRequestStatus  @default(PENDING)
+  requestedAt      DateTime                    @default(now()) @map("requested_at") @db.Timestamptz
+  requestIp        String?                     @map("request_ip") @db.Inet
+  resolvedAt       DateTime?                   @map("resolved_at") @db.Timestamptz
+  resolvedBy       String?                     @map("resolved_by") @db.Uuid
+
+  user           User  @relation("PasswordResetOwner", fields: [userId], references: [id], onDelete: Cascade)
+  resolvedByUser User? @relation("PasswordResetResolvedBy", fields: [resolvedBy], references: [id], onDelete: SetNull)
+
+  @@index([status, requestedAt(sort: Desc)])
+  @@index([userId])
+  @@map("password_reset_requests")
+  @@schema("app")
+}
+
+// ---------------------------------------------------------------------------
+// Query history (spec e/f) — no upstream PII persisted, only query conditions.
+// ---------------------------------------------------------------------------
+
+model QueryLog {
+  id     String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId String? @map("user_id") @db.Uuid
+  /// Denormalized on purpose: history stays readable after the user row changes/goes away.
+  usernameSnapshot   String      @map("username_snapshot") @db.VarChar(100)
+  datasourceCode     String      @map("datasource_code") @db.VarChar(100)
+  /// Sensitive fields (per config.json `sensitive` flag) are masked before storage.
+  queryParams        Json        @map("query_params")
+  querySummary       String?     @map("query_summary")
+  status             QueryStatus
+  /// Real HTTP status code (200-599) this lookup resolved to — more granular
+  /// than `status` (e.g. distinguishes a 422 validation failure from a 504
+  /// upstream timeout, both of which are `status: FAILED`). Nullable: rows
+  /// written before this column existed have no value.
+  statusCode         Int?        @map("status_code")
+  errorCode          String?     @map("error_code") @db.VarChar(100)
+  errorMessage       String?     @map("error_message")
+  recordCount        Int?        @map("record_count")
+  upstreamRequestId  String?     @map("upstream_request_id") @db.VarChar(255)
+  durationMs         Int?        @map("duration_ms")
+  ip                 String?     @db.Inet
+  userAgent          String?     @map("user_agent")
+  createdAt          DateTime    @default(now()) @map("created_at") @db.Timestamptz
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId, createdAt(sort: Desc)])
+  @@index([datasourceCode, createdAt(sort: Desc)])
+  @@index([createdAt(sort: Desc)])
+  @@map("query_logs")
+  @@schema("app")
+}
+
+// ---------------------------------------------------------------------------
+// Admin audit trail (spec g) — before/after diffs, password hashes stripped
+// by the audit writer (Phase 03), never persisted here.
+// ---------------------------------------------------------------------------
+
+model AuditLog {
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  actorUserId  String?  @map("actor_user_id") @db.Uuid
+  action       String   @db.VarChar(100)
+  targetType   String   @map("target_type") @db.VarChar(100)
+  targetId     String?  @map("target_id") @db.VarChar(255)
+  before       Json?
+  after        Json?
+  ip           String?  @db.Inet
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  actor User? @relation("AuditActor", fields: [actorUserId], references: [id], onDelete: SetNull)
+
+  @@index([actorUserId, createdAt(sort: Desc)])
+  @@index([targetType, targetId])
+  @@map("audit_logs")
+  @@schema("app")
+}

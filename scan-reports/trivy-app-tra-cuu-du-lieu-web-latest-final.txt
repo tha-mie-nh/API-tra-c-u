@@ -1,0 +1,19 @@
+2026-09-21T15:09:41Z	INFO	[vuln] Vulnerability scanning is enabled
+2026-09-21T15:09:41Z	INFO	[secret] Secret scanning is enabled
+2026-09-21T15:09:41Z	INFO	[secret] If your scanning is slow, please try '--scanners vuln' to disable secret scanning
+2026-09-21T15:09:41Z	INFO	[secret] Please see https://trivy.dev/docs/v0.74/guide/scanner/secret#recommendation for faster secret detection
+2026-09-21T15:09:43Z	INFO	Detected OS	family="alpine" version="3.21.3"
+2026-09-21T15:09:43Z	INFO	[alpine] Detecting vulnerabilities...	os_version="3.21" repository="3.21" pkg_num=68
+2026-09-21T15:09:43Z	INFO	Number of language-specific files	num=0
+
+Report Summary
+
+┌────────────────────────────────────────────────┬────────┬─────────────────┬─────────┐
+│                     Target                     │  Type  │ Vulnerabilities │ Secrets │
+├────────────────────────────────────────────────┼────────┼─────────────────┼─────────┤
+│ app-tra-cuu-du-lieu-web:latest (alpine 3.21.3) │ alpine │        0        │    -    │
+└────────────────────────────────────────────────┴────────┴─────────────────┴─────────┘
+Legend:
+- '-': Not scanned
+- '0': Clean (no security findings detected)
+

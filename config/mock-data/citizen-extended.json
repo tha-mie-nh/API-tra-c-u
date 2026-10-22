@@ -1,0 +1,26 @@
+[
+  {
+    "so_cccd": "001099001234",
+    "ho_va_ten": "Nguyễn Văn A",
+    "nam_sinh": 1999,
+    "nghe_nghiep": "Sinh viên",
+    "noi_o_hien_tai": "Hà Nội",
+    "ngay_cap_nhat": "2022-02-01T00:00:00Z"
+  },
+  {
+    "so_cccd": "001099001234",
+    "ho_va_ten": "Nguyễn Văn A",
+    "nam_sinh": 1999,
+    "nghe_nghiep": "Kỹ sư phần mềm",
+    "noi_o_hien_tai": "Hà Nội",
+    "ngay_cap_nhat": "2025-08-15T00:00:00Z"
+  },
+  {
+    "so_cccd": "001099009999",
+    "ho_va_ten": "Trần Thị B",
+    "nam_sinh": 1995,
+    "nghe_nghiep": "Giáo viên",
+    "noi_o_hien_tai": "Hà Nội",
+    "ngay_cap_nhat": "2024-04-10T00:00:00Z"
+  }
+]

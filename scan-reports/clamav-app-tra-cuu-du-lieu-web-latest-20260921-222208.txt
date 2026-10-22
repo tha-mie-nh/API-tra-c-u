@@ -1,0 +1,17 @@
+[malware-scan] real end-to-end ClamAV deep scan of app-tra-cuu-du-lieu-web:latest
+Same method as the api image report in this directory.
+
+LibClamAV Warning: Max file-size was set to 4194304000 bytes. Unfortunately, scanning files greater than 2147483647 bytes (2 GiB - 1) is not supported.
+/scan/web-image.tar: OK
+
+----------- SCAN SUMMARY -----------
+Known viruses: 3628071
+Engine version: 1.5.4
+Scanned directories: 0
+Scanned files: 1
+Infected files: 0
+Data scanned: 103.34 MiB
+Data read: 47.85 MiB (ratio 2.16:1)
+Time: 40.456 sec (0 m 40 s)
+Start Date: 2026:09:21 15:22:08
+End Date:   2026:09:21 15:22:48

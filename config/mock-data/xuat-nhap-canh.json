@@ -1,0 +1,74 @@
+[
+  {
+    "so_cccd": "001099001234",
+    "ho_ten": "Nguyễn Văn A",
+    "chieu": "XUAT",
+    "cua_khau": "Sân bay quốc tế Nội Bài (Hà Nội)",
+    "quoc_gia": "Thái Lan",
+    "muc_dich": "Du lịch",
+    "thoi_diem": "2019-06-15T07:20:00Z"
+  },
+  {
+    "so_cccd": "001099001234",
+    "ho_ten": "Nguyễn Văn A",
+    "chieu": "NHAP",
+    "cua_khau": "Sân bay quốc tế Nội Bài (Hà Nội)",
+    "quoc_gia": "Thái Lan",
+    "muc_dich": "Du lịch",
+    "thoi_diem": "2019-06-25T14:05:00Z"
+  },
+  {
+    "so_cccd": "001099001234",
+    "ho_ten": "Nguyễn Văn A",
+    "chieu": "XUAT",
+    "cua_khau": "Cửa khẩu quốc tế Hữu Nghị (Lạng Sơn)",
+    "quoc_gia": "Trung Quốc",
+    "muc_dich": "Công tác",
+    "thoi_diem": "2022-11-02T06:40:00Z"
+  },
+  {
+    "so_cccd": "001099001234",
+    "ho_ten": "Nguyễn Văn A",
+    "chieu": "NHAP",
+    "cua_khau": "Cửa khẩu quốc tế Hữu Nghị (Lạng Sơn)",
+    "quoc_gia": "Trung Quốc",
+    "muc_dich": "Công tác",
+    "thoi_diem": "2022-11-10T18:15:00Z"
+  },
+  {
+    "so_cccd": "001099001234",
+    "ho_ten": "Nguyễn Văn A",
+    "chieu": "XUAT",
+    "cua_khau": "Sân bay quốc tế Tân Sơn Nhất (TP.HCM)",
+    "quoc_gia": "Hàn Quốc",
+    "muc_dich": "Học tập",
+    "thoi_diem": "2025-03-20T09:50:00Z"
+  },
+  {
+    "so_cccd": "001099001234",
+    "ho_ten": "Nguyễn Văn A",
+    "chieu": "NHAP",
+    "cua_khau": "Sân bay quốc tế Tân Sơn Nhất (TP.HCM)",
+    "quoc_gia": "Hàn Quốc",
+    "muc_dich": "Học tập",
+    "thoi_diem": "2025-09-05T21:30:00Z"
+  },
+  {
+    "so_cccd": "001099009999",
+    "ho_ten": "Trần Thị B",
+    "chieu": "XUAT",
+    "cua_khau": "Sân bay quốc tế Nội Bài (Hà Nội)",
+    "quoc_gia": "Nhật Bản",
+    "muc_dich": "Du lịch",
+    "thoi_diem": "2024-04-02T08:10:00Z"
+  },
+  {
+    "so_cccd": "001099009999",
+    "ho_ten": "Trần Thị B",
+    "chieu": "NHAP",
+    "cua_khau": "Sân bay quốc tế Nội Bài (Hà Nội)",
+    "quoc_gia": "Nhật Bản",
+    "muc_dich": "Du lịch",
+    "thoi_diem": "2024-04-12T19:45:00Z"
+  }
+]

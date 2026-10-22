@@ -1,0 +1,60 @@
+{
+  "version": 1,
+  "defaults": { "maxResults": 100, "pageSize": 20, "timeoutMs": 5000, "retry": { "attempts": 1, "backoffMs": 100 } },
+  "datasources": [
+    {
+      "code": "E2E_DS_ONE",
+      "name": "E2E datasource one",
+      "type": "info",
+      "enabled": true,
+      "permissionCode": "api:e2e_ds_one",
+      "transport": { "kind": "mock", "dataFile": "mock-data/one.json" },
+      "input": { "fields": [{ "name": "id", "label": "ID", "type": "string" }] },
+      "output": {
+        "timestampField": "ts",
+        "sortOrder": "desc",
+        "identityField": "id",
+        "fields": [
+          { "name": "id", "label": "ID", "from": "id", "type": "string" },
+          { "name": "ts", "label": "Timestamp", "from": "ts", "type": "datetime" }
+        ]
+      }
+    },
+    {
+      "code": "E2E_DS_TWO",
+      "name": "E2E datasource two",
+      "type": "info",
+      "enabled": true,
+      "permissionCode": "api:e2e_ds_two",
+      "transport": { "kind": "mock", "dataFile": "mock-data/two.json" },
+      "input": { "fields": [{ "name": "id", "label": "ID", "type": "string" }] },
+      "output": {
+        "timestampField": "ts",
+        "sortOrder": "desc",
+        "identityField": "id",
+        "fields": [
+          { "name": "id", "label": "ID", "from": "id", "type": "string" },
+          { "name": "ts", "label": "Timestamp", "from": "ts", "type": "datetime" }
+        ]
+      }
+    },
+    {
+      "code": "E2E_DS_THREE",
+      "name": "E2E datasource three",
+      "type": "info",
+      "enabled": true,
+      "permissionCode": "api:e2e_ds_three",
+      "transport": { "kind": "mock", "dataFile": "mock-data/three.json" },
+      "input": { "fields": [{ "name": "id", "label": "ID", "type": "string" }] },
+      "output": {
+        "timestampField": "ts",
+        "sortOrder": "desc",
+        "identityField": "id",
+        "fields": [
+          { "name": "id", "label": "ID", "from": "id", "type": "string" },
+          { "name": "ts", "label": "Timestamp", "from": "ts", "type": "datetime" }
+        ]
+      }
+    }
+  ]
+}

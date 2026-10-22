@@ -1,0 +1,79 @@
+[
+  {
+    "so_cccd": "001099001234",
+    "ho_ten": "Nguyễn Văn A",
+    "loai_giay_to": "CMND9",
+    "so_giay_to": "012345678",
+    "tuoi_luc_cap": 14,
+    "chieu_cao": 158,
+    "dac_diem_nhan_dang": "Nốt ruồi nhỏ trên má phải",
+    "noi_cap": "Công an Thành phố Hà Nội",
+    "ngay_cap": "2013-06-01T00:00:00Z"
+  },
+  {
+    "so_cccd": "001099001234",
+    "ho_ten": "Nguyễn Văn A",
+    "loai_giay_to": "CCCD_MVACH",
+    "so_giay_to": "001099001234",
+    "tuoi_luc_cap": 17,
+    "chieu_cao": 168,
+    "dac_diem_nhan_dang": "Nốt ruồi nhỏ trên má phải",
+    "noi_cap": "Công an Thành phố Hà Nội",
+    "ngay_cap": "2016-09-10T00:00:00Z"
+  },
+  {
+    "so_cccd": "001099001234",
+    "ho_ten": "Nguyễn Văn A",
+    "loai_giay_to": "CCCD_CHIP",
+    "so_giay_to": "001099001234",
+    "tuoi_luc_cap": 21,
+    "chieu_cao": 172,
+    "dac_diem_nhan_dang": "Sẹo nhỏ ở cằm (tai nạn xe máy năm 2019)",
+    "noi_cap": "Cục Cảnh sát QLHC về TTXH",
+    "ngay_cap": "2021-03-15T00:00:00Z"
+  },
+  {
+    "so_cccd": "001099001234",
+    "ho_ten": "Nguyễn Văn A",
+    "loai_giay_to": "THE_CAN_CUOC",
+    "so_giay_to": "001099001234",
+    "tuoi_luc_cap": 25,
+    "chieu_cao": 172,
+    "dac_diem_nhan_dang": "Sẹo nhỏ ở cằm; đã thu nhận thông tin mống mắt",
+    "noi_cap": "Cục Cảnh sát QLHC về TTXH",
+    "ngay_cap": "2024-07-01T00:00:00Z"
+  },
+  {
+    "so_cccd": "001099009999",
+    "ho_ten": "Trần Thị B",
+    "loai_giay_to": "CMND9",
+    "so_giay_to": "087654321",
+    "tuoi_luc_cap": 14,
+    "chieu_cao": 152,
+    "dac_diem_nhan_dang": "Không có đặc điểm gì đặc biệt",
+    "noi_cap": "Công an Thành phố Hà Nội",
+    "ngay_cap": "2009-11-10T00:00:00Z"
+  },
+  {
+    "so_cccd": "001099009999",
+    "ho_ten": "Trần Thị B",
+    "loai_giay_to": "CCCD_MVACH",
+    "so_giay_to": "001099009999",
+    "tuoi_luc_cap": 21,
+    "chieu_cao": 160,
+    "dac_diem_nhan_dang": "Không có đặc điểm gì đặc biệt",
+    "noi_cap": "Công an Thành phố Hà Nội",
+    "ngay_cap": "2016-09-10T00:00:00Z"
+  },
+  {
+    "so_cccd": "001099009999",
+    "ho_ten": "Trần Thị B",
+    "loai_giay_to": "CCCD_CHIP",
+    "so_giay_to": "001099009999",
+    "tuoi_luc_cap": 25,
+    "chieu_cao": 160,
+    "dac_diem_nhan_dang": "Nốt ruồi nhỏ dưới mắt trái",
+    "noi_cap": "Cục Cảnh sát QLHC về TTXH",
+    "ngay_cap": "2020-11-05T00:00:00Z"
+  }
+]

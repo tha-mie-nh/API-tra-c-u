@@ -1,0 +1,42 @@
+{
+  "version": 1,
+  "defaults": { "maxResults": 100, "pageSize": 20, "timeoutMs": 5000, "retry": { "attempts": 1, "backoffMs": 100 } },
+  "datasources": [
+    {
+      "code": "DUP_DS",
+      "name": "First",
+      "type": "info",
+      "enabled": true,
+      "permissionCode": "api:dup_ds",
+      "transport": { "kind": "mock", "dataFile": "mock-data/sample.json" },
+      "input": { "fields": [{ "name": "id", "label": "ID", "type": "string", "required": true }] },
+      "output": {
+        "timestampField": "ts",
+        "sortOrder": "desc",
+        "identityField": "id",
+        "fields": [
+          { "name": "id", "label": "ID", "from": "id", "type": "string" },
+          { "name": "ts", "label": "Timestamp", "from": "ts", "type": "datetime" }
+        ]
+      }
+    },
+    {
+      "code": "DUP_DS",
+      "name": "Second (duplicate code)",
+      "type": "info",
+      "enabled": true,
+      "permissionCode": "api:dup_ds_2",
+      "transport": { "kind": "mock", "dataFile": "mock-data/sample.json" },
+      "input": { "fields": [{ "name": "id", "label": "ID", "type": "string", "required": true }] },
+      "output": {
+        "timestampField": "ts",
+        "sortOrder": "desc",
+        "identityField": "id",
+        "fields": [
+          { "name": "id", "label": "ID", "from": "id", "type": "string" },
+          { "name": "ts", "label": "Timestamp", "from": "ts", "type": "datetime" }
+        ]
+      }
+    }
+  ]
+}

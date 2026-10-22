@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "defaults": { "maxResults": 100, "pageSize": 20, "timeoutMs": 5000, "retry": { "attempts": 1, "backoffMs": 100 } },
+  "datasources": [
+    {
+      "code": "HTTP_DS",
+      "name": "HTTP datasource with missing env credential",
+      "type": "info",
+      "enabled": true,
+      "permissionCode": "api:http_ds",
+      "transport": {
+        "kind": "http",
+        "baseUrl": "http://localhost:9999",
+        "path": "/search",
+        "method": "POST",
+        "auth": { "kind": "apiKeyHeader", "header": "X-API-Key", "valueEnv": "THIS_ENV_VAR_DOES_NOT_EXIST_12345" }
+      },
+      "input": { "fields": [{ "name": "id", "label": "ID", "type": "string", "required": true }] },
+      "output": {
+        "timestampField": "ts",
+        "sortOrder": "desc",
+        "identityField": "id",
+        "fields": [
+          { "name": "id", "label": "ID", "from": "id", "type": "string" },
+          { "name": "ts", "label": "Timestamp", "from": "ts", "type": "datetime" }
+        ]
+      }
+    }
+  ]
+}

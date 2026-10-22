@@ -1,0 +1,46 @@
+[
+  {
+    "so_cccd": "001099001234",
+    "chu_so_huu": "Nguyễn Văn A",
+    "loai_xe": "XE_MAY",
+    "hang_xe": "Honda",
+    "dong_xe": "Wave Alpha 110",
+    "bien_so": "29H1-123.45",
+    "gia_tri": 18000000,
+    "noi_dang_ky": "Công an quận Đống Đa, Hà Nội",
+    "ngay_dang_ky": "2018-08-20T00:00:00Z"
+  },
+  {
+    "so_cccd": "001099001234",
+    "chu_so_huu": "Nguyễn Văn A",
+    "loai_xe": "XE_MAY",
+    "hang_xe": "Yamaha",
+    "dong_xe": "Exciter 155 VVA",
+    "bien_so": "29H1-456.78",
+    "gia_tri": 52000000,
+    "noi_dang_ky": "Công an quận Cầu Giấy, Hà Nội",
+    "ngay_dang_ky": "2021-05-14T00:00:00Z"
+  },
+  {
+    "so_cccd": "001099001234",
+    "chu_so_huu": "Nguyễn Văn A",
+    "loai_xe": "O_TO",
+    "hang_xe": "Toyota",
+    "dong_xe": "Vios 2024 G",
+    "bien_so": "30G-888.88",
+    "gia_tri": 580000000,
+    "noi_dang_ky": "Phòng CSGT Công an Thành phố Hà Nội",
+    "ngay_dang_ky": "2025-01-10T00:00:00Z"
+  },
+  {
+    "so_cccd": "001099009999",
+    "chu_so_huu": "Trần Thị B",
+    "loai_xe": "XE_MAY",
+    "hang_xe": "Honda",
+    "dong_xe": "Vision 2019",
+    "bien_so": "30F1-222.22",
+    "gia_tri": 32000000,
+    "noi_dang_ky": "Công an quận Hoàn Kiếm, Hà Nội",
+    "ngay_dang_ky": "2019-03-01T00:00:00Z"
+  }
+]

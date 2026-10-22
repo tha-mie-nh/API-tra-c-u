@@ -1,0 +1,67 @@
+name: Build & Scan Docker images
+
+# Runs on every push/PR to main (Key Insight from phase-09: run scans on
+# every CI build, not once right before go-live) plus manual dispatch.
+# Separate from ci.yml so a slow Trivy/ClamAV pass never blocks the fast
+# lint/typecheck/test feedback loop.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build-and-scan:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        target: [api, web]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build ${{ matrix.target }} image
+        run: docker build -f docker/${{ matrix.target }}.Dockerfile -t app-${{ matrix.target }}:ci .
+
+      - name: Trivy vulnerability scan (HIGH/CRITICAL fails the build)
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: app-${{ matrix.target }}:ci
+          format: table
+          output: trivy-${{ matrix.target }}-report.txt
+          severity: HIGH,CRITICAL
+          exit-code: '1'
+
+      - name: Upload Trivy report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-${{ matrix.target }}-report
+          path: trivy-${{ matrix.target }}-report.txt
+
+      - name: ClamAV malware scan (customer requirement, spec g)
+        if: always()
+        run: ./scripts/scan-image-malware.sh app-${{ matrix.target }}:ci ./scan-reports
+
+      - name: Upload ClamAV report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: clamav-${{ matrix.target }}-report
+          path: scan-reports/
+
+      - name: Verify no secrets in image layers
+        run: |
+          docker history --no-trunc app-${{ matrix.target }}:ci | tee history-${{ matrix.target }}.txt
+          # Fail if any layer command string contains an obvious secret env
+          # var name being baked in via ENV/ARG (should only ever arrive at
+          # runtime via env_file — see docker-compose.prod.yml).
+          if grep -Ei '(JWT_ACCESS_SECRET|JWT_REFRESH_SECRET|_PASSWORD|_API_KEY)=' history-${{ matrix.target }}.txt; then
+            echo "::error::Possible secret baked into image layer history" && exit 1
+          fi
+
+      # Registry push is intentionally NOT wired up — no company registry
+      # has been confirmed yet (see phase-09 Unresolved Questions). Once one
+      # exists, add a `docker push` step here gated on both scans passing
+      # (this job already fails fast on either scan finding HIGH/CRITICAL
+      # vulns or malware, so a push step appended after is safe to add).

@@ -1,0 +1,42 @@
+[
+  {
+    "cccd": "001099001234",
+    "ho_ten": "Nguyễn Văn A",
+    "ngay_sinh": "1999-05-12",
+    "gioi_tinh": "1",
+    "dia_chi": "12 Lê Lợi, Hoàn Kiếm, Hà Nội",
+    "thoi_diem": "2024-01-10T08:00:00Z"
+  },
+  {
+    "cccd": "001099001234",
+    "ho_ten": "Nguyễn Văn A",
+    "ngay_sinh": "1999-05-12",
+    "gioi_tinh": "1",
+    "dia_chi": "45 Trần Phú, Ba Đình, Hà Nội",
+    "thoi_diem": "2025-06-20T14:30:00Z"
+  },
+  {
+    "cccd": "001099001234",
+    "ho_ten": "Nguyễn Văn A",
+    "ngay_sinh": "1999-05-12",
+    "gioi_tinh": "1",
+    "dia_chi": "78 Nguyễn Trãi, Thanh Xuân, Hà Nội",
+    "thoi_diem": "2026-03-01T10:00:00Z"
+  },
+  {
+    "cccd": "001099009999",
+    "ho_ten": "Trần Thị B",
+    "ngay_sinh": "1995-11-02",
+    "gioi_tinh": "2",
+    "dia_chi": "9 Hai Bà Trưng, Hoàn Kiếm, Hà Nội",
+    "thoi_diem": "2023-09-05T09:00:00Z"
+  },
+  {
+    "cccd": "001099009999",
+    "ho_ten": "Trần Thị B",
+    "ngay_sinh": "1995-11-02",
+    "gioi_tinh": "2",
+    "dia_chi": "20 Kim Mã, Ba Đình, Hà Nội",
+    "thoi_diem": "2025-12-15T16:45:00Z"
+  }
+]

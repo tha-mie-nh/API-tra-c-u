@@ -1,0 +1,62 @@
+[
+  {
+    "so_cccd": "001099001234",
+    "ho_ten": "Nguyễn Văn A",
+    "loai_su_kien": "KHAI_SINH",
+    "quan_he": "Cha",
+    "nguoi_lien_quan": "Nguyễn Văn Bình",
+    "cccd_nguoi_lien_quan": "",
+    "noi_dang_ky": "UBND Phường Điện Biên, Hà Nội",
+    "ngay_su_kien": "1999-05-20T00:00:00Z"
+  },
+  {
+    "so_cccd": "001099001234",
+    "ho_ten": "Nguyễn Văn A",
+    "loai_su_kien": "KET_HON",
+    "quan_he": "Vợ/Chồng",
+    "nguoi_lien_quan": "Trần Thị B",
+    "cccd_nguoi_lien_quan": "001099009999",
+    "noi_dang_ky": "UBND Phường Cầu Giấy, Hà Nội",
+    "ngay_su_kien": "2023-10-15T00:00:00Z"
+  },
+  {
+    "so_cccd": "001099001234",
+    "ho_ten": "Nguyễn Văn A",
+    "loai_su_kien": "KHAI_SINH_CON",
+    "quan_he": "Con",
+    "nguoi_lien_quan": "Nguyễn Văn Bảo",
+    "cccd_nguoi_lien_quan": "",
+    "noi_dang_ky": "UBND Phường Cầu Giấy, Hà Nội",
+    "ngay_su_kien": "2025-06-02T00:00:00Z"
+  },
+  {
+    "so_cccd": "001099009999",
+    "ho_ten": "Trần Thị B",
+    "loai_su_kien": "KHAI_SINH",
+    "quan_he": "Cha",
+    "nguoi_lien_quan": "Trần Văn Cường",
+    "cccd_nguoi_lien_quan": "",
+    "noi_dang_ky": "UBND Phường Hàng Bạc, Hà Nội",
+    "ngay_su_kien": "1995-11-10T00:00:00Z"
+  },
+  {
+    "so_cccd": "001099009999",
+    "ho_ten": "Trần Thị B",
+    "loai_su_kien": "KET_HON",
+    "quan_he": "Vợ/Chồng",
+    "nguoi_lien_quan": "Nguyễn Văn A",
+    "cccd_nguoi_lien_quan": "001099001234",
+    "noi_dang_ky": "UBND Phường Cầu Giấy, Hà Nội",
+    "ngay_su_kien": "2023-10-15T00:00:00Z"
+  },
+  {
+    "so_cccd": "001099009999",
+    "ho_ten": "Trần Thị B",
+    "loai_su_kien": "KHAI_SINH_CON",
+    "quan_he": "Con",
+    "nguoi_lien_quan": "Nguyễn Văn Bảo",
+    "cccd_nguoi_lien_quan": "",
+    "noi_dang_ky": "UBND Phường Cầu Giấy, Hà Nội",
+    "ngay_su_kien": "2025-06-02T00:00:00Z"
+  }
+]

@@ -1,0 +1,19 @@
+[malware-scan] real end-to-end ClamAV deep scan of app-tra-cuu-du-lieu-api:latest
+Method: docker export -> single tar archive -> clamscan --scan-archive=yes with raised
+max-filesize/max-scansize (default 100MB caps were silently skipping content on the
+initial attempt against this 537MB image; raised to 4000M, real ClamAV limit is 2GiB/file).
+
+LibClamAV Warning: Max file-size was set to 4194304000 bytes. Unfortunately, scanning files greater than 2147483647 bytes (2 GiB - 1) is not supported.
+/scan/api-image.tar: OK
+
+----------- SCAN SUMMARY -----------
+Known viruses: 3628071
+Engine version: 1.5.4
+Scanned directories: 0
+Scanned files: 1
+Infected files: 0
+Data scanned: 264.54 MiB
+Data read: 537.94 MiB (ratio 0.49:1)
+Time: 146.311 sec (2 m 26 s)
+Start Date: 2026:09:21 15:19:08
+End Date:   2026:09:21 15:21:34
