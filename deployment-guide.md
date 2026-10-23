@@ -98,7 +98,8 @@ Mở trình duyệt `http://<IP-server>` → thấy trang đăng nhập.
 
 - Tài khoản: `admin`
 - Mật khẩu: `grep BOOTSTRAP_ADMIN_PASSWORD .env.prod`
-- Bắt buộc đổi mật khẩu lần đầu.
+- Bắt buộc đổi mật khẩu lần đầu. Sau khi đổi, mật khẩu trong `.env.prod` **không còn dùng được**
+  (chỉ là mật khẩu khởi tạo) — dùng mật khẩu mới.
 
 **Tài liệu API (Swagger)**: `http://<IP-server>/api/v1/docs` — sinh tự động từ code, luôn khớp
 API thật. Bấm "Authorize" rồi dán access token (lấy từ response của `POST /api/v1/auth/login`,
@@ -139,7 +140,9 @@ họ, theo đúng quy trình họ muốn.
    ```bash
    docker compose -f docker-compose.prod.yml --env-file .env.prod --profile db-setup run --rm seed
    ```
-   Lệnh này chỉ tạo role/quyền/tài khoản admin — không đụng gì tới cấu trúc bảng.
+   Lệnh này chỉ tạo role/quyền/tài khoản admin — không đụng gì tới cấu trúc bảng. Chạy **sau
+   khi `api` đã khởi động** (bước 3) thì ADMIN được cấp luôn các quyền `api:*` đã đồng bộ; thêm
+   datasource sau này thì chạy lại lệnh này (xem "4 API thật" bước 4).
 
 Ở chế độ 2, chỉ còn `api`/`web` là image tự quản lý/cập nhật — Postgres do bên vận hành Postgres
 đó lo backup/vận hành/áp schema mới sau này (mỗi lần có thay đổi, nhận thêm file `.sql` mới áp
@@ -173,9 +176,12 @@ không dùng tới — chỉ là input cho container `postgres` tự chứa, kh�
 | `IMMIGRATION_HISTORY_*`/`PASSPORT_INFO_*`/`DRIVER_LICENSE_*`/`FACE_PHOTO_*` | `BASE_URL`/`API_KEY` của 4 API thật, đang mock | Chỉ khi có API thật |
 | `ALLOW_MOCK_DATASOURCES` | Cho phép chạy datasource mock | `false` khi hết mock |
 
-**4 API thật — cách bật, tự làm được, không cần xem code:**
+**4 API thật — cách bật:**
 
 1. Điền `BASE_URL`/`API_KEY` của 4 biến trên trong `.env.prod`.
+   - `BASE_URL` phải là địa chỉ mà **container `api`** tới được. `localhost` trong container là
+     chính container đó, **không phải máy host** — dùng IP/DNS thật của máy chạy API (vd
+     `http://172.22.142.171:4000`), và mở firewall giữa 2 máy nếu cần.
 2. Trong `config/config.json`, tìm đúng datasource (`IMMIGRATION_HISTORY`, `PASSPORT_INFO`,
    `DRIVER_LICENSE`, hoặc `FACE_PHOTO`), sửa khối `"transport"` từ:
    ```json
@@ -201,10 +207,51 @@ không dùng tới — chỉ là input cho container `postgres` tự chứa, kh�
    - `auth.header`: tên header **xác thực** theo tài liệu (`X-Access`, `X-Api-Key`... tùy API
      thật đặt tên gì, điền đúng tên đó). `auth.valueEnv`: tên biến env chứa giá trị thật (đã có
      sẵn, vd `IMMIGRATION_HISTORY_API_KEY`) — không ghi giá trị thật vào `config.json`.
-3. `docker compose -f docker-compose.prod.yml --env-file .env.prod restart api` — không cần
-   pull/rebuild.
-4. Test thử ngay qua Swagger (`/api/v1/docs`) → gọi `POST /api/v1/query/IMMIGRATION_HISTORY` với
-   tham số thật, xem có trả đúng dữ liệu không.
+   - Chỉ đổi `kind` sang `http` cho datasource **đang bật** (`enabled: true`). Datasource đang tắt
+     để nguyên `mock` — `http` mà thiếu `baseUrl`/`path` có thể làm app lỗi lúc nạp config.
+   - **Cấu trúc response của API thật phải khớp phần `output`** của datasource đó: `recordsPath`
+     (vd `data.0.data`) và `from` của từng field. API thật trả JSON khác mẫu mock thì sửa
+     `recordsPath`/`from` cho khớp, nếu không app trả rỗng hoặc thiếu field dù gọi thành công.
+3. Áp dụng thay đổi — **chọn đúng lệnh**:
+   ```bash
+   # Đã sửa .env.prod (dù có sửa config.json hay không): tạo lại container để nạp env mới
+   docker compose -f docker-compose.prod.yml --env-file .env.prod up -d api
+   # Chỉ sửa config.json: restart là đủ
+   docker compose -f docker-compose.prod.yml --env-file .env.prod restart api
+   ```
+   Docker chỉ đọc `.env.prod` **lúc tạo container**; `restart` không nạp lại env, container sẽ
+   vẫn dùng `BASE_URL`/`API_KEY` cũ. Không cần pull/rebuild.
+4. **Cấp quyền tra cứu.** Menu "Tra cứu" chỉ hiện datasource mà user có quyền `api:<tên>` (vd
+   `api:passport_info`). `api` tự tạo các quyền này từ `config.json` lúc khởi động nhưng **không
+   cấp cho role nào**; chưa cấp thì menu trống dù kết nối đúng. Cấp bằng 1 trong 2 cách:
+   - Giao diện: Quản trị → Vai trò & quyền → chọn role → tick các `api:*` cần dùng → lưu → user
+     đăng nhập lại.
+   - Cấp cho ADMIN tự động: chạy lại `seed` **sau khi `api` đã khởi động ít nhất 1 lần** (seed
+     cấp cho ADMIN mọi quyền `api:*` đã đồng bộ; chạy lại bao nhiêu lần cũng an toàn):
+     ```bash
+     docker compose -f docker-compose.prod.yml --env-file .env.prod --profile db-setup run --rm seed
+     ```
+   Role khác (OPERATOR, AUDITOR) luôn phải cấp qua giao diện. Mỗi lần thêm datasource mới vào
+   `config.json` cũng làm lại bước này.
+5. Test thử qua giao diện (menu Tra cứu) hoặc Swagger (`/api/v1/docs`) → gọi
+   `POST /api/v1/query/IMMIGRATION_HISTORY` với tham số thật, xem có trả đúng dữ liệu không.
+
+**Báo `Nguồn dữ liệu tạm thời không phản hồi` — cách trace.** Log `api` chỉ ghi chung
+`Upstream datasource request failed`, không nói lý do. Tái hiện đúng request ngay từ trong
+container `api`:
+
+```bash
+C="docker compose -f docker-compose.prod.yml --env-file .env.prod"
+# 1. Container đang thấy env nào? (so với .env.prod — khác nghĩa là cần `up -d api`)
+$C exec api printenv | grep -E 'BASE_URL'
+# 2. Từ container có gọi tới API được không?
+$C exec api curl -s -m 5 -o /dev/null -w "%{http_code}\n" "<BASE_URL>/health-hoac-path-that"
+```
+
+- `ECONNREFUSED`/timeout: `BASE_URL` sai (vd còn `localhost`), API chưa chạy, hoặc firewall chặn.
+- `401`/`403`: sai `API_KEY` hoặc sai tên header `auth.header`.
+- `404`: sai `path`.
+- `200` nhưng app báo rỗng/thiếu field: sai `output.recordsPath`/`from` (xem bước 2).
 
 Toàn bộ chỉ sửa `config.json` + `.env.prod` — **không cần xem/sửa code, không cần build lại
 image**. Nếu tài liệu API thật có gì mà mẫu trên chưa khớp (vd cần ký request, header đặc biệt
@@ -227,7 +274,8 @@ App không tự có HTTPS — `web` (nginx) chỉ phục vụ HTTP thuần.
 ```bash
 docker compose -f docker-compose.prod.yml --env-file .env.prod restart api
 ```
-Không cần pull/rebuild — `config/` mount trực tiếp vào container.
+Không cần pull/rebuild — `config/` mount trực tiếp vào container. Nếu có sửa cả `.env.prod`
+thì dùng `up -d api` thay cho `restart` (xem "4 API thật" bước 3).
 
 **Lên phiên bản mới (có đổi code):** nhận file `docker-compose.prod.yml` mới (tag mới ghi sẵn
 trong đó), ghi đè file cũ, chạy lại:
@@ -254,10 +302,29 @@ docker compose -f docker-compose.prod.yml --env-file .env.prod logs web --tail 5
 docker compose -f docker-compose.prod.yml --env-file .env.prod up -d web
 ```
 
-**`api` không healthy:** thường do `config/config.json` sai định dạng.
+**`api` không healthy:** thường do `config/config.json` sai định dạng, hoặc không kết nối được DB.
 ```bash
 docker compose -f docker-compose.prod.yml --env-file .env.prod logs api --tail 100
 ```
+
+**`api` crash, log có `P1000 ... credentials for app_user are not valid`:** mật khẩu DB không
+khớp. Hay gặp khi volume `postgres-data` được tạo từ lần chạy cũ — Postgres chỉ đặt mật khẩu
+**1 lần lúc tạo volume**, đổi `POSTGRES_PASSWORD`/`DATABASE_URL` sau đó không áp dụng lại.
+- Không cần giữ dữ liệu: `docker compose ... down -v` rồi `up -d` (**xóa toàn bộ dữ liệu DB**).
+- Cần giữ dữ liệu: đặt lại mật khẩu cho khớp `DATABASE_URL`:
+  ```bash
+  docker compose -f docker-compose.prod.yml --env-file .env.prod exec postgres \
+    psql -U <POSTGRES_USER> -d <POSTGRES_DB> -c "ALTER USER app_user PASSWORD '<mật khẩu trong DATABASE_URL>';"
+  docker compose -f docker-compose.prod.yml --env-file .env.prod up -d api
+  ```
+- Chế độ PG có sẵn: kiểm tra user/mật khẩu trong `DATABASE_URL` với bên quản lý Postgres.
+
+**Đăng nhập được nhưng menu "Tra cứu" trống:** user chưa có quyền `api:*` — không phải lỗi kết
+nối. Xem "4 API thật" bước 4. Kiểm tra nhanh: F12 → Network → `GET /api/v1/datasources` trả
+`200` với `[]` nghĩa là chưa cấp quyền.
+
+**Tra cứu báo `Nguồn dữ liệu tạm thời không phản hồi`:** BE không gọi được API nguồn. Trace theo
+mục "Báo `Nguồn dữ liệu tạm thời không phản hồi`" trong phần "4 API thật".
 
 **`pull` báo lỗi 401/403 ở 1 image:** nhà cung cấp image đó vừa đổi chính sách pull công khai
 (từng xảy ra thật với 1 image MinIO trước đây) — báo cho đội dev biết để xử lý.
