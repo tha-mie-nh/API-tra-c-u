@@ -1,6 +1,0 @@
-Về kiến trúc: 
-- hiện tại chỉ cần push FE, BE image. Hệ thống đã có sẵn db PG
-- PG trong hệ thống đã có sẵn, nhưng cần nhấc schema PG của mình sang PG hệ thống  (tức là nhấc PG mình sang làm con PG hệ thống-schema)
-
-- vẫn giữ pg của mình ở đây nhé
-- ngoài ra cần phải viết lại doc deploy, ghi lại list env cần set..
