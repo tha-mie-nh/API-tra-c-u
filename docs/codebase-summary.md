@@ -32,6 +32,9 @@ apps/api/src/
   users/         Admin CRUD user, lock/unlock, reset password, password-reset-requests
   roles/         Admin CRUD role + gán permission
   datasources/   Đọc + validate config.json, adapter factory, registry (xem mục 4)
+  admin-datasources/  ADMIN CRUD `config.json` qua giao diện — ghi atomic (tmp + `.bak` +
+                       rename) rồi reload registry trong tiến trình (zero-downtime, zero
+                       restart); `POST /admin/datasources/reload` nạp lại từ đĩa (hand-edit)
   query/         POST /query/:code — chạy 1 lượt tra cứu qua datasource
   history/       Lịch sử tra cứu (query_logs)
   audit/         Audit log admin actions (@AuditAction decorator + interceptor)
@@ -81,6 +84,17 @@ Mỗi datasource là 1 entry trong `config/config.json`, gồm:
 chuẩn (nhóm theo `identityField`, sort theo `timestampField`) → luôn ghi 1 dòng `query_logs`.
 
 Đọc chi tiết đầy đủ DSL: [`plans/260920-2200-app-tra-cuu-du-lieu/reference-config-schema.md`](../plans/260920-2200-app-tra-cuu-du-lieu/reference-config-schema.md).
+
+**Sửa `config.json` không cần restart:** `DatasourceConfigLoaderService` build snapshot
+`{config, secrets, configDir}` bất biến; `DatasourceRegistryService` dựng `Map` mới rồi gán đè
+bằng 1 phép assign tham chiếu (không có consumer nào giữ ref cũ, mọi nơi đọc qua
+`registry.get()` theo từng request). Trigger reload có 2 đường: (a) ADMIN tạo/sửa/bật-tắt/xóa
+qua `admin-datasources/` — dry-run toàn bộ (AJV + cross-field + resolve secret + dựng adapter)
+trên bản nháp trong RAM trước, chỉ ghi file khi pass hết, rồi mới swap registry; (b)
+`POST /admin/datasources/reload` nạp lại đúng những gì đang có trên đĩa (dành cho hand-edit SSH
+trực tiếp). Quyền ADMIN-only: `admin:datasources` (seed tự cấp cho role ADMIN). Chi tiết vận
+hành: [`docs/deployment-guide.md`](./deployment-guide.md) mục "Quản lý nguồn dữ liệu trên giao
+diện quản trị".
 
 ### 4 datasource đang bật (+ 8 đã tắt)
 

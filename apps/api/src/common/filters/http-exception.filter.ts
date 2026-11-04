@@ -36,12 +36,14 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
     let code = STATUS_CODE_MAP[status] ?? 'ERROR';
     let message = 'Unexpected error';
+    let details: unknown;
 
     if (body && typeof body === 'object') {
       const asRecord = body as Record<string, unknown>;
       const nested = (asRecord.error as Record<string, unknown> | undefined) ?? asRecord;
       if (typeof nested.code === 'string') code = nested.code;
       if (typeof nested.message === 'string') message = nested.message;
+      if (Array.isArray(nested.details)) details = nested.details;
     } else if (exception instanceof Error) {
       message = exception.message;
     }
@@ -50,6 +52,8 @@ export class HttpExceptionFilter implements ExceptionFilter {
       this.logger.error(message, exception instanceof Error ? exception.stack : undefined);
     }
 
-    response.status(status).json({ error: { code, message, requestId: request?.requestId ?? randomUUID() } });
+    response
+      .status(status)
+      .json({ error: { code, message, ...(details ? { details } : {}), requestId: request?.requestId ?? randomUUID() } });
   }
 }

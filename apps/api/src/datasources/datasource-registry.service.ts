@@ -1,12 +1,12 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import type { ZodType } from 'zod';
 import type { ClientDatasource, ClientOutputField, DatasourceEntry } from '@app/shared';
-import { DatasourceConfigLoaderService } from './datasource-config.loader';
+import { DatasourceConfigLoaderService, type ConfigSnapshot } from './datasource-config.loader';
 import { buildInputSchema } from './input-schema.builder';
 import { AdapterFactory } from './adapters/adapter.factory';
 import type { DatasourceAdapter } from './adapters/datasource-adapter.interface';
 
-interface RegistryEntry {
+export interface RegistryEntry {
   config: DatasourceEntry;
   inputSchema: ZodType;
   adapter: DatasourceAdapter;
@@ -14,23 +14,39 @@ interface RegistryEntry {
 
 /**
  * code -> {config, inputSchema(Zod), adapter}. Built once at boot from
- * `DatasourceConfigLoaderService` (phase-04 Architecture). This is the one
- * object Phase 05's query controller and this phase's `GET /datasources`
- * both read from.
+ * `DatasourceConfigLoaderService` (phase-04 Architecture) and rebuilt on
+ * reload (phase-01). This is the one object Phase 05's query controller and
+ * this phase's `GET /datasources` both read from — `get()`/`getAll()` read
+ * `this.entries` fresh on every call, so a `swap()` is visible to the very
+ * next request with no further wiring.
  */
 @Injectable()
 export class DatasourceRegistryService {
-  private readonly entries = new Map<string, RegistryEntry>();
+  private entries: Map<string, RegistryEntry>;
 
   constructor(
     private readonly loader: DatasourceConfigLoaderService,
     private readonly adapterFactory: AdapterFactory,
   ) {
-    for (const config of loader.getConfig().datasources) {
+    this.entries = this.buildEntries(loader.getSnapshot());
+  }
+
+  /** Pure: builds a brand-new entries Map from `snapshot` WITHOUT touching `this.entries` — adapter construction errors (e.g. an unsupported transport.kind) surface here before anything live is touched. */
+  buildEntries(snapshot: ConfigSnapshot): Map<string, RegistryEntry> {
+    const entries = new Map<string, RegistryEntry>();
+    for (const config of snapshot.config.datasources) {
       const inputSchema = buildInputSchema(config.input.fields, config.input.atLeastOneOf, config.input.requireGroups);
-      const adapter = this.adapterFactory.create(config);
-      this.entries.set(config.code, { config, inputSchema, adapter });
+      const adapter = this.adapterFactory.create(config, snapshot);
+      entries.set(config.code, { config, inputSchema, adapter });
     }
+    return entries;
+  }
+
+  /** Swaps in an already-built entries Map by single reference assignment and returns the OLD Map so the caller can retire its adapters. */
+  swap(entries: Map<string, RegistryEntry>): Map<string, RegistryEntry> {
+    const old = this.entries;
+    this.entries = entries;
+    return old;
   }
 
   getAll(): DatasourceEntry[] {

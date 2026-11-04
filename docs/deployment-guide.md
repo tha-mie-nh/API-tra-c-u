@@ -222,17 +222,11 @@ không dùng tới — chỉ là input cho container `postgres` tự chứa, kh�
    Docker chỉ đọc `.env.prod` **lúc tạo container**; `restart` không nạp lại env, container sẽ
    vẫn dùng `BASE_URL`/`API_KEY` cũ. Không cần pull/rebuild.
 4. **Cấp quyền tra cứu.** Menu "Tra cứu" chỉ hiện datasource mà user có quyền `api:<tên>` (vd
-   `api:passport_info`). `api` tự tạo các quyền này từ `config.json` lúc khởi động nhưng **không
-   cấp cho role nào**; chưa cấp thì menu trống dù kết nối đúng. Cấp bằng 1 trong 2 cách:
-   - Giao diện: Quản trị → Vai trò & quyền → chọn role → tick các `api:*` cần dùng → lưu → user
-     đăng nhập lại.
-   - Cấp cho ADMIN tự động: chạy lại `seed` **sau khi `api` đã khởi động ít nhất 1 lần** (seed
-     cấp cho ADMIN mọi quyền `api:*` đã đồng bộ; chạy lại bao nhiêu lần cũng an toàn):
-     ```bash
-     docker compose -f docker-compose.prod.yml --env-file .env.prod --profile db-setup run --rm seed
-     ```
-   Role khác (OPERATOR, AUDITOR) luôn phải cấp qua giao diện. Mỗi lần thêm datasource mới vào
-   `config.json` cũng làm lại bước này.
+   `api:passport_info`). `api` tự tạo các quyền này từ `config.json` và **tự cấp luôn cho ADMIN**
+   mỗi lần khởi động hoặc nạp lại config (không cần chạy lại `seed` cho việc này nữa — khác với
+   bản cũ). Role khác (OPERATOR, AUDITOR) luôn phải cấp tay qua **Quản trị → Vai trò & quyền** →
+   chọn role → tick các `api:*` cần dùng → lưu → user đăng nhập lại. Mỗi lần thêm datasource mới
+   cũng làm lại bước cấp quyền này cho role không phải ADMIN.
 5. Test thử qua giao diện (menu Tra cứu) hoặc Swagger (`/api/v1/docs`) → gọi
    `POST /api/v1/query/IMMIGRATION_HISTORY` với tham số thật, xem có trả đúng dữ liệu không.
 
@@ -256,6 +250,113 @@ $C exec api curl -s -m 5 -o /dev/null -w "%{http_code}\n" "<BASE_URL>/health-hoa
 Toàn bộ chỉ sửa `config.json` + `.env.prod` — **không cần xem/sửa code, không cần build lại
 image**. Nếu tài liệu API thật có gì mà mẫu trên chưa khớp (vd cần ký request, header đặc biệt
 khác) thì báo lại, lúc đó mới cần đội dev sửa code/đẩy image mới.
+
+## Quản lý nguồn dữ liệu trên giao diện quản trị
+
+Từ bản này, thêm/sửa/bật-tắt/xóa nguồn dữ liệu làm trực tiếp trên giao diện web — **không cần
+sửa `config.json` bằng tay, không cần restart `api`** cho các trường hợp thông thường. Cách cũ
+(sửa `config.json` + restart, mục "4 API thật" trên) vẫn dùng được, xem "Escape hatch" dưới đây.
+
+### Chuẩn bị (1 lần)
+
+Host `./config` phải **ghi được** bởi user chạy trong container (`uid 1000`, user `node` — xem
+`docker/api.Dockerfile`), vì mỗi lần lưu, API ghi file tạm + `.bak` + rename ngay trong thư mục
+đó (không chỉ cần quyền ghi file, mà cả quyền ghi thư mục):
+
+```bash
+sudo chown -R 1000:1000 ./config
+```
+
+Không chown theo uid được (một số host hạn chế quyền)? Mở quyền ghi theo nhóm và thêm user
+deploy vào nhóm đó thay thế:
+
+```bash
+sudo chmod -R g+w ./config
+sudo chown -R :1000 ./config   # hoặc nhóm bất kỳ, miễn user chạy container nằm trong nhóm đó
+```
+
+Kiểm tra đã ghi được chưa:
+```bash
+docker compose -f docker-compose.prod.yml --env-file .env.prod exec api sh -c \
+  'touch /repo/config/.w && rm /repo/config/.w && echo OK'
+```
+
+Nâng cấp từ bản cũ chưa có tính năng này lên bản có tính năng này: chạy lại `seed` **1 lần** để
+tạo quyền `admin:datasources` mới và cấp cho ADMIN:
+```bash
+docker compose -f docker-compose.prod.yml --env-file .env.prod --profile db-setup run --rm seed
+```
+
+### Vào đâu, ai dùng được
+
+Menu **Quản trị → Nguồn dữ liệu** (`/quan-tri/nguon-du-lieu`) — chỉ role **ADMIN** thấy mục
+này và thao tác được (quyền `admin:datasources`). Tạo/sửa/bật-tắt/xóa 1 nguồn dữ liệu: server
+validate kỹ (schema + cross-field + thử dựng adapter) trước khi ghi file, sai gì báo ngay trên
+form — không có cách nào lưu ra 1 `config.json` làm app crash lúc khởi động sau này. Lưu xong áp
+dụng ngay cho người đang dùng, không cần restart.
+
+### Điều kiện bắt buộc trước khi thêm 1 nguồn dữ liệu API thật MỚI
+
+Giao diện **không cho nhập trực tiếp giá trị secret** (API key) — chỉ cho **chọn tên 1 biến môi
+trường đã có sẵn** trong `.env.prod` (trường xác thực → chọn tên biến `*_API_KEY`; `baseUrl` →
+chọn tên biến `*_BASE_URL`). Nếu datasource cần 1 biến env **CHƯA từng có** trong `.env.prod`:
+
+1. DevOps thêm biến đó vào `.env.prod` trước (đặt tên theo quy ước `*_API_KEY` / `*_BASE_URL`,
+   giống các biến `IMMIGRATION_HISTORY_*`/`PASSPORT_INFO_*`... đang có).
+2. Khởi động lại container `api` **đúng 1 lần** để đọc biến mới (Docker chỉ đọc `.env.prod` lúc
+   tạo container):
+   ```bash
+   docker compose -f docker-compose.prod.yml --env-file .env.prod up -d api
+   ```
+3. Sau đó, vào giao diện tạo nguồn dữ liệu, chọn đúng tên biến vừa thêm. Mọi lần
+   tạo/sửa/bật/tắt/xóa SAU NÀY (cùng biến env đó, hoặc datasource khác dùng biến env đã có sẵn)
+   **không cần restart nữa**.
+
+Nếu biến env đã có sẵn trong `.env.prod` (vd đang mock, giờ chuyển sang API thật) — làm thẳng
+trên giao diện, không cần restart.
+
+### Cấp quyền tra cứu
+
+Giống mục "4 API thật" bước 4: quyền `api:<code>` được tạo và **tự cấp cho ADMIN ngay lúc lưu**,
+không cần chạy lại `seed`. Role khác (OPERATOR, AUDITOR) vẫn phải cấp tay qua **Quản trị → Vai
+trò & quyền**.
+
+### Escape hatch — sửa `config.json` bằng tay khi cần
+
+SSH thẳng vào máy sửa `config/config.json` vẫn hợp lệ (vd debug, hoặc máy chưa chown được).
+Áp dụng bằng 1 trong 2 cách:
+- **Restart** (cách cũ, luôn áp dụng được): `docker compose -f docker-compose.prod.yml
+  --env-file .env.prod restart api`.
+- **Không cần restart** — gọi API nạp lại từ đĩa (cần token ADMIN):
+  ```bash
+  curl -s -X POST http://<IP-server>/api/v1/admin/datasources/reload \
+    -H "Authorization: Bearer <ADMIN access token>"
+  ```
+  Chạy đúng bộ kiểm tra như khi lưu từ giao diện — file sửa tay mà sai sẽ báo lỗi, KHÔNG nạp vào
+  app đang chạy.
+
+### Khôi phục khi lưu sai (rollback)
+
+Mỗi lần giao diện ghi file thành công, bản TRƯỚC ĐÓ được giữ ở `config/config.json.bak` (chỉ
+mang tính lưới an toàn — về lý thuyết không thể lưu ra file hỏng do validate trước khi ghi).
+Muốn khôi phục bản trước:
+```bash
+cp config/config.json.bak config/config.json
+docker compose -f docker-compose.prod.yml --env-file .env.prod restart api
+```
+
+### Giới hạn đã biết (không phải bug, chưa xử lý)
+
+- **Nhiều instance `api` (nhiều replica)**: lưu từ giao diện chỉ áp dụng cho instance xử lý
+  đúng request lưu đó — các instance khác vẫn dùng config cũ tới khi restart. Setup mặc định của
+  `docker-compose.prod.yml` chỉ chạy 1 instance `api` nên không ảnh hưởng.
+- **Lần lưu đầu tiên format lại cả file**: `config.json` được viết lại theo format chuẩn (thụt
+  2 dấu cách) — khác định dạng gốc dù nội dung logic không đổi, chỉ lệch 1 lần duy nhất.
+- **Không có khóa chống ghi đè**: 2 admin sửa cùng lúc, người lưu sau cùng thắng (mất thay đổi
+  người lưu trước) — hệ thống chỉ đảm bảo không ghi ra file bị lỗi/nửa chừng, không đảm bảo giữ
+  thay đổi của người khác.
+- **Khối `defaults`** (maxResults/pageSize/timeoutMs/retry mặc định) không sửa được trên giao
+  diện — cần đổi thì vẫn phải sửa tay `config.json` + restart.
 
 ## Về HTTPS
 
@@ -336,6 +437,11 @@ tiếp. Bỏ qua được.
 
 **Đăng nhập xong bị văng ra liên tục:** nếu vừa đổi `COOKIE_SECURE=true` mà `web` chưa thật sự
 có HTTPS, trình duyệt sẽ âm thầm từ chối cookie — đổi lại `false` nếu chưa có TLS thật.
+
+**Lưu nguồn dữ liệu báo lỗi không ghi được config:** container không ghi được vào `./config` —
+hoặc mount đang `:ro` (bản `docker-compose.prod.yml` cũ), hoặc host `./config` chưa thuộc/ghi
+được bởi uid 1000. Xem mục "Quản lý nguồn dữ liệu trên giao diện quản trị" → "Chuẩn bị" (lệnh
+`chown -R 1000:1000 ./config` + lệnh kiểm tra `touch`/`rm` qua `docker compose exec`).
 
 **Quên mật khẩu admin:** trang đăng nhập → "Quên mật khẩu?" → admin khác duyệt trong Quản trị →
 Người dùng. Chỉ có 1 admin duy nhất thì cần người có quyền truy cập DB reset trực tiếp.

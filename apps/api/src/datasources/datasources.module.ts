@@ -12,6 +12,10 @@ import { DatasourcesController } from './datasources.controller';
  * permission sync, and the `GET /datasources` projection endpoint. Exports
  * `DatasourceRegistryService` + `ResponseMapperService` for Phase 05's query
  * module to build `POST /query/:code` on top of, without re-parsing config.
+ * Phase 02 additionally exports `AdapterFactory` + `PermissionSyncService` so
+ * `AdminDatasourcesModule` can retire old adapters and re-sync permissions
+ * after a validated write, reusing these exact instances (never a second
+ * copy of the registry's state).
  */
 @Module({
   imports: [RbacModule],
@@ -23,6 +27,12 @@ import { DatasourcesController } from './datasources.controller';
     ResponseMapperService,
     PermissionSyncService,
   ],
-  exports: [DatasourceConfigLoaderService, DatasourceRegistryService, ResponseMapperService],
+  exports: [
+    DatasourceConfigLoaderService,
+    DatasourceRegistryService,
+    ResponseMapperService,
+    AdapterFactory,
+    PermissionSyncService,
+  ],
 })
 export class DatasourcesModule {}

@@ -29,7 +29,7 @@ function fakeConfigService(env: Record<string, string>): { get: (key: string) =>
 
 function buildRegistry(configPath: string): DatasourceRegistryService {
   const loader = new DatasourceConfigLoaderService(fakeConfigService({ APP_CONFIG_PATH: configPath }) as never);
-  const factory = new AdapterFactory(loader);
+  const factory = new AdapterFactory();
   return new DatasourceRegistryService(loader, factory);
 }
 

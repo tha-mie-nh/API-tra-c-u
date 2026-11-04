@@ -26,7 +26,10 @@ export class AuditInterceptor implements NestInterceptor {
 
     return next.handle().pipe(
       tap((result) => {
-        const paramId = request.params?.id;
+        // `:code`-keyed routes (e.g. admin datasources, Phase 02) have no
+        // numeric/uuid `:id` param — fall back to `:code` before the
+        // result's own `id` field.
+        const paramId = request.params?.id ?? request.params?.code;
         const targetId =
           (Array.isArray(paramId) ? paramId[0] : paramId) ??
           (result as { id?: string } | undefined)?.id ??

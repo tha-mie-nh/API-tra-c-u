@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router';
-import { Home, History, Users, KeyRound, ScrollText } from 'lucide-react';
+import { Home, History, Users, KeyRound, ScrollText, Database } from 'lucide-react';
 import { FEATURE_PERMISSION_CODES } from '@shared/index';
 import { cn } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -35,7 +35,8 @@ export function SidebarNav() {
   const canViewUsers = hasAnyPermission([FEATURE_PERMISSION_CODES.ADMIN_USERS]);
   const canViewRoles = hasAnyPermission([FEATURE_PERMISSION_CODES.ADMIN_ROLES]);
   const canViewAudit = hasAnyPermission([FEATURE_PERMISSION_CODES.ADMIN_AUDIT]);
-  const showAdminSection = canViewUsers || canViewRoles || canViewAudit;
+  const canViewDatasources = hasAnyPermission([FEATURE_PERMISSION_CODES.ADMIN_DATASOURCES]);
+  const showAdminSection = canViewUsers || canViewRoles || canViewAudit || canViewDatasources;
 
   return (
     <nav className="flex flex-col gap-0.5 p-2">
@@ -92,6 +93,12 @@ export function SidebarNav() {
             <NavLink to="/quan-tri/nhat-ky" className={linkClass}>
               <ScrollText className="size-4" />
               {vi.nav.adminAudit}
+            </NavLink>
+          )}
+          {canViewDatasources && (
+            <NavLink to="/quan-tri/nguon-du-lieu" className={linkClass}>
+              <Database className="size-4" />
+              {vi.nav.adminDatasources}
             </NavLink>
           )}
         </>

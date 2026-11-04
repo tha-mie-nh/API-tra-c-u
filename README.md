@@ -76,8 +76,11 @@ docker compose --profile full up -d --build
 ```
 
 Builds and runs `api` (NestJS) and `web` (static build served by nginx) alongside Postgres/MinIO.
-`config/` is bind-mounted read-only into the api container so ops can update `config.json` without
-rebuilding the image.
+`config/` is bind-mounted read-write into the api container — datasources can be managed live from
+the admin UI (`/quan-tri/nguon-du-lieu`, ADMIN-only), or `config.json` can still be hand-edited +
+container restarted; neither path ever needs an image rebuild. See
+[`docs/deployment-guide.md`](docs/deployment-guide.md) for the admin-UI workflow and the host
+directory permission prerequisite (`chown -R 1000:1000 ./config`).
 
 ## Docker (production)
 

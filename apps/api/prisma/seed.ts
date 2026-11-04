@@ -24,6 +24,7 @@ const FEATURE_PERMISSIONS = [
   { code: 'admin:users', name: 'Manage users' },
   { code: 'admin:roles', name: 'Manage roles' },
   { code: 'admin:audit', name: 'View audit log' },
+  { code: 'admin:datasources', name: 'Manage datasources' },
 ] as const;
 
 const BOOTSTRAP_ADMIN_USERNAME = 'admin';

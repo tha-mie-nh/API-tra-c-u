@@ -1,130 +1,121 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import Ajv, { type ErrorObject } from 'ajv';
-import addFormats from 'ajv-formats';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import type { DatasourceConfigFile } from '@app/shared';
-import { validateCrossFieldConstraints } from './config-cross-field-validator';
-import { resolveTransportSecrets, type ResolvedSecrets } from './transport-secret-resolver';
+import { buildConfigSnapshot, type ConfigSnapshot } from './config-snapshot-builder';
+import { DatasourceConfigInvalidError, formatIssues } from './datasource-config-invalid.error';
+import type { ResolvedSecrets } from './transport-secret-resolver';
 
 export type { ResolvedHttpSecrets, ResolvedMinioPgSecrets, ResolvedSecrets } from './transport-secret-resolver';
+export type { ConfigSnapshot } from './config-snapshot-builder';
 
 // Same depth as apps/api/src/config/app-config.module.ts's ROOT_ENV_PATH:
 // src/datasources -> src -> api -> apps -> repo root. Computed from
 // __dirname (not process.cwd()) so `pnpm dev` (cwd=apps/api), Docker
 // (cwd=/app) and ts-jest (cwd=apps/api) all resolve the same file.
 const REPO_ROOT = join(__dirname, '..', '..', '..', '..');
-const CONFIG_SCHEMA_PATH = join(REPO_ROOT, 'config', 'config.schema.json');
 
 function loadJsonFile(path: string): unknown {
   return JSON.parse(readFileSync(path, 'utf-8'));
 }
 
-function formatAjvErrors(errors: ErrorObject[] | null | undefined): string {
-  return (errors ?? []).map((e) => `  - ${e.instancePath || '(root)'} ${e.message ?? 'invalid'}`).join('\n');
-}
-
 /**
  * Reads + AJV-validates `config.json`, resolves `${ENV}`/`*Env` references
- * from `process.env`, and deep-freezes the result. Runs synchronously in the
- * constructor (not an async lifecycle hook) so a bad config crashes Nest's
- * DI container during bootstrap — "fail fast, not fail silently at query
- * time" (phase-04 Key Insight). Cross-field checks live in
- * `config-cross-field-validator.ts`; secret/env resolution lives in
- * `transport-secret-resolver.ts` — kept out of this file to stay under the
- * project's ~200-line-per-file guideline.
+ * from `process.env`, and deep-freezes the result into an immutable
+ * `ConfigSnapshot` (built by `config-snapshot-builder.ts`). Boot runs this
+ * synchronously in the constructor (not an async lifecycle hook) so a bad
+ * config crashes Nest's DI container during bootstrap — "fail fast, not
+ * fail silently at query time" (phase-04 Key Insight) — unchanged by
+ * phase-01. What's new: `buildSnapshot()`/`applySnapshot()` let a CANDIDATE
+ * config be validated and swapped in without a process restart — every
+ * getter below reads `this.snapshot`, so once it's reassigned every
+ * consumer (all of which call these getters per-request, never caching the
+ * result) sees the new config with no further wiring (phase-01 Key
+ * Insight).
  */
 @Injectable()
 export class DatasourceConfigLoaderService {
   private readonly logger = new Logger(DatasourceConfigLoaderService.name);
-  private readonly config: DatasourceConfigFile;
+  private readonly configPath: string;
   private readonly configDir: string;
-  private readonly resolvedSecrets = new Map<string, ResolvedSecrets>();
+  private readonly nodeEnv: string;
+  private readonly allowMock: boolean;
+  private snapshot: ConfigSnapshot;
 
   constructor(private readonly configService: ConfigService) {
-    const configPath = this.resolveConfigPath();
-    this.configDir = join(configPath, '..');
-    this.config = this.loadAndValidate(configPath);
-    this.resolveSecretsForEnabledDatasources();
-    this.enforceNoMockInProduction();
-    Object.freeze(this.config);
+    this.configPath = this.resolveConfigPath();
+    this.configDir = join(this.configPath, '..');
+    this.nodeEnv = this.configService.get<string>('NODE_ENV') ?? 'development';
+    this.allowMock = this.configService.get<string>('ALLOW_MOCK_DATASOURCES') === 'true';
+    this.snapshot = this.loadAtBoot();
     this.logger.log(
-      `Loaded ${this.config.datasources.length} datasource(s) from ${configPath}: ${this.config.datasources.map((d) => d.code).join(', ')}`,
+      `Loaded ${this.snapshot.config.datasources.length} datasource(s) from ${this.configPath}: ` +
+        `${this.snapshot.config.datasources.map((d) => d.code).join(', ')}`,
     );
   }
 
   getConfig(): Readonly<DatasourceConfigFile> {
-    return this.config;
+    return this.snapshot.config;
   }
 
   /** Directory containing the loaded config.json — `transport.dataFile` (mock adapter) is relative to this, NOT a hardcoded path, so test fixtures can live anywhere. */
   getConfigDir(): string {
-    return this.configDir;
+    return this.snapshot.configDir;
+  }
+
+  getConfigPath(): string {
+    return this.configPath;
   }
 
   getResolvedSecrets(code: string): ResolvedSecrets | undefined {
-    return this.resolvedSecrets.get(code);
+    return this.snapshot.resolvedSecrets.get(code);
+  }
+
+  /** The full current snapshot — used by `DatasourceRegistryService`/`AdapterFactory` so candidate adapters are always built from the snapshot being applied, never from whatever happens to be live at the time (phase-01 Architecture). */
+  getSnapshot(): ConfigSnapshot {
+    return this.snapshot;
+  }
+
+  /** Reads the raw, un-validated config.json off disk. Throws a plain `Error` (not `DatasourceConfigInvalidError`) on read/parse failure — mirrors the pre-phase-01 behavior for this specific failure mode. */
+  readRawFromDisk(): unknown {
+    try {
+      return loadJsonFile(this.configPath);
+    } catch (err) {
+      throw new Error(`Failed to read/parse config.json at ${this.configPath}: ${(err as Error).message}`);
+    }
+  }
+
+  /** Pure: validates `raw` and returns a new snapshot WITHOUT touching `this.snapshot`. Throws `DatasourceConfigInvalidError` on any failure — callers must catch and MUST NOT call `applySnapshot` on failure. */
+  buildSnapshot(raw: unknown): ConfigSnapshot {
+    return buildConfigSnapshot(raw, { configDir: this.configDir, nodeEnv: this.nodeEnv, allowMock: this.allowMock });
+  }
+
+  /** Swaps in an already-validated snapshot by single reference assignment — the only mutation this class ever performs after boot. */
+  applySnapshot(snapshot: ConfigSnapshot): void {
+    this.snapshot = snapshot;
+    this.logger.log(
+      `Applied config snapshot: ${snapshot.config.datasources.length} datasource(s): ` +
+        `${snapshot.config.datasources.map((d) => d.code).join(', ')}`,
+    );
+  }
+
+  private loadAtBoot(): ConfigSnapshot {
+    const raw = this.readRawFromDisk();
+    try {
+      return this.buildSnapshot(raw);
+    } catch (err) {
+      if (err instanceof DatasourceConfigInvalidError) {
+        const details = formatIssues(err.issues);
+        this.logger.error(`config.json failed validation:\n${details}`);
+        throw new Error(`config.json failed validation:\n${details}`);
+      }
+      throw err;
+    }
   }
 
   private resolveConfigPath(): string {
     const configured = this.configService.get<string>('APP_CONFIG_PATH') ?? './config/config.json';
     return configured.startsWith('/') ? configured : join(REPO_ROOT, configured.replace(/^\.\//, ''));
-  }
-
-  private loadAndValidate(configPath: string): DatasourceConfigFile {
-    let raw: unknown;
-    try {
-      raw = loadJsonFile(configPath);
-    } catch (err) {
-      throw new Error(`Failed to read/parse config.json at ${configPath}: ${(err as Error).message}`);
-    }
-
-    const schema = loadJsonFile(CONFIG_SCHEMA_PATH);
-    const ajv = new Ajv({ allErrors: true, strict: false });
-    addFormats(ajv);
-    const validate = ajv.compile(schema as object);
-    if (!validate(raw)) {
-      const details = formatAjvErrors(validate.errors);
-      this.logger.error(`config.json failed schema validation:\n${details}`);
-      throw new Error(`config.json failed schema validation against config.schema.json:\n${details}`);
-    }
-
-    const config = raw as DatasourceConfigFile;
-    const issues = validateCrossFieldConstraints(config);
-    if (issues.length > 0) {
-      const details = issues.map((i) => `  - ${i}`).join('\n');
-      this.logger.error(`config.json failed cross-field validation:\n${details}`);
-      throw new Error(`config.json failed cross-field validation:\n${details}`);
-    }
-    return config;
-  }
-
-  /** Resolves `${VAR}`/`*Env` references for enabled datasources only (disabled ones may lack real env vars). */
-  private resolveSecretsForEnabledDatasources(): void {
-    for (const ds of this.config.datasources) {
-      if (!ds.enabled) continue;
-      this.resolvedSecrets.set(ds.code, resolveTransportSecrets(ds));
-    }
-  }
-
-  /**
-   * Security Considerations (phase-04): mock adapters must be impossible to
-   * enable in production. Escape hatch (`ALLOW_MOCK_DATASOURCES=true`)
-   * exists for the rare deliberate case (e.g. a demo environment).
-   */
-  private enforceNoMockInProduction(): void {
-    const nodeEnv = this.configService.get<string>('NODE_ENV') ?? 'development';
-    const allowMock = this.configService.get<string>('ALLOW_MOCK_DATASOURCES') === 'true';
-    if (nodeEnv !== 'production' || allowMock) return;
-
-    const mockDatasources = this.config.datasources.filter((d) => d.enabled && d.transport.kind === 'mock');
-    if (mockDatasources.length > 0) {
-      const codes = mockDatasources.map((d) => d.code).join(', ');
-      throw new Error(
-        `Refusing to start: NODE_ENV=production but enabled mock datasource(s) present: ${codes}. ` +
-          `Set ALLOW_MOCK_DATASOURCES=true to override, or flip transport.kind to "http".`,
-      );
-    }
   }
 }

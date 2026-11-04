@@ -9,9 +9,14 @@
 #
 # Prereqs (see docs/deployment-guide.md):
 #   - `.env.prod` next to this file, `chmod 600`, NEVER committed.
-#   - `config/config.json` present (bind-mounted read-only into api — add a
-#     new datasource by editing this file + `docker compose restart api`,
-#     no image rebuild).
+#   - `config/config.json` present, HOST DIR writable by the container's
+#     uid 1000 (`chown -R 1000:1000 ./config`, or `chmod g+w` + add the
+#     deploy user to the group if chown-by-uid isn't possible) — the admin
+#     UI (Quản trị -> Nguồn dữ liệu) saves datasources with zero restart via
+#     an atomic write (tmp file + `.bak` + rename, all inside this dir), see
+#     docs/deployment-guide.md "Quản lý nguồn dữ liệu trên giao diện quản trị".
+#     Hand-editing this file + `docker compose restart api` is still a valid
+#     fallback (no image rebuild either way).
 #   - No TLS of its own: `web`'s nginx (docker/nginx.conf) serves plain HTTP
 #     on `WEB_PORT` (default 80) and is the single entry point (it also
 #     reverse-proxies /api/v1/* to `api`). Put this behind an org-owned
@@ -144,9 +149,14 @@ services:
       NODE_ENV: production
       PORT: 3000
     volumes:
-      # Config-driven requirement (spec): adding a datasource is a config
-      # edit + restart, never a rebuild.
-      - ./config:/repo/config:ro
+      # Writable (NOT :ro) — the admin-UI datasource API needs to atomically
+      # write config.json (tmp file + .bak + rename, all inside this dir).
+      # Host ./config must be owned/writable by uid 1000 (container's `node`
+      # user, see docker/api.Dockerfile's `USER node`) — see
+      # docs/deployment-guide.md's chown prerequisite. Hand-editing
+      # config.json + `docker compose restart api` remains a valid fallback
+      # (no rebuild either way).
+      - ./config:/repo/config
     depends_on:
       postgres:
         condition: service_healthy

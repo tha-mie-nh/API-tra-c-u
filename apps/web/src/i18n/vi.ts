@@ -1,6 +1,7 @@
 import { viAdminUsers } from './vi-admin-users';
 import { viAdminRoles } from './vi-admin-roles';
 import { viAdminAudit } from './vi-admin-audit';
+import { viAdminDatasources } from './vi-admin-datasources';
 import { viHistory } from './vi-history';
 
 /**
@@ -36,6 +37,7 @@ export const vi = {
     adminUsers: 'Người dùng',
     adminRoles: 'Vai trò & quyền',
     adminAudit: 'Nhật ký quản trị',
+    adminDatasources: 'Nguồn dữ liệu',
     home: 'Trang chủ',
   },
   auth: {
@@ -120,6 +122,7 @@ export const vi = {
     users: viAdminUsers,
     roles: viAdminRoles,
     audit: viAdminAudit,
+    datasources: viAdminDatasources,
   },
   history: viHistory,
 } as const;

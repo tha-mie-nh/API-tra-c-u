@@ -1,14 +1,22 @@
+import { resolve, sep } from 'node:path';
 import type { DatasourceConfigFile } from '@app/shared';
+import { apiPermissionCode } from '@app/shared';
 
 /**
  * Cross-field constraints JSON Schema cannot express (phase-04 Implementation
  * Step 2/3): unique `code`s, `identityField`/`timestampField`/`imageRef.*`
  * must reference an existing `output.fields[].name`, `atLeastOneOf` must
  * reference existing input fields, and per-`transport.kind` requiredness.
+ * Phase 01 additions: `permissionCode` must be the code's own derivation (an
+ * admin-edited mismatch would silently break the web route's permission
+ * check), and a mock `dataFile` must resolve inside `configDir` (an
+ * admin-entered `../../..` path must not read arbitrary files) — both skip
+ * when `configDir` is omitted (boot path always passes it; existing unit
+ * tests that don't care about path containment may omit it).
  * Returns the list of human-readable issues (empty = valid); the caller logs
  * + throws so a bad config fails the boot, not a query.
  */
-export function validateCrossFieldConstraints(config: DatasourceConfigFile): string[] {
+export function validateCrossFieldConstraints(config: DatasourceConfigFile, configDir?: string): string[] {
   const issues: string[] = [];
   const seenCodes = new Set<string>();
 
@@ -17,6 +25,13 @@ export function validateCrossFieldConstraints(config: DatasourceConfigFile): str
       issues.push(`duplicate datasource code "${ds.code}"`);
     }
     seenCodes.add(ds.code);
+
+    const expectedPermissionCode = apiPermissionCode(ds.code);
+    if (ds.permissionCode !== expectedPermissionCode) {
+      issues.push(
+        `${ds.code}: permissionCode "${ds.permissionCode}" does not match the required derivation "${expectedPermissionCode}"`,
+      );
+    }
 
     const outputFieldNames = new Set(ds.output.fields.map((f) => f.name));
     if (!outputFieldNames.has(ds.output.identityField)) {
@@ -50,6 +65,11 @@ export function validateCrossFieldConstraints(config: DatasourceConfigFile): str
 
     if (ds.transport.kind === 'mock' && !ds.transport.dataFile) {
       issues.push(`${ds.code}: transport.kind=mock requires transport.dataFile`);
+    } else if (ds.transport.kind === 'mock' && configDir) {
+      const resolved = resolve(configDir, ds.transport.dataFile);
+      if (resolved !== configDir && !resolved.startsWith(configDir + sep)) {
+        issues.push(`${ds.code}: transport.dataFile "${ds.transport.dataFile}" resolves outside configDir`);
+      }
     }
     if (ds.transport.kind === 'http' && (!ds.transport.baseUrl || !ds.transport.path)) {
       issues.push(`${ds.code}: transport.kind=http requires transport.baseUrl and transport.path`);

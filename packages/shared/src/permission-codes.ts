@@ -20,6 +20,9 @@ export const FEATURE_PERMISSION_CODES = {
   ADMIN_USERS: 'admin:users',
   ADMIN_ROLES: 'admin:roles',
   ADMIN_AUDIT: 'admin:audit',
+  /** Phase 02 (admin datasource config live reload): CRUD + enable/disable
+   * of `config.json` entries from the web UI. */
+  ADMIN_DATASOURCES: 'admin:datasources',
 } as const;
 
 export type FeaturePermissionCode =

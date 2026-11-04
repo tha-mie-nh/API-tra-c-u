@@ -11,6 +11,7 @@ import { UsersModule } from './users/users.module';
 import { RolesModule } from './roles/roles.module';
 import { AuditModule } from './audit/audit.module';
 import { DatasourcesModule } from './datasources/datasources.module';
+import { AdminDatasourcesModule } from './admin-datasources/admin-datasources.module';
 import { QueryModule } from './query/query.module';
 import { HistoryModule } from './history/history.module';
 import { JwtAuthGuard } from './rbac/jwt-auth.guard';
@@ -53,6 +54,7 @@ import { RequestIdMiddleware } from './common/middleware/request-id.middleware';
     RolesModule,
     AuditModule,
     DatasourcesModule,
+    AdminDatasourcesModule,
     HistoryModule,
     QueryModule,
   ],

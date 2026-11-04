@@ -27,6 +27,9 @@ const RolesPage = lazy(() => import('@/features/admin/roles/roles-page').then((m
 const AuditLogPage = lazy(() =>
   import('@/features/admin/audit/audit-log-page').then((m) => ({ default: m.AuditLogPage })),
 );
+const DatasourcesAdminPage = lazy(() =>
+  import('@/features/admin/datasources/datasources-admin-page').then((m) => ({ default: m.DatasourcesAdminPage })),
+);
 
 function RouteLoading() {
   return <div className="text-muted-foreground p-6 text-sm">{vi.common.loading}</div>;
@@ -98,6 +101,14 @@ export function AppRoutes() {
             element={
               <RequirePermission anyOf={[FEATURE_PERMISSION_CODES.ADMIN_AUDIT]}>
                 <AuditLogPage />
+              </RequirePermission>
+            }
+          />
+          <Route
+            path="quan-tri/nguon-du-lieu"
+            element={
+              <RequirePermission anyOf={[FEATURE_PERMISSION_CODES.ADMIN_DATASOURCES]}>
+                <DatasourcesAdminPage />
               </RequirePermission>
             }
           />

@@ -109,6 +109,47 @@ export interface SetRolePermissionsResult {
   permissionCodes: string[];
 }
 
+/**
+ * Phase 02 (admin datasource config live reload): `GET/POST/PUT/PATCH
+ * /admin/datasources[...]` response shape. Mirrors `DatasourceEntry`
+ * (`@app/shared/datasource-config.types`) exactly — includes `transport`
+ * (no secret VALUES, only env var NAMES, same as the file on disk) — plus
+ * `envStatus`, which the admin write path derives at response time (never
+ * stored) so the UI can show "env var set?" without ever seeing a value.
+ */
+export interface DatasourceEnvStatus {
+  /** `true` when every referenced `*Env`/`auth.valueEnv` name has a non-empty `process.env` value on THIS instance. */
+  apiKeyEnvSet: boolean | null;
+  baseUrlEnvSet: boolean | null;
+}
+
+/** `GET/POST/PUT/PATCH /admin/datasources[/:code]` response — same shape as
+ * `DatasourceEntry` (server projection, config holds no secret values) plus
+ * `envStatus`. Declared structurally (not `DatasourceEntry & {...}`) to
+ * avoid a cross-file type import cycle between `admin-types.ts` and
+ * `datasource-config.types.ts`; field names must stay in sync by hand. */
+export interface AdminDatasource {
+  code: string;
+  name: string;
+  description?: string;
+  type: 'info' | 'image';
+  enabled: boolean;
+  permissionCode: string;
+  transport: unknown;
+  input: unknown;
+  output: unknown;
+  limits?: { maxResults: number; pageSize: number };
+  envStatus: DatasourceEnvStatus;
+}
+
+/** `GET /admin/datasources/env-refs` — env var NAMES only, matching the
+ * admin-write naming policy suffixes (`*_API_KEY`/`*_BASE_URL`); values are
+ * never returned. Lets the web form offer a picker instead of free text. */
+export interface DatasourceEnvRefs {
+  apiKeyEnvNames: string[];
+  baseUrlEnvNames: string[];
+}
+
 /** One row from `GET /admin/audit-logs` (spec g: before/after diff, read-only). */
 export interface AuditLogEntry {
   id: string;

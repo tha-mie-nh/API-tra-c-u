@@ -35,7 +35,11 @@ services:
       # not /app/config (mismatch here silently made this mount dead: the app
       # would read whatever config.json got baked into the image at build
       # time instead of this bind mount).
-      - ./config:/repo/config:ro
+      # Writable (NOT :ro) — the admin-UI datasource API atomically writes
+      # config.json (tmp file + .bak + rename, inside this dir). Host
+      # ./config must be writable by uid 1000 (container's `node` user) —
+      # see docs/deployment-guide.md's chown prerequisite.
+      - ./config:/repo/config
     depends_on:
       postgres:
         condition: service_healthy
