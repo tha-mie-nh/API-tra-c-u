@@ -13,7 +13,12 @@
 # Node 22, not 20 — see docker/api.Dockerfile's `base` stage comment
 # (undici@8.10.2 requires Node >=22.19.0; this stage installs the full
 # workspace lockfile too, so it needs to match).
-FROM node:22-bookworm-slim AS base
+# Pinned to an exact patched version (CVE-2026-111497 "Node2Shell", fixed in
+# 22.23.4 — see docker/api.Dockerfile for the full writeup). This Node only
+# runs at BUILD time here (runtime is nginx:1.27-alpine below, never
+# touches Node), so it's not internet-facing either way — pinned anyway for
+# consistency/supply-chain hygiene, not because this stage is exposed.
+FROM node:22.23.4-bookworm-slim AS base
 WORKDIR /repo
 RUN corepack enable
 

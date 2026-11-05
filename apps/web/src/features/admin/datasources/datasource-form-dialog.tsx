@@ -109,59 +109,65 @@ export function DatasourceFormDialog({ open, onOpenChange, entry, existingDataso
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[85vh] max-w-2xl overflow-y-auto">
+      <DialogContent className="flex max-h-[94vh] w-[96vw] max-w-[96vw] flex-col overflow-y-auto sm:max-w-[1600px]">
         <DialogHeader>
           <DialogTitle>{isEdit ? t.editTitle : t.createTitle}</DialogTitle>
         </DialogHeader>
-        <form className="flex flex-col gap-4" onSubmit={onSubmit} noValidate>
-          <DatasourceIdentityFields
-            register={register}
-            watch={watch}
-            setValue={setValue}
-            errors={errors}
-            isEdit={isEdit}
-            existingDatasources={existingDatasources}
-            onCopyFrom={onCopyFrom}
-          />
+        <form className="flex flex-col gap-6" onSubmit={onSubmit} noValidate>
+          <div className="grid gap-6 xl:grid-cols-[minmax(0,440px)_minmax(0,1fr)]">
+            <div className="flex flex-col gap-4">
+              <DatasourceIdentityFields
+                register={register}
+                watch={watch}
+                setValue={setValue}
+                errors={errors}
+                isEdit={isEdit}
+                existingDatasources={existingDatasources}
+                onCopyFrom={onCopyFrom}
+              />
 
-          <DatasourceTransportFields
-            register={register}
-            watch={watch}
-            setValue={setValue}
-            control={control}
-            errors={errors}
-            envRefs={envRefsQuery.data}
-          />
+              <DatasourceTransportFields
+                register={register}
+                watch={watch}
+                setValue={setValue}
+                control={control}
+                errors={errors}
+                envRefs={envRefsQuery.data}
+              />
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor="maxResults">{t.fieldMaxResults}</Label>
-              <Input id="maxResults" type="number" min={1} aria-invalid={!!errors.pageSize} {...register('maxResults')} />
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex flex-col gap-1.5">
+                  <Label htmlFor="maxResults">{t.fieldMaxResults}</Label>
+                  <Input id="maxResults" type="number" min={1} aria-invalid={!!errors.pageSize} {...register('maxResults')} />
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <Label htmlFor="pageSize">{t.fieldPageSize}</Label>
+                  <Input id="pageSize" type="number" min={1} aria-invalid={!!errors.pageSize} {...register('pageSize')} />
+                </div>
+              </div>
+              {errors.pageSize && <p className="text-destructive text-sm">{errors.pageSize.message}</p>}
             </div>
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor="pageSize">{t.fieldPageSize}</Label>
-              <Input id="pageSize" type="number" min={1} aria-invalid={!!errors.pageSize} {...register('pageSize')} />
+
+            <div className="flex flex-col gap-4">
+              <DatasourceInputFieldsEditor control={control} register={register} watch={watch} setValue={setValue} errors={errors} />
+              {inputBlockErrors.length > 0 && (
+                <div className="rounded-md border border-destructive/50 bg-destructive/10 p-2 text-xs text-destructive">
+                  {inputBlockErrors.map((message, i) => (
+                    <p key={i}>{message}</p>
+                  ))}
+                </div>
+              )}
+
+              <DatasourceOutputFieldsEditor control={control} register={register} watch={watch} setValue={setValue} errors={errors} />
+              {outputBlockErrors.length > 0 && (
+                <div className="rounded-md border border-destructive/50 bg-destructive/10 p-2 text-xs text-destructive">
+                  {outputBlockErrors.map((message, i) => (
+                    <p key={i}>{message}</p>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
-          {errors.pageSize && <p className="text-destructive text-sm">{errors.pageSize.message}</p>}
-
-          <DatasourceInputFieldsEditor control={control} register={register} watch={watch} setValue={setValue} errors={errors} />
-          {inputBlockErrors.length > 0 && (
-            <div className="rounded-md border border-destructive/50 bg-destructive/10 p-2 text-xs text-destructive">
-              {inputBlockErrors.map((message, i) => (
-                <p key={i}>{message}</p>
-              ))}
-            </div>
-          )}
-
-          <DatasourceOutputFieldsEditor control={control} register={register} watch={watch} setValue={setValue} errors={errors} />
-          {outputBlockErrors.length > 0 && (
-            <div className="rounded-md border border-destructive/50 bg-destructive/10 p-2 text-xs text-destructive">
-              {outputBlockErrors.map((message, i) => (
-                <p key={i}>{message}</p>
-              ))}
-            </div>
-          )}
 
           {formErrors.length > 0 && (
             <div className="rounded-md border border-destructive/50 bg-destructive/10 p-3 text-sm text-destructive">

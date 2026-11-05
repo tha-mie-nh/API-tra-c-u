@@ -5,7 +5,7 @@
   "description": "Internal config-driven lookup portal (NestJS + React monorepo)",
   "license": "UNLICENSED",
   "engines": {
-    "node": ">=22.19.0"
+    "node": ">=22.23.4"
   },
   "packageManager": "pnpm@10.14.0",
   "scripts": {
@@ -40,16 +40,21 @@
   },
   "pnpm": {
     "overrides": {
-      "multer": ">=2.3.0",
+      "multer": ">=2.5.0",
       "deepmerge-ts": ">=8.0.0",
       "tar": ">=7.5.19",
       "brace-expansion": ">=2.1.2",
-      "glob": ">=10.5.0",
-      "ip-address": ">=10.3.1",
-      "minimatch": ">=10.2.1",
+      "glob": ">=14.0.2",
+      "ip-address": ">=10.7.4",
+      "minimatch": ">=11.0.1",
       "pacote": ">=21.5.1",
       "picomatch": ">=4.0.4",
-      "sigstore": ">=4.1.1"
+      "sigstore": ">=4.1.1",
+      "body-parser": ">=2.4.0",
+      "js-yaml": ">=5.4.1",
+      "fast-uri": ">=3.1.9",
+      "decode-uri-component": ">=0.5.0",
+      "stream-json": ">=3.5.0"
     }
   }
 }

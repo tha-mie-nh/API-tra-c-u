@@ -51,6 +51,7 @@ export const viAdminDatasources = {
   fieldBaseUrl: 'Base URL',
   fieldBaseUrlEnvPicker: 'Chèn biến',
   fieldPath: 'Đường dẫn (path)',
+  fieldPathHint: 'Nối vào sau Base URL để tạo URL gọi thật. Copy đúng path từ tài liệu API, có dấu / ở đầu (VD: /v1/cong-dan/tra-cuu).',
   fieldMethod: 'Phương thức',
   fieldTimeoutMs: 'Timeout (ms)',
   fieldHeaders: 'Headers tĩnh (không chứa khóa bí mật)',

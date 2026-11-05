@@ -24,7 +24,18 @@
 # is Active LTS ("Jod"), so this is a straightforward re-pin, not a
 # regression — see root package.json's `engines.node` and .github/ci.yml,
 # updated to match.
-FROM node:22-bookworm-slim AS base
+#
+# Pinned to an EXACT patch (not the floating `node:22-bookworm-slim` tag)
+# because of CVE-2026-111497 ("Node2Shell") — an out-of-bounds write in
+# Node's built-in Brotli decoder, fixed in 22.23.4 (2026-10-21). Express 5
+# (what @nestjs/platform-express resolves to here — see pnpm-lock.yaml)
+# auto-decodes `Content-Encoding: br` request bodies through that decoder on
+# every JSON/urlencoded/text/raw body, pre-auth — a real, unauthenticated
+# attack surface on this exact service, not a theoretical one. No in-runtime
+# workaround exists per the Node.js advisory; only fix is the Node version.
+# Bump this tag (and `engines.node` in root package.json) whenever a newer
+# patch lands — never go back to a floating `node:22-...` tag here.
+FROM node:22.23.4-bookworm-slim AS base
 WORKDIR /repo
 RUN corepack enable
 # openssl: Prisma's engine needs libssl at runtime; ca-certificates: needed

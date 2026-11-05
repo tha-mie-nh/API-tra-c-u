@@ -79,7 +79,7 @@ export function DatasourceIdentityFields({
 
       <div className="flex flex-col gap-1.5">
         <Label htmlFor="description">{t.fieldDescription}</Label>
-        <Textarea id="description" {...register('description')} />
+        <Textarea id="description" rows={4} className="min-h-28 resize-y" {...register('description')} />
       </div>
 
       <div className="grid grid-cols-2 gap-4">

@@ -47,15 +47,30 @@ export function DatasourceOutputFieldRow({
 
   return (
     <div className="flex flex-col gap-2 rounded-md border p-2">
-      <div className="flex items-center gap-2">
-        <Button type="button" variant="ghost" size="icon-sm" onClick={() => setExpanded((v) => !v)} aria-label={t.expandRowButton}>
+      <div className="flex flex-wrap items-center gap-2">
+        <Button type="button" variant="ghost" size="icon-sm" className="shrink-0" onClick={() => setExpanded((v) => !v)} aria-label={t.expandRowButton}>
           {expanded ? <ChevronDown /> : <ChevronRight />}
         </Button>
-        <Input className="flex-1" placeholder={t.fieldRowName} aria-invalid={!!rowErrors?.name} {...register(`outputFields.${index}.name`)} />
-        <Input className="flex-1" placeholder={t.fieldRowLabel} aria-invalid={!!rowErrors?.label} {...register(`outputFields.${index}.label`)} />
-        <Input className="flex-1" placeholder={t.outputFieldFrom} title={t.outputFieldFromHint} {...register(`outputFields.${index}.from`)} />
+        <Input
+          className="min-w-[110px] flex-1 basis-28"
+          placeholder={t.fieldRowName}
+          aria-invalid={!!rowErrors?.name}
+          {...register(`outputFields.${index}.name`)}
+        />
+        <Input
+          className="min-w-[110px] flex-1 basis-28"
+          placeholder={t.fieldRowLabel}
+          aria-invalid={!!rowErrors?.label}
+          {...register(`outputFields.${index}.label`)}
+        />
+        <Input
+          className="min-w-[140px] flex-1 basis-40"
+          placeholder={t.outputFieldFrom}
+          title={t.outputFieldFromHint}
+          {...register(`outputFields.${index}.from`)}
+        />
         <Select value={row.type} onValueChange={(v) => setValue(`outputFields.${index}.type`, v as (typeof FIELD_TYPE_VALUES)[number])}>
-          <SelectTrigger className="w-36">
+          <SelectTrigger className="w-36 shrink-0">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -66,15 +81,17 @@ export function DatasourceOutputFieldRow({
             ))}
           </SelectContent>
         </Select>
-        <Button type="button" variant="ghost" size="icon-sm" onClick={onMoveUp} disabled={!canMoveUp} aria-label={t.moveRowUpButton}>
-          ^
-        </Button>
-        <Button type="button" variant="ghost" size="icon-sm" onClick={onMoveDown} disabled={!canMoveDown} aria-label={t.moveRowDownButton}>
-          v
-        </Button>
-        <Button type="button" variant="ghost" size="icon-sm" onClick={onRemove} aria-label={t.removeRowButton}>
-          <Trash2 />
-        </Button>
+        <div className="ml-auto flex shrink-0 items-center gap-1">
+          <Button type="button" variant="ghost" size="icon-sm" onClick={onMoveUp} disabled={!canMoveUp} aria-label={t.moveRowUpButton}>
+            ^
+          </Button>
+          <Button type="button" variant="ghost" size="icon-sm" onClick={onMoveDown} disabled={!canMoveDown} aria-label={t.moveRowDownButton}>
+            v
+          </Button>
+          <Button type="button" variant="ghost" size="icon-sm" onClick={onRemove} aria-label={t.removeRowButton}>
+            <Trash2 />
+          </Button>
+        </div>
       </div>
       {(rowErrors?.name || rowErrors?.label) && (
         <p className="text-destructive text-xs">{rowErrors?.name?.message ?? rowErrors?.label?.message}</p>

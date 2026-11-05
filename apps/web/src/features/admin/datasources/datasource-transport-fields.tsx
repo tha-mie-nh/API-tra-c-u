@@ -79,7 +79,11 @@ export function DatasourceTransportFields({ register, watch, setValue, control, 
             <div className="flex flex-col gap-1.5">
               <Label htmlFor="httpPath">{t.fieldPath}</Label>
               <Input id="httpPath" aria-invalid={!!errors.httpPath} {...register('httpPath')} />
-              {errors.httpPath && <p className="text-destructive text-sm">{errors.httpPath.message}</p>}
+              {errors.httpPath ? (
+                <p className="text-destructive text-sm">{errors.httpPath.message}</p>
+              ) : (
+                <p className="text-muted-foreground text-xs">{t.fieldPathHint}</p>
+              )}
             </div>
             <div className="flex flex-col gap-1.5">
               <Label htmlFor="httpMethod">{t.fieldMethod}</Label>

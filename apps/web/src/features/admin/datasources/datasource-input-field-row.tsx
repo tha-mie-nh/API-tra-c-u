@@ -45,14 +45,24 @@ export function DatasourceInputFieldRow({
 
   return (
     <div className="flex flex-col gap-2 rounded-md border p-2">
-      <div className="flex items-center gap-2">
-        <Button type="button" variant="ghost" size="icon-sm" onClick={() => setExpanded((v) => !v)} aria-label={t.expandRowButton}>
+      <div className="flex flex-wrap items-center gap-2">
+        <Button type="button" variant="ghost" size="icon-sm" className="shrink-0" onClick={() => setExpanded((v) => !v)} aria-label={t.expandRowButton}>
           {expanded ? <ChevronDown /> : <ChevronRight />}
         </Button>
-        <Input className="flex-1" placeholder={t.fieldRowName} aria-invalid={!!rowErrors?.name} {...register(`inputFields.${index}.name`)} />
-        <Input className="flex-1" placeholder={t.fieldRowLabel} aria-invalid={!!rowErrors?.label} {...register(`inputFields.${index}.label`)} />
+        <Input
+          className="min-w-[110px] flex-1 basis-32"
+          placeholder={t.fieldRowName}
+          aria-invalid={!!rowErrors?.name}
+          {...register(`inputFields.${index}.name`)}
+        />
+        <Input
+          className="min-w-[110px] flex-1 basis-32"
+          placeholder={t.fieldRowLabel}
+          aria-invalid={!!rowErrors?.label}
+          {...register(`inputFields.${index}.label`)}
+        />
         <Select value={row.type} onValueChange={(v) => setValue(`inputFields.${index}.type`, v as (typeof FIELD_TYPE_VALUES)[number])}>
-          <SelectTrigger className="w-36">
+          <SelectTrigger className="w-36 shrink-0">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -63,19 +73,21 @@ export function DatasourceInputFieldRow({
             ))}
           </SelectContent>
         </Select>
-        <div className="flex items-center gap-1">
+        <div className="flex shrink-0 items-center gap-1">
           <Checkbox checked={row.required} onCheckedChange={(c) => setValue(`inputFields.${index}.required`, c === true)} />
           <span className="text-xs">{t.fieldRowRequired}</span>
         </div>
-        <Button type="button" variant="ghost" size="icon-sm" onClick={onMoveUp} disabled={!canMoveUp} aria-label={t.moveRowUpButton}>
-          ^
-        </Button>
-        <Button type="button" variant="ghost" size="icon-sm" onClick={onMoveDown} disabled={!canMoveDown} aria-label={t.moveRowDownButton}>
-          v
-        </Button>
-        <Button type="button" variant="ghost" size="icon-sm" onClick={onRemove} aria-label={t.removeRowButton}>
-          <Trash2 />
-        </Button>
+        <div className="ml-auto flex shrink-0 items-center gap-1">
+          <Button type="button" variant="ghost" size="icon-sm" onClick={onMoveUp} disabled={!canMoveUp} aria-label={t.moveRowUpButton}>
+            ^
+          </Button>
+          <Button type="button" variant="ghost" size="icon-sm" onClick={onMoveDown} disabled={!canMoveDown} aria-label={t.moveRowDownButton}>
+            v
+          </Button>
+          <Button type="button" variant="ghost" size="icon-sm" onClick={onRemove} aria-label={t.removeRowButton}>
+            <Trash2 />
+          </Button>
+        </div>
       </div>
       {(rowErrors?.name || rowErrors?.label) && (
         <p className="text-destructive text-xs">{rowErrors?.name?.message ?? rowErrors?.label?.message}</p>
