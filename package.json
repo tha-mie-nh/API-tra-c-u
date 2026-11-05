@@ -52,9 +52,7 @@
       "sigstore": ">=4.1.1",
       "body-parser": ">=2.4.0",
       "js-yaml": ">=5.4.1",
-      "fast-uri": ">=3.1.9",
-      "decode-uri-component": ">=0.5.0",
-      "stream-json": ">=3.5.0"
+      "fast-uri": ">=3.1.9"
     }
   }
 }
