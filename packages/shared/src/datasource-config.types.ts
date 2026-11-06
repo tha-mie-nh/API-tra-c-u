@@ -65,6 +65,13 @@ export interface OutputFieldDef {
   /** Render this column's value next to the record's timestamp instead of
    * in the field grid (e.g. a direction/status that belongs with "when"). */
   headerField?: boolean;
+  /** Source format of a raw `type: "date"`/`"datetime"` value when the
+   * upstream does NOT send ISO 8601 (e.g. a Vietnamese-style upstream
+   * sending "31/12/1999" or "20/10/2024 12:30:45") — tokens `DD`/`MM`/
+   * `YYYY`/`HH`/`mm`/`ss`, any other character is a literal separator.
+   * Server normalizes to ISO 8601 before the client ever sees it. Absent
+   * means the upstream already sends ISO 8601 (pass-through, unchanged). */
+  format?: string;
 }
 
 export type TransportAuthKind = 'apiKeyHeader' | 'bearer' | 'basic' | 'none';

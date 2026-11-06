@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import type { DatasourceEntry, QueryColumn, QueryEnvelope, QueryPage, QueryRecord, QueryRecordGroup } from '@app/shared';
 import type { RawRecord } from './adapters/datasource-adapter.interface';
+import { parseWithFormat } from './date-format-parser.util';
 
 export interface MapOptions {
   page?: number;
@@ -73,7 +74,10 @@ export class ResponseMapperService {
   private mapOne(raw: RawRecord, datasource: DatasourceEntry): QueryRecord {
     const mapped: QueryRecord = {};
     for (const field of datasource.output.fields) {
-      const rawValue = field.from ? raw[field.from] : raw[field.name];
+      let rawValue = field.from ? raw[field.from] : raw[field.name];
+      if (field.format && (field.type === 'date' || field.type === 'datetime') && typeof rawValue === 'string' && rawValue !== '') {
+        rawValue = parseWithFormat(rawValue, field.format) ?? rawValue;
+      }
       mapped[field.name] = field.valueMap && rawValue !== undefined ? (field.valueMap[String(rawValue)] ?? rawValue) : rawValue;
     }
     return mapped;

@@ -44,35 +44,42 @@ const GPKD_RECORDS = [
 // matches those 4 datasources' output.recordsPath = "data.0.data" exactly —
 // field names below match their output.fields[].from, not the mock-data
 // fixtures (different key names on purpose, same as the real spec).
+// Date/datetime fields here are DD/MM/YYYY[ HH:mm:ss] on purpose — confirmed
+// against a real customer curl sample for this vendor's /find endpoint
+// (NOT ISO 8601). config.json declares output.fields[].format:
+// "DD/MM/YYYY"/"DD/MM/YYYY HH:mm:ss" on every date/datetime field of these
+// 3 datasources so ResponseMapperService normalizes it server-side — keep
+// this mock data in the same non-ISO shape so the demo actually exercises
+// that normalization path, not just a shape it happens to already handle.
 const FIND_RECORDS = {
   'find-immihistory': [
     {
       hoTen: 'Nguyễn Văn A',
-      ngaySinh: '1999-05-12',
+      ngaySinh: '12/05/1999',
       defNgaySinh: 'D',
       gioiTinh: 'M',
       soHoChieu: 'E00123456',
       loaiHoChieu: 'PT',
-      hanHoChieu: '2029-05-12',
+      hanHoChieu: '12/05/2029',
       noiCapHoChieu: 'Cục Quản lý xuất nhập cảnh',
       quocTich: 'Việt Nam',
       xuatNhap: 'X',
-      ngayXuatNhap: '2026-01-15T09:30:00Z',
+      ngayXuatNhap: '15/01/2026 09:30:00',
       cuaKhau: 'Sân bay Nội Bài',
       mucDich: 'Du lịch',
     },
     {
       hoTen: 'Nguyễn Văn A',
-      ngaySinh: '1999-05-12',
+      ngaySinh: '12/05/1999',
       defNgaySinh: 'D',
       gioiTinh: 'M',
       soHoChieu: 'E00123456',
       loaiHoChieu: 'PT',
-      hanHoChieu: '2029-05-12',
+      hanHoChieu: '12/05/2029',
       noiCapHoChieu: 'Cục Quản lý xuất nhập cảnh',
       quocTich: 'Việt Nam',
       xuatNhap: 'N',
-      ngayXuatNhap: '2026-02-02T14:10:00Z',
+      ngayXuatNhap: '02/02/2026 14:10:00',
       cuaKhau: 'Sân bay Nội Bài',
       mucDich: 'Du lịch',
     },
@@ -80,17 +87,17 @@ const FIND_RECORDS = {
   'find-passport': [
     {
       hoTen: 'Nguyễn Văn A',
-      ngaySinh: '1999-05-12',
+      ngaySinh: '12/05/1999',
       gioiTinh: 'M',
       soHoChieu: 'E00123456',
-      ngayCapHoChieu: '2024-05-12',
-      hanHoChieu: '2029-05-12',
+      ngayCapHoChieu: '12/05/2024',
+      hanHoChieu: '12/05/2029',
       noiCapHoChieu: 'Cục Quản lý xuất nhập cảnh',
       trangThai: '1',
     },
   ],
   'find-driverlicense': [
-    { soCCCD: '001099001234', soGplx: '010123456789', ngaySinh: '1999-05-12', hangGPLX: 'B2', ngayCap: '2020-03-01' },
+    { soCCCD: '001099001234', soGplx: '010123456789', ngaySinh: '12/05/1999', hangGPLX: 'B2', ngayCap: '01/03/2020' },
   ],
 };
 
@@ -128,22 +135,31 @@ const FACE_PHOTO_RECORDS = [
   { soCCCD: '001099001234', hinhAnh: DEMO_PHOTO_BASE64, created_at: '2026-01-10T08:00:00Z' },
 ];
 
-// path, records, idField for each /tra-cuu/* route below.
+// path, records, idField, header name for each /tra-cuu/* route below.
+// FACE_PHOTO shares the real-spec vendor (X-Access-Key) with the /find
+// group; the citizen/CCCD ones are the separate no-real-sample-yet group
+// (X-Access).
 const SIMPLE_ROUTES = [
-  { path: '/tra-cuu/cong-dan-co-ban', records: CITIZEN_BASIC_RECORDS, idField: 'cccd' },
-  { path: '/tra-cuu/cong-dan-mo-rong', records: CITIZEN_EXTENDED_RECORDS, idField: 'so_cccd' },
-  { path: '/tra-cuu/cu-tru', records: CITIZEN_RESIDENCE_RECORDS, idField: 'citizen_id' },
-  { path: '/tra-cuu/xuat-nhap-canh', records: XUAT_NHAP_CANH_RECORDS, idField: 'so_cccd' },
-  { path: '/tra-cuu/lich-su-cccd', records: CCCD_HISTORY_RECORDS, idField: 'so_cccd' },
-  { path: '/tra-cuu/phuong-tien', records: VEHICLE_OWNERSHIP_RECORDS, idField: 'so_cccd' },
-  { path: '/tra-cuu/ho-tich', records: FAMILY_EVENTS_RECORDS, idField: 'so_cccd' },
-  { path: '/tra-cuu/anh-mat', records: FACE_PHOTO_RECORDS, idField: 'soCCCD' },
+  { path: '/tra-cuu/cong-dan-co-ban', records: CITIZEN_BASIC_RECORDS, idField: 'cccd', headerName: 'x-access' },
+  { path: '/tra-cuu/cong-dan-mo-rong', records: CITIZEN_EXTENDED_RECORDS, idField: 'so_cccd', headerName: 'x-access' },
+  { path: '/tra-cuu/cu-tru', records: CITIZEN_RESIDENCE_RECORDS, idField: 'citizen_id', headerName: 'x-access' },
+  { path: '/tra-cuu/xuat-nhap-canh', records: XUAT_NHAP_CANH_RECORDS, idField: 'so_cccd', headerName: 'x-access' },
+  { path: '/tra-cuu/lich-su-cccd', records: CCCD_HISTORY_RECORDS, idField: 'so_cccd', headerName: 'x-access' },
+  { path: '/tra-cuu/phuong-tien', records: VEHICLE_OWNERSHIP_RECORDS, idField: 'so_cccd', headerName: 'x-access' },
+  { path: '/tra-cuu/ho-tich', records: FAMILY_EVENTS_RECORDS, idField: 'so_cccd', headerName: 'x-access' },
+  { path: '/tra-cuu/anh-mat', records: FACE_PHOTO_RECORDS, idField: 'soCCCD', headerName: 'x-access-key' },
 ];
 
-function checkAuth(req, res, requireReqType) {
-  if (req.headers['x-access'] !== API_KEY) {
+// `headerName` must match each datasource's `transport.auth.header` in
+// config.json EXACTLY (case-insensitive is fine, Node lower-cases incoming
+// header names) — confirmed against a real customer curl sample for the
+// /find group: they use "X-Access-Key", NOT "X-Access". The MST/GPKD demo
+// routes are a separate fictional vendor with no real sample yet, so they
+// keep "X-Access" until a real spec says otherwise.
+function checkAuth(req, res, { requireReqType = false, headerName = 'x-access' } = {}) {
+  if (req.headers[headerName] !== API_KEY) {
     res.writeHead(401, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ error: 'invalid or missing X-Access header' }));
+    res.end(JSON.stringify({ error: `invalid or missing ${headerName} header` }));
     return false;
   }
   if (requireReqType && req.headers['x-reqtype'] !== REQ_TYPE) {
@@ -172,7 +188,7 @@ const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, `http://localhost:${PORT}`);
 
   if (url.pathname === '/tra-cuu/ma-so-thue' && req.method === 'POST') {
-    if (!checkAuth(req, res, true)) return;
+    if (!checkAuth(req, res, { requireReqType: true })) return;
     const body = await readJsonBody(req).catch(() => ({}));
     const items = MST_RECORDS.filter((r) => !body.mst || r.mst === body.mst);
     res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -181,7 +197,7 @@ const server = http.createServer(async (req, res) => {
   }
 
   if (url.pathname === '/tra-cuu/giay-phep-kinh-doanh' && req.method === 'POST') {
-    if (!checkAuth(req, res, true)) return;
+    if (!checkAuth(req, res, { requireReqType: true })) return;
     const body = await readJsonBody(req).catch(() => ({}));
     const items = GPKD_RECORDS.filter((r) => !body.soGPKD || r.soGPKD === body.soGPKD);
     res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -191,7 +207,7 @@ const server = http.createServer(async (req, res) => {
 
   const simpleRoute = SIMPLE_ROUTES.find((r) => r.path === url.pathname);
   if (simpleRoute && req.method === 'POST') {
-    if (!checkAuth(req, res, true)) return;
+    if (!checkAuth(req, res, { requireReqType: true, headerName: simpleRoute.headerName })) return;
     const body = await readJsonBody(req).catch(() => ({}));
     const filterValue = body[simpleRoute.idField];
     const data = simpleRoute.records.filter((r) => !filterValue || r[simpleRoute.idField] === filterValue);
@@ -200,11 +216,12 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  // Shared /find endpoint for the 3 real-spec datasources — auth header
+  // Shared /find endpoint for the 3 real-spec datasources — X-Access-Key
   // only (X-Request-Type picks the dataset, not a fixed value like X-ReqType
-  // above), matching .env.example's documented real-world shape exactly.
+  // above). Envelope ({code,data:[{data,errorDescription}],message,status})
+  // matches a real customer curl sample for this vendor exactly.
   if (url.pathname === '/find' && req.method === 'POST') {
-    if (!checkAuth(req, res, false)) return;
+    if (!checkAuth(req, res, { headerName: 'x-access-key' })) return;
     const reqType = req.headers['x-request-type'];
     const data = FIND_RECORDS[reqType];
     if (!data) {
@@ -213,7 +230,7 @@ const server = http.createServer(async (req, res) => {
       return;
     }
     res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ data: [{ data }] }));
+    res.end(JSON.stringify({ code: 200, data: [{ data, errorDescription: '' }], message: 'OK', status: 200 }));
     return;
   }
 

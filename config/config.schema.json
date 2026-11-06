@@ -76,7 +76,8 @@
         "internal": { "type": "boolean" },
         "emphasize": { "type": "boolean" },
         "iconMap": { "type": "object", "additionalProperties": { "type": "string" } },
-        "headerField": { "type": "boolean" }
+        "headerField": { "type": "boolean" },
+        "format": { "type": "string" }
       }
     },
     "transportAuth": {

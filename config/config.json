@@ -838,7 +838,7 @@
         "timeoutMs": 10000,
         "auth": {
           "kind": "apiKeyHeader",
-          "header": "X-Access",
+          "header": "X-Access-Key",
           "valueEnv": "IMMIGRATION_HISTORY_API_KEY"
         }
       },
@@ -910,7 +910,8 @@
             "name": "dob",
             "label": "Ngày sinh",
             "from": "ngaySinh",
-            "type": "date"
+            "type": "date",
+            "format": "DD/MM/YYYY"
           },
           {
             "name": "dobAccuracy",
@@ -957,7 +958,8 @@
             "name": "passportExpiry",
             "label": "Ngày hết hạn hộ chiếu",
             "from": "hanHoChieu",
-            "type": "date"
+            "type": "date",
+            "format": "DD/MM/YYYY"
           },
           {
             "name": "passportIssuePlace",
@@ -987,7 +989,8 @@
             "name": "visaIssueDate",
             "label": "Ngày cấp thị thực",
             "from": "ngayThiThuc",
-            "type": "date"
+            "type": "date",
+            "format": "DD/MM/YYYY"
           },
           {
             "name": "visaIssuePlace",
@@ -1015,7 +1018,8 @@
             "name": "eventAt",
             "label": "Ngày giờ xuất/nhập cảnh",
             "from": "ngayXuatNhap",
-            "type": "datetime"
+            "type": "datetime",
+            "format": "DD/MM/YYYY HH:mm:ss"
           },
           {
             "name": "borderGate",
@@ -1066,7 +1070,7 @@
         "timeoutMs": 10000,
         "auth": {
           "kind": "apiKeyHeader",
-          "header": "X-Access",
+          "header": "X-Access-Key",
           "valueEnv": "PASSPORT_INFO_API_KEY"
         }
       },
@@ -1138,7 +1142,8 @@
             "name": "dob",
             "label": "Ngày sinh",
             "from": "ngaySinh",
-            "type": "date"
+            "type": "date",
+            "format": "DD/MM/YYYY"
           },
           {
             "name": "gender",
@@ -1179,7 +1184,8 @@
             "name": "citizenIdIssueDate",
             "label": "Ngày cấp CMND/CCCD",
             "from": "ngayCapGiayTo",
-            "type": "date"
+            "type": "date",
+            "format": "DD/MM/YYYY"
           },
           {
             "name": "phone",
@@ -1227,13 +1233,15 @@
             "name": "passportIssueDate",
             "label": "Ngày cấp hộ chiếu",
             "from": "ngayCapHoChieu",
-            "type": "date"
+            "type": "date",
+            "format": "DD/MM/YYYY"
           },
           {
             "name": "passportExpiry",
             "label": "Hạn hộ chiếu",
             "from": "hanHoChieu",
-            "type": "date"
+            "type": "date",
+            "format": "DD/MM/YYYY"
           },
           {
             "name": "passportIssuePlace",
@@ -1251,7 +1259,8 @@
             "name": "revokedDate",
             "label": "Ngày hủy",
             "from": "ngayHuy",
-            "type": "date"
+            "type": "date",
+            "format": "DD/MM/YYYY"
           }
         ]
       },
@@ -1278,7 +1287,7 @@
         "timeoutMs": 10000,
         "auth": {
           "kind": "apiKeyHeader",
-          "header": "X-Access",
+          "header": "X-Access-Key",
           "valueEnv": "DRIVER_LICENSE_API_KEY"
         }
       },
@@ -1344,7 +1353,8 @@
             "name": "dob",
             "label": "Ngày sinh",
             "from": "ngaySinh",
-            "type": "date"
+            "type": "date",
+            "format": "DD/MM/YYYY"
           },
           {
             "name": "licenseClass",
@@ -1362,7 +1372,8 @@
             "name": "issueDate",
             "label": "Ngày cấp GPLX",
             "from": "ngayCap",
-            "type": "date"
+            "type": "date",
+            "format": "DD/MM/YYYY"
           }
         ]
       },
@@ -1389,7 +1400,7 @@
         "timeoutMs": 10000,
         "auth": {
           "kind": "apiKeyHeader",
-          "header": "X-Access",
+          "header": "X-Access-Key",
           "valueEnv": "FACE_PHOTO_API_KEY"
         }
       },
