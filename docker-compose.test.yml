@@ -1,0 +1,111 @@
+# Pre-release verification stack — separate from docker-compose.yml (dev,
+# builds from local source) and docker-compose.prod.yml (prod, builds or
+# pulls, org's real deploy). This one ONLY pulls already-PUBLISHED images
+# from Docker Hub (no `build:` anywhere) and runs them in a fully isolated
+# project (own network/volumes/ports, never collides with dev or prod) — the
+# point is to verify the exact artifact that would be handed to leader
+# actually boots and works, before saying "done", not to re-verify source
+# code (that's what dev/CI already do).
+#
+# Usage:
+#   cp .env.test.example .env.test   # fill in TEST_API_IMAGE/TEST_WEB_IMAGE
+#   docker compose -f docker-compose.test.yml --env-file .env.test pull
+#   docker compose -f docker-compose.test.yml --env-file .env.test up -d
+#   # ... verify via http://localhost:${TEST_WEB_PORT:-8081} ...
+#   docker compose -f docker-compose.test.yml --env-file .env.test down -v
+#
+# Always self-contained (no profiles, unlike prod) — a test run against an
+# external/shared Postgres defeats the point of isolation.
+name: app-tra-cuu-du-lieu-test
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    env_file: [.env.test]
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - test-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    # Published (unlike prod) so you can psql in and inspect test data —
+    # this stack is throwaway, no real secrets ever live here.
+    ports:
+      - '${TEST_POSTGRES_PORT:-55434}:5432'
+    networks: [test-backend]
+
+  migrate:
+    image: ${TEST_API_IMAGE:?set TEST_API_IMAGE in .env.test, e.g. gthanh/app_tra_cuu:api-v6}
+    env_file: [.env.test]
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+    entrypoint: ['/usr/bin/tini', '--']
+    command:
+      ['node', 'apps/api/node_modules/prisma/build/index.js', 'migrate', 'deploy', '--schema=apps/api/prisma/schema.prisma']
+    depends_on:
+      postgres: { condition: service_healthy }
+    networks: [test-backend]
+    restart: 'no'
+
+  seed:
+    image: ${TEST_API_IMAGE:?set TEST_API_IMAGE in .env.test}
+    working_dir: /repo/apps/api
+    env_file: [.env.test]
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+    entrypoint: ['/usr/bin/tini', '--']
+    command:
+      ['sh', '-c', 'PATH="/repo/apps/api/node_modules/.bin:$$PATH" node node_modules/prisma/build/index.js db seed --schema=prisma/schema.prisma']
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+    networks: [test-backend]
+    restart: 'no'
+
+  api:
+    image: ${TEST_API_IMAGE:?set TEST_API_IMAGE in .env.test}
+    restart: unless-stopped
+    env_file: [.env.test]
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+    # Mounts deploy-check/config, NOT the root config/ — the root one is this
+    # repo's own working/demo state (scratch datasources come and go there);
+    # deploy-check/ is the actual release artifact handed to leader, so
+    # that's what a pre-release verification run should boot against.
+    # Read-only (unlike prod's rw mount) — this is a throwaway verification
+    # run, not where you'd click through the admin-datasources live-reload
+    # feature; that's covered by dev.
+    volumes:
+      - ./deploy-check/config:/repo/config:ro
+    depends_on:
+      postgres: { condition: service_healthy }
+      seed: { condition: service_completed_successfully }
+    healthcheck:
+      test: ['CMD', 'curl', '-fsS', 'http://127.0.0.1:3000/api/v1/health']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks: [test-backend, test-frontend]
+
+  web:
+    image: ${TEST_WEB_IMAGE:?set TEST_WEB_IMAGE in .env.test, e.g. gthanh/app_tra_cuu:web-v10}
+    restart: unless-stopped
+    ports:
+      - '${TEST_WEB_PORT:-8081}:8080'
+    depends_on:
+      api: { condition: service_healthy }
+    networks: [test-frontend]
+
+networks:
+  test-backend:
+  test-frontend:
+
+volumes:
+  test-postgres-data:

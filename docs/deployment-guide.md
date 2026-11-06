@@ -392,6 +392,33 @@ Dữ liệu trong `postgres-data` không mất.
 dùng PG có sẵn — nhận thêm file `.sql` đánh số tiếp theo (vd `04-...sql`) trong `schema/`, áp
 bằng tay giống Bước "Về Postgres" bước 1, rồi mới `pull`/`up -d` cho `api`/`web`.
 
+## Môi trường test — verify image đã push trước khi báo "xong"
+
+`docker-compose.test.yml` (ở repo gốc, khác `docker-compose.yml`/`docker-compose.prod.yml`) — kéo
+**thẳng image đã push lên Docker Hub** (không build lại từ source) và chạy ở 1 project Docker
+Compose hoàn toàn tách biệt (network/volume/port riêng — `app-tra-cuu-du-lieu-test`, port mặc định
+`8081`, không đụng tới dev `5173`/`3000` hay prod `80`). Mục đích: xác nhận **đúng cái artifact sẽ
+giao cho leader** thật sự chạy được, trước khi báo "done" — không phải kiểm tra lại source code
+(việc đó dev/CI đã làm).
+
+```bash
+cp .env.test.example .env.test
+# sửa TEST_API_IMAGE/TEST_WEB_IMAGE trong .env.test thành tag vừa push, vd:
+#   TEST_API_IMAGE=gthanh/app_tra_cuu:api-v6
+#   TEST_WEB_IMAGE=gthanh/app_tra_cuu:web-v10
+
+docker compose -f docker-compose.test.yml --env-file .env.test pull   # kéo thật từ Docker Hub
+docker compose -f docker-compose.test.yml --env-file .env.test up -d
+# vào http://localhost:8081 kiểm tra, hoặc curl http://localhost:8081/api/v1/health
+
+docker compose -f docker-compose.test.yml --env-file .env.test down -v   # dọn sạch khi xong
+```
+
+Mount `deploy-check/config/` (không phải `config/` ở gốc repo) — vì `deploy-check/` mới là bản
+release thật sự giao cho leader, còn `config/` ở gốc là trạng thái làm việc/demo của dev, có thể
+đang chứa datasource demo tạm thời. Dữ liệu Postgres của môi trường test **xóa sạch sau mỗi lần
+`down -v`** — không bao giờ giữ lại, không bao giờ chứa dữ liệu thật.
+
 ## Xử lý sự cố
 
 **Không load được trang:** kiểm tra port (80 hoặc `WEB_PORT`) mở trong mạng nội bộ chưa;
