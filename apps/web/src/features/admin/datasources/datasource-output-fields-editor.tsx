@@ -1,10 +1,8 @@
-import { useState } from 'react';
 import { useFieldArray, type Control, type FieldErrors, type UseFormRegister, type UseFormSetValue, type UseFormWatch } from 'react-hook-form';
-import { ChevronDown, ChevronRight, Plus } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { vi } from '@/i18n/vi';
 import type { DatasourceFormValues } from './datasource-form-schema';
@@ -23,14 +21,16 @@ interface DatasourceOutputFieldsEditorProps {
  * fields table (add/remove/reorder) + `timestampField`/`identityField`
  * (selects, so they can only ever point at a field that actually exists —
  * directly prevents the cross-field validation error the server checks
- * for) + `sortOrder`/paths + a collapsed `imageRef` advanced section.
- * Replaces the old raw-JSON `outputJson` textarea. */
+ * for) + `sortOrder`/paths. No `imageRef` UI — every real upstream API in
+ * this project returns images as base64 (never a bucket/object-key
+ * reference), so that block was unused complexity; `type: "image"` on the
+ * relevant field row is the only thing needed for an image column (see
+ * `InfoRecordTable`/`Base64ImageCell`). Replaces the old raw-JSON
+ * `outputJson` textarea. */
 export function DatasourceOutputFieldsEditor({ control, register, watch, setValue, errors }: DatasourceOutputFieldsEditorProps) {
   const t = vi.admin.datasources;
-  const [imageRefExpanded, setImageRefExpanded] = useState(false);
   const { fields, append, remove, move } = useFieldArray({ control, name: 'outputFields' });
   const fieldNames = watch('outputFields').map((f) => f.name.trim()).filter(Boolean);
-  const imageRefEnabled = watch('outputImageRefEnabled');
 
   return (
     <div className="flex flex-col gap-2 rounded-md border p-3">
@@ -132,28 +132,6 @@ export function DatasourceOutputFieldsEditor({ control, register, watch, setValu
         </div>
       </div>
 
-      <div className="mt-2 flex flex-col gap-2">
-        <Button type="button" variant="ghost" size="sm" className="w-fit" onClick={() => setImageRefExpanded((v) => !v)}>
-          {imageRefExpanded ? <ChevronDown data-icon="inline-start" /> : <ChevronRight data-icon="inline-start" />}
-          {t.imageRefAdvancedToggle}
-        </Button>
-        {imageRefExpanded && (
-          <div className="flex flex-col gap-2 rounded-md border p-2">
-            <div className="flex items-center gap-1.5">
-              <Checkbox checked={imageRefEnabled} onCheckedChange={(c) => setValue('outputImageRefEnabled', c === true)} />
-              <span className="text-xs">{t.imageRefEnableLabel}</span>
-            </div>
-            {imageRefEnabled && (
-              <div className="grid grid-cols-3 gap-2">
-                <Input placeholder={t.imageRefBucketFieldLabel} {...register('outputImageRefBucketField')} />
-                <Input placeholder={t.imageRefObjectKeyFieldLabel} {...register('outputImageRefObjectKeyField')} />
-                <Input placeholder={t.imageRefMimeFieldLabel} {...register('outputImageRefMimeField')} />
-              </div>
-            )}
-            {errors.outputImageRefMimeField && <p className="text-destructive text-xs">{errors.outputImageRefMimeField.message}</p>}
-          </div>
-        )}
-      </div>
     </div>
   );
 }
