@@ -20,6 +20,7 @@ interface DatasourceTransportFieldsProps {
 }
 
 const CUSTOM_BASE_URL_OPTION = '__custom__';
+const CUSTOM_AUTH_VALUE_ENV_OPTION = '__custom__';
 
 /** Transport mock|http subform (phase-03 Architecture). `minio-pg` is
  * intentionally never offered — the backend rejects it on write
@@ -33,6 +34,11 @@ export function DatasourceTransportFields({ register, watch, setValue, control, 
   const baseUrlValue = watch('httpBaseUrl') ?? '';
   const matchedEnvName = envRefs?.baseUrlEnvNames.find((name) => baseUrlValue === `\${${name}}`);
   const baseUrlMode = baseUrlValue === '' ? undefined : (matchedEnvName ?? CUSTOM_BASE_URL_OPTION);
+
+  const authValueEnvValue = watch('authValueEnv') ?? '';
+  const matchedApiKeyEnvName = envRefs?.apiKeyEnvNames.find((name) => authValueEnvValue === name);
+  const authValueEnvMode = authValueEnvValue === '' ? undefined : (matchedApiKeyEnvName ?? CUSTOM_AUTH_VALUE_ENV_OPTION);
+  const authHeaderValue = watch('authHeader') ?? '';
 
   return (
     <div className="flex flex-col gap-4">
@@ -134,8 +140,9 @@ export function DatasourceTransportFields({ register, watch, setValue, control, 
             </Button>
           </div>
 
-          <div className="flex flex-col gap-1.5">
+          <div className="flex flex-col gap-1.5 rounded-md border p-3">
             <Label htmlFor="authKind">{t.fieldAuthKind}</Label>
+            <p className="text-muted-foreground text-xs">{t.authSectionHint}</p>
             <Select value={authKind} onValueChange={(v) => setValue('authKind', v as DatasourceFormValues['authKind'])}>
               <SelectTrigger id="authKind" className="w-full">
                 <SelectValue />
@@ -147,39 +154,53 @@ export function DatasourceTransportFields({ register, watch, setValue, control, 
                 <SelectItem value="basic">{t.authKindBasic}</SelectItem>
               </SelectContent>
             </Select>
-          </div>
 
-          {authKind !== 'none' && (
-            <>
-              {authKind === 'apiKeyHeader' && (
-                <div className="flex flex-col gap-1.5">
-                  <Label htmlFor="authHeader">{t.fieldAuthHeader}</Label>
-                  <Input id="authHeader" {...register('authHeader')} />
-                </div>
-              )}
-              <div className="flex flex-col gap-1.5">
-                <Label htmlFor="authValueEnv">{t.fieldAuthValueEnv}</Label>
-                <div className="flex gap-2">
-                  <Input id="authValueEnv" aria-invalid={!!errors.authValueEnv} {...register('authValueEnv')} />
-                  {!!envRefs?.apiKeyEnvNames.length && (
-                    <Select onValueChange={(name) => setValue('authValueEnv', name)}>
-                      <SelectTrigger className="w-auto">
-                        <SelectValue placeholder={t.authValueEnvPlaceholder} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {envRefs.apiKeyEnvNames.map((name) => (
-                          <SelectItem key={name} value={name}>
-                            {name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+            {authKind !== 'none' && (
+              <>
+                {authKind === 'apiKeyHeader' && (
+                  <div className="mt-2 flex flex-col gap-1.5">
+                    <Label htmlFor="authHeader">{t.fieldAuthHeader}</Label>
+                    <Input id="authHeader" {...register('authHeader')} />
+                    <p className="text-muted-foreground text-xs">{t.fieldAuthHeaderHint}</p>
+                  </div>
+                )}
+                <div className="mt-2 flex flex-col gap-1.5">
+                  <Label htmlFor="authValueEnv">{t.fieldAuthValueEnv}</Label>
+                  <Select
+                    value={authValueEnvMode}
+                    onValueChange={(v) => setValue('authValueEnv', v === CUSTOM_AUTH_VALUE_ENV_OPTION ? '' : v)}
+                  >
+                    <SelectTrigger id="authValueEnv" className="w-full" aria-invalid={!!errors.authValueEnv}>
+                      <SelectValue placeholder={t.authValueEnvPlaceholder} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {envRefs?.apiKeyEnvNames.map((name) => (
+                        <SelectItem key={name} value={name}>
+                          {name}
+                        </SelectItem>
+                      ))}
+                      <SelectItem value={CUSTOM_AUTH_VALUE_ENV_OPTION}>{t.authValueEnvCustomOption}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {authValueEnvMode === CUSTOM_AUTH_VALUE_ENV_OPTION && (
+                    <Input
+                      aria-invalid={!!errors.authValueEnv}
+                      placeholder={t.authValueEnvCustomPlaceholder}
+                      value={authValueEnvValue}
+                      onChange={(e) => setValue('authValueEnv', e.target.value)}
+                    />
+                  )}
+                  {errors.authValueEnv && <p className="text-destructive text-sm">{errors.authValueEnv.message}</p>}
+                  {authKind === 'apiKeyHeader' && authHeaderValue && authValueEnvValue && (
+                    <p className="text-muted-foreground text-xs">
+                      {t.authPreviewPrefix} <code className="font-mono">{authHeaderValue}</code> {t.authPreviewMiddle}{' '}
+                      <code className="font-mono">{authValueEnvValue}</code> {t.authPreviewSuffix}
+                    </p>
                   )}
                 </div>
-                {errors.authValueEnv && <p className="text-destructive text-sm">{errors.authValueEnv.message}</p>}
-              </div>
-            </>
-          )}
+              </>
+            )}
+          </div>
         </>
       )}
     </div>
