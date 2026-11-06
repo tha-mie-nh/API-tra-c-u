@@ -33,6 +33,28 @@ const MST_RECORDS = [
 // "Giấy phép kinh doanh" (business license) lookup — POST with a JSON body.
 const GPKD_RECORDS = [
   { soGPKD: 'GP-2024-001122', tenDoanhNghiep: 'Công ty TNHH Công nghệ ABC', nganhNghe: 'Dịch vụ công nghệ thông tin', ngayCap: '2024-05-10T00:00:00Z' },
+  { soGPKD: 'GP-2023-004455', tenDoanhNghiep: 'Công ty CP Thương mại XYZ', nganhNghe: 'Bán buôn thiết bị điện tử', ngayCap: '2023-09-22T00:00:00Z' },
+];
+
+// Candidate routes for the "thêm API hoàn toàn mới" live demo (Demo B/C in
+// demo-guide.md) — NOT backing any datasource already in config.json. Each
+// is a different domain on purpose (bảo hiểm xã hội/giao thông/giáo dục,
+// nothing citizen-ID-adjacent) so picking a different one each demo session
+// still proves the same point: config-driven, not hardcoded per domain.
+// Same auth convention as MST/GPKD (X-Access + X-ReqType: LOOKUP, flat
+// "data" array) — no real vendor sample for these, so no reason to invent
+// a different shape than the one already taught via MST/GPKD.
+const BHXH_RECORDS = [
+  { cccd: '001099001234', hoTen: 'Nguyễn Văn A', soBHXH: '0199009999', donViCongTac: 'Công ty TNHH Công nghệ ABC', mucLuongDong: 15000000, soThangDong: 48, trangThai: 'Đang đóng' },
+  { cccd: '001099005678', hoTen: 'Trần Thị B', soBHXH: '0199008888', donViCongTac: 'Công ty CP Thương mại XYZ', mucLuongDong: 12000000, soThangDong: 30, trangThai: 'Đang đóng' },
+];
+const TRAFFIC_VIOLATION_RECORDS = [
+  { bienSoXe: '30A-123.45', hoTenChuXe: 'Nguyễn Văn A', loaiViPham: 'Vượt đèn đỏ', diaDiem: 'Ngã tư Láng Hạ - Thái Hà', thoiGianViPham: '2026-01-10T08:15:00Z', mucPhat: 4000000, trangThaiNop: 'Chưa nộp' },
+  { bienSoXe: '29B-567.89', hoTenChuXe: 'Trần Thị B', loaiViPham: 'Quá tốc độ', diaDiem: 'QL1A, Thanh Trì', thoiGianViPham: '2026-02-05T14:40:00Z', mucPhat: 2500000, trangThaiNop: 'Đã nộp' },
+];
+const DIPLOMA_RECORDS = [
+  { soHieuVanBang: 'DH2021001234', hoTen: 'Nguyễn Văn A', cccd: '001099001234', truong: 'Đại học Bách Khoa Hà Nội', nganh: 'Công nghệ thông tin', xepLoai: 'Giỏi', ngayCap: '2021-07-15T00:00:00Z' },
+  { soHieuVanBang: 'CD2019005678', hoTen: 'Trần Thị B', cccd: '001099005678', truong: 'Cao đẳng Kinh tế Kỹ thuật', nganh: 'Kế toán', xepLoai: 'Khá', ngayCap: '2019-06-20T00:00:00Z' },
 ];
 
 // 1x1 transparent PNG, as a FULL data URI — real upstream for this vendor
@@ -151,14 +173,18 @@ const CITIZEN_RESIDENCE_RECORDS = [
 ];
 const XUAT_NHAP_CANH_RECORDS = [
   { so_cccd: '001099001234', ho_ten: 'Nguyễn Văn A', chieu: 'XUAT', cua_khau: 'Sân bay Nội Bài', quoc_gia: 'Nhật Bản', muc_dich: 'Du lịch', thoi_diem: '2026-01-15T09:30:00Z' },
+  { so_cccd: '001099001234', ho_ten: 'Nguyễn Văn A', chieu: 'NHAP', cua_khau: 'Sân bay Nội Bài', quoc_gia: 'Nhật Bản', muc_dich: 'Du lịch', thoi_diem: '2026-01-22T18:05:00Z' },
 ];
 const CCCD_HISTORY_RECORDS = [
+  { so_cccd: '001099001234', ho_ten: 'Nguyễn Văn A', loai_giay_to: 'CMND9', so_giay_to: '025099001234', tuoi_luc_cap: 18, chieu_cao: 168, dac_diem_nhan_dang: 'Không có', noi_cap: 'Công an TP Hà Nội', ngay_cap: '2017-05-12T00:00:00Z' },
   { so_cccd: '001099001234', ho_ten: 'Nguyễn Văn A', loai_giay_to: 'CCCD_CHIP', so_giay_to: '001099001234', tuoi_luc_cap: 25, chieu_cao: 170, dac_diem_nhan_dang: 'Không có', noi_cap: 'Cục Cảnh sát QLHC về TTXH', ngay_cap: '2024-03-10T00:00:00Z' },
 ];
 const VEHICLE_OWNERSHIP_RECORDS = [
+  { so_cccd: '001099001234', chu_so_huu: 'Nguyễn Văn A', loai_xe: 'XE_MAY', hang_xe: 'Honda', dong_xe: 'Vision', bien_so: '29H1-234.56', gia_tri: 35000000, noi_dang_ky: 'Phòng CSGT Hà Nội', ngay_dang_ky: '2019-02-14T00:00:00Z' },
   { so_cccd: '001099001234', chu_so_huu: 'Nguyễn Văn A', loai_xe: 'O_TO', hang_xe: 'Toyota', dong_xe: 'Vios', bien_so: '30A-123.45', gia_tri: 550000000, noi_dang_ky: 'Phòng CSGT Hà Nội', ngay_dang_ky: '2023-07-20T00:00:00Z' },
 ];
 const FAMILY_EVENTS_RECORDS = [
+  { so_cccd: '001099001234', ho_ten: 'Nguyễn Văn A', loai_su_kien: 'KHAI_SINH', quan_he: 'Bản thân', nguoi_lien_quan: '', cccd_nguoi_lien_quan: '', noi_dang_ky: 'UBND phường Láng Hạ', ngay_su_kien: '1999-05-12T00:00:00Z' },
   { so_cccd: '001099001234', ho_ten: 'Nguyễn Văn A', loai_su_kien: 'KET_HON', quan_he: 'Vợ/chồng', nguoi_lien_quan: 'Trần Thị B', cccd_nguoi_lien_quan: '001099005678', noi_dang_ky: 'UBND phường Láng Hạ', ngay_su_kien: '2022-11-01T00:00:00Z' },
 ];
 // path, records, idField, header name for each /tra-cuu/* route below —
@@ -174,6 +200,12 @@ const SIMPLE_ROUTES = [
   { path: '/tra-cuu/lich-su-cccd', records: CCCD_HISTORY_RECORDS, idField: 'so_cccd', headerName: 'x-access' },
   { path: '/tra-cuu/phuong-tien', records: VEHICLE_OWNERSHIP_RECORDS, idField: 'so_cccd', headerName: 'x-access' },
   { path: '/tra-cuu/ho-tich', records: FAMILY_EVENTS_RECORDS, idField: 'so_cccd', headerName: 'x-access' },
+  // "Thêm API mới" demo candidates (see comment above BHXH_RECORDS) — not
+  // wired to any datasource in config.json; add one of these live in the
+  // Admin UI to demo, same as MST_LOOKUP/GPKD_LOOKUP.
+  { path: '/tra-cuu/bao-hiem-xa-hoi', records: BHXH_RECORDS, idField: 'cccd', headerName: 'x-access' },
+  { path: '/tra-cuu/vi-pham-giao-thong', records: TRAFFIC_VIOLATION_RECORDS, idField: 'bienSoXe', headerName: 'x-access' },
+  { path: '/tra-cuu/van-bang', records: DIPLOMA_RECORDS, idField: 'soHieuVanBang', headerName: 'x-access' },
 ];
 
 // `headerName` must match each datasource's `transport.auth.header` in

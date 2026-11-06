@@ -92,15 +92,33 @@ Phải cover được **2 tình huống** — leader hay hỏi cả 2:
 
 ### Demo B — API HOÀN TOÀN MỚI (chưa từng tồn tại trong hệ thống)
 
-Để chứng minh hệ thống không hardcode riêng cho dữ liệu công dân (CCCD/hộ chiếu/GPLX...), mà thật sự **config-driven cho bất kỳ loại API nào**, tạo sống ngay trong buổi demo 1 datasource hoàn toàn mới, không liên quan gì tới nhóm dữ liệu công dân có sẵn — ví dụ **"Tra cứu Bảo hiểm xã hội" (`BHXH_LOOKUP`)** — để leader thấy menu **Tra cứu** tự sinh form nhập + bảng kết quả hoàn toàn tự động từ cấu hình vừa nhập, không có 1 dòng code nào viết riêng cho nó.
+Để chứng minh hệ thống không hardcode riêng cho dữ liệu công dân (CCCD/hộ chiếu/GPLX...), mà thật sự **config-driven cho bất kỳ loại API nào**, tạo sống ngay trong buổi demo 1 datasource hoàn toàn mới, không liên quan gì tới nhóm dữ liệu công dân có sẵn. Server demo (`scripts/mock-upstream-server.js`) có sẵn **3 "API mới" khác domain nhau** để không phải demo đi demo lại đúng 1 cái mỗi lần — chọn 1 trong 3, hoặc đổi sang cái khác cho buổi sau:
 
-Kịch bản live demo cho leader xem:
+| Domain | Mã gợi ý | Đường dẫn (path) | Trường định danh | Mã mẫu để tra cứu |
+|---|---|---|---|---|
+| Bảo hiểm xã hội | `BHXH_LOOKUP` | `/tra-cuu/bao-hiem-xa-hoi` | `cccd` | `001099001234` |
+| Vi phạm giao thông (phạt nguội) | `VI_PHAM_GT_LOOKUP` | `/tra-cuu/vi-pham-giao-thong` | `bienSoXe` | `30A-123.45` |
+| Văn bằng tốt nghiệp | `VAN_BANG_LOOKUP` | `/tra-cuu/van-bang` | `soHieuVanBang` | `DH2021001234` |
+
+Kịch bản live demo cho leader xem (lấy ví dụ BHXH, 2 cái kia làm y hệt chỉ đổi path/trường):
 
 1. Bấm **"Thêm datasource mới"**.
 2. Có thể chọn **"Sao chép từ nguồn có sẵn"** để đỡ phải điền lại từ đầu (copy toàn bộ cấu hình của 1 datasource đang có, chỉ cần đổi `Mã` vì mã phải duy nhất) — hoặc điền từ đầu để chứng minh không có gì "cheat".
-3. Điền `Loại kết nối = HTTP (API thật)` để minh họa việc trỏ API thật: `Base URL`, `Đường dẫn (path)`, `Headers`, `Xác thực` (chỉ **chọn tên** biến env có sẵn trong `.env.prod`, không bao giờ gõ thẳng API key thật vào form).
-4. Bảng **"Các trường đầu vào"**/**"đầu ra"** — thêm/xóa từng dòng trực quan (không cần gõ JSON tay).
-5. Lưu lại → datasource mới xuất hiện ngay trong **Tra cứu**, menu tự sinh form nhập liệu + bảng kết quả hoàn toàn tự động từ cấu hình vừa nhập.
+3. Điền `Loại kết nối = HTTP (API thật)`:
+
+   | Trường | Điền |
+   |---|---|
+   | Base URL | 1 dropdown duy nhất — chọn `MOCK_UPSTREAM_BASE_URL` trong danh sách (không gõ tay, không có ô nào khác) |
+   | Đường dẫn (path) | `/tra-cuu/bao-hiem-xa-hoi` |
+   | Phương thức | `POST` |
+   | Headers tĩnh | `X-ReqType` = `LOOKUP` |
+   | Xác thực → Loại | `apiKeyHeader` |
+   | Xác thực → Tên header | `X-Access` |
+   | Xác thực → Biến chứa giá trị | `MOCK_UPSTREAM_API_KEY` (chọn dropdown) |
+
+4. Trường đầu vào: 1 trường `cccd` (Số CCCD). Trường đầu ra: `hoTen`, `soBHXH`, `donViCongTac`, `mucLuongDong`, `soThangDong`, `trangThai` — tên `from` phải khớp **đúng chữ hoa/thường** với field trong response (xem data mẫu ở bảng trên, hoặc gọi thử bằng curl trước — mục "Thêm API mock mới" cuối tài liệu).
+5. **`output.recordsPath`** phải điền `data` — thiếu ô này thì tra cứu luôn ra rỗng dù API trả đúng data (lỗi hay gặp nhất khi tự thêm datasource, xem giải thích ở mục "Câu hỏi thường gặp").
+6. Lưu lại → datasource mới xuất hiện ngay trong **Tra cứu**, menu tự sinh form nhập liệu + bảng kết quả hoàn toàn tự động từ cấu hình vừa nhập.
 
 ### Demo C — nối API THẬT qua mạng + cách điền prefix/header
 
@@ -178,7 +196,8 @@ curl -s -X PATCH http://localhost:3000/api/v1/admin/datasources/CITIZEN_BASIC/en
   -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
   -d '{"enabled": true}'
 
-# 3b. Demo B — query thử API HOÀN TOÀN MỚI (đã sống sẵn, không cần tạo lại)
+# 3b. Demo B — query thử API HOÀN TOÀN MỚI (phải tạo BHXH_LOOKUP trước, xem
+#     mục Demo B — datasource này không có sẵn trong config.json)
 curl -s -X POST http://localhost:3000/api/v1/query/BHXH_LOOKUP \
   -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
   -d '{"params": {"cccd": "001099001234"}}'
@@ -193,7 +212,7 @@ curl -s -X POST http://localhost:3000/api/v1/query/MST_LOOKUP \
 
 Toàn bộ endpoint `admin/datasources/*` (list/tạo/sửa/xóa/bật-tắt/reload-từ-file) có sẵn trong Swagger (`/api/v1/docs`, nhóm **Admin Datasources**) — tự bấm "Try it out" thử trực tiếp không cần nhớ cú pháp curl.
 
-**Lưu ý khi demo:** mọi thay đổi ghi thẳng vào `config/config.json` thật (có backup `.bak` tự động) — demo thoải mái, nhưng nếu muốn trả về trạng thái ban đầu thì tắt lại/xóa datasource vừa tạo sau khi demo xong. `BHXH_LOOKUP`/`MST_LOOKUP`/`GPKD_LOOKUP` là các ví dụ cố định, giữ nguyên để dùng demo nhiều lần — nếu tự tạo thêm 1 cái nữa để luyện tay thì nhớ xóa sau khi xong. `MST_LOOKUP`/`GPKD_LOOKUP` cần server mock đang chạy (`node scripts/mock-upstream-server.js`) mới query được — không bật server thì sẽ báo lỗi kết nối (đúng hành vi thật khi 1 API thật bị down, cũng là điểm hay để minh họa thông báo lỗi trông thế nào).
+**Lưu ý khi demo:** mọi thay đổi ghi thẳng vào `config/config.json` thật (có backup `.bak` tự động) — demo thoải mái, nhưng nếu muốn trả về trạng thái ban đầu thì tắt lại/xóa datasource vừa tạo sau khi demo xong. Các **route mock** (`/tra-cuu/ma-so-thue`, `/tra-cuu/bao-hiem-xa-hoi`...) là cố định trong `scripts/mock-upstream-server.js`, luôn có sẵn để trỏ vào — nhưng **datasource trong Admin UI** (`BHXH_LOOKUP`, `MST_LOOKUP`...) phải tự tạo sống mỗi lần demo (đó chính là nội dung Demo B/C), KHÔNG có sẵn trong `config.json`. Mọi route cần server mock đang chạy (`node scripts/mock-upstream-server.js`) mới query được — không bật server thì sẽ báo lỗi kết nối (đúng hành vi thật khi 1 API thật bị down, cũng là điểm hay để minh họa thông báo lỗi trông thế nào).
 
 ## Câu hỏi thường gặp khi demo
 
@@ -202,3 +221,26 @@ A: Đúng theo `spec upstream` — API GPLX thật yêu cầu tất cả 5 trư�
 
 **Q: Dữ liệu ảnh GPLX/ảnh mặt là ảnh thật hay ảnh giả?**
 A: Ảnh giả (1x1 pixel) — vì đang chạy mock, chưa có API thật. Cơ chế hiển thị (thumbnail + bấm để xem to) đã hoạt động đúng, chỉ cần đổi mock → API thật là ảnh sẽ hiển thị thật.
+
+**Q: Tự thêm datasource mới, API gọi thành công (không báo lỗi) nhưng tra cứu ra 0 kết quả — vì sao?**
+A: 99% là thiếu điền **`output.recordsPath`** — ô này nằm cuối khối "Các trường đầu ra", khai báo đường dẫn tới mảng bản ghi trong response JSON (ví dụ response `{"data":[...]}` thì điền `data`; response `{"data":[{"data":[...]}]}` như nhóm `/find` thì điền `data.0.data`). Thiếu ô này thì hệ thống luôn coi như 0 bản ghi, dù API trả đúng data — không có cảnh báo riêng cho lỗi này, phải tự nhớ điền.
+
+**Q: Muốn biết chính xác response JSON của 1 route mock trước khi điền form, làm sao xem?**
+A: Gọi thẳng bằng curl, xem mục "Thêm API mock mới" ngay dưới đây — luôn gọi thử trước khi điền form, đỡ đoán mò tên field.
+
+## Thêm API mock mới (cho dev — mở rộng `scripts/mock-upstream-server.js`)
+
+Khi cần thêm 1 route demo mới (ví dụ chuẩn bị sẵn cho buổi demo sau, hoặc khách hàng cung cấp thêm 1 API thật mới cần tập trỏ thử), sửa `scripts/mock-upstream-server.js`:
+
+1. Khai báo 1 mảng record (đặt tên `<TÊN>_RECORDS`), dùng tên field tiếng Việt không dấu kiểu `snake_case` hoặc `camelCase` tùy ý — **đây chính là tên `from` sẽ điền ở Admin UI**, không có quy tắc bắt buộc vì đang tự tạo API giả, miễn nhất quán.
+2. Thêm 1 dòng vào mảng `SIMPLE_ROUTES` (gần cuối file): `{ path: '/tra-cuu/...', records: TEN_RECORDS, idField: 'tên_field_dùng_để_lọc', headerName: 'x-access' }` — route tự có luôn, không cần viết handler riêng (dùng chung logic lọc theo `idField`, trả về `{"data": [...]}`).
+3. Khởi động lại server: dừng (Ctrl+C) rồi `node scripts/mock-upstream-server.js` — danh sách route in ra console lúc khởi động sẽ tự có dòng mới.
+4. Gọi thử bằng curl để xem đúng response trước khi điền Admin UI:
+   ```bash
+   curl -X POST http://localhost:4100/tra-cuu/<path-vừa-thêm> \
+     -H "X-Access: demo-mst-secret-123" -H "X-ReqType: LOOKUP" -H "Content-Type: application/json" \
+     -d '{"tên_field_lọc": "giá-trị-mẫu"}'
+   ```
+5. Vào Admin UI tạo datasource mới trỏ `Đường dẫn (path)` = path vừa thêm, `output.recordsPath` = `data` (route kiểu `SIMPLE_ROUTES` luôn trả phẳng, không lồng) — xem bảng field-by-field ở Demo B phía trên làm mẫu.
+
+Nếu muốn mô phỏng 1 kiểu response phức tạp hơn (lồng nhiều tầng, envelope `code`/`message`/`status` như nhóm `/find`) thì viết thêm 1 nhánh `if (url.pathname === ...)` riêng trong `http.createServer(...)` thay vì dùng `SIMPLE_ROUTES` — xem khối xử lý `/find` trong file làm ví dụ.
