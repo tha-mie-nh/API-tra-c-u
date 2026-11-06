@@ -11,8 +11,8 @@
 //          whatever datasource.transport.auth.valueEnv resolves to.
 //
 // Demo citizen used across CITIZEN_*/XUAT_NHAP_CANH/CCCD_HISTORY/
-// VEHICLE_OWNERSHIP/FAMILY_EVENTS/FACE_PHOTO so one CCCD ("001099001234")
-// returns a result on every one of those datasources in a live demo.
+// VEHICLE_OWNERSHIP/FAMILY_EVENTS/FACE_PHOTO/the 4 /find datasources so one
+// CCCD ("001099001234") returns a result on every datasource in a live demo.
 const http = require('node:http');
 const { URL } = require('node:url');
 
@@ -34,6 +34,13 @@ const MST_RECORDS = [
 const GPKD_RECORDS = [
   { soGPKD: 'GP-2024-001122', tenDoanhNghiep: 'Công ty TNHH Công nghệ ABC', nganhNghe: 'Dịch vụ công nghệ thông tin', ngayCap: '2024-05-10T00:00:00Z' },
 ];
+
+// 1x1 transparent PNG, as a FULL data URI — real upstream for this vendor
+// always sends "data:image/png;base64,..." already prefixed (confirmed
+// against a real sample), never bare base64. `Base64ImageCell` on the FE
+// already handles both (adds the prefix only if missing), but the mock
+// mirrors the real shape here so the demo exercises the real path.
+const DEMO_PHOTO_DATA_URI = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUAAarVyFEAAAAASUVORK5CYII=';
 
 // Single shared /find endpoint, distinguished by X-Request-Type — matches
 // the REAL "spec upstream" shape documented in .env.example for
@@ -86,20 +93,46 @@ const FIND_RECORDS = {
   ],
   'find-passport': [
     {
-      hoTen: 'Nguyễn Văn A',
-      ngaySinh: '12/05/1999',
+      hoTen: 'NGUYEN VAN AN',
+      ngaySinh: '31/12/1999',
       gioiTinh: 'M',
+      noiSinh: 'HN',
+      danToc: 'Kinh',
+      soGiayToDangKy: '001099001234',
+      noiCapGiayTo: 'C06',
+      ngayCapGiayTo: '19/09/2019',
+      soDienThoai: '0900123456',
+      ngheNghiep: 'Chuyen vien',
+      noiLamViec: 'Cau Giay, HN',
+      chucVu: null,
+      diaChiThuongTru: '',
+      diaChiTamTru: null,
       soHoChieu: 'E00123456',
-      ngayCapHoChieu: '12/05/2024',
-      hanHoChieu: '12/05/2029',
-      noiCapHoChieu: 'Cục Quản lý xuất nhập cảnh',
+      ngayCapHoChieu: '20/10/2020',
+      hanHoChieu: '20/10/2030',
+      noiCapHoChieu: 'AA',
       trangThai: '1',
+      ngayHuy: null,
     },
   ],
   'find-driverlicense': [
-    { soCCCD: '001099001234', soGplx: '010123456789', ngaySinh: '12/05/1999', hangGPLX: 'B2', ngayCap: '01/03/2020' },
+    {
+      soCCCD: '001099001234',
+      soGplx: '010123456789',
+      ngaySinh: '12/05/1999',
+      hangGPLX: 'B2',
+      ngayCap: '01/03/2020',
+      hinhAnh: DEMO_PHOTO_DATA_URI,
+    },
   ],
 };
+
+// find-face uses the SAME /find endpoint but a FLATTER envelope than the
+// other 3 (confirmed against a real customer sample: {"data":[...],
+// "errorDescription":"","status":"200"} — no "code"/"message", no extra
+// "data.0.data" nesting, and "status" is a STRING here, not a number).
+// recordsPath: "data" for FACE_PHOTO in config.json reflects that.
+const FIND_FACE_RECORDS = [{ soCCCD: '001099001234', hinhAnh: DEMO_PHOTO_DATA_URI, created_at: '20/10/2024 12:30:45' }];
 
 // Demo records for the 8 datasources that don't share the /find envelope —
 // each gets its own /tra-cuu/* route (same auth pattern as MST/GPKD:
@@ -128,17 +161,11 @@ const VEHICLE_OWNERSHIP_RECORDS = [
 const FAMILY_EVENTS_RECORDS = [
   { so_cccd: '001099001234', ho_ten: 'Nguyễn Văn A', loai_su_kien: 'KET_HON', quan_he: 'Vợ/chồng', nguoi_lien_quan: 'Trần Thị B', cccd_nguoi_lien_quan: '001099005678', noi_dang_ky: 'UBND phường Láng Hạ', ngay_su_kien: '2022-11-01T00:00:00Z' },
 ];
-// 1x1 transparent PNG — stands in for a real base64 photo (every real
-// upstream in this project returns images this way, never a bucket ref).
-const DEMO_PHOTO_BASE64 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUAAarVyFEAAAAASUVORK5CYII=';
-const FACE_PHOTO_RECORDS = [
-  { soCCCD: '001099001234', hinhAnh: DEMO_PHOTO_BASE64, created_at: '2026-01-10T08:00:00Z' },
-];
-
-// path, records, idField, header name for each /tra-cuu/* route below.
-// FACE_PHOTO shares the real-spec vendor (X-Access-Key) with the /find
-// group; the citizen/CCCD ones are the separate no-real-sample-yet group
-// (X-Access).
+// path, records, idField, header name for each /tra-cuu/* route below —
+// FACE_PHOTO moved to the /find group (see FIND_FACE_RECORDS above, real
+// sample confirmed it's /find + X-Request-Type: find-face, not a dedicated
+// route). The citizen/CCCD ones below are a separate no-real-sample-yet
+// vendor (X-Access, not X-Access-Key).
 const SIMPLE_ROUTES = [
   { path: '/tra-cuu/cong-dan-co-ban', records: CITIZEN_BASIC_RECORDS, idField: 'cccd', headerName: 'x-access' },
   { path: '/tra-cuu/cong-dan-mo-rong', records: CITIZEN_EXTENDED_RECORDS, idField: 'so_cccd', headerName: 'x-access' },
@@ -147,7 +174,6 @@ const SIMPLE_ROUTES = [
   { path: '/tra-cuu/lich-su-cccd', records: CCCD_HISTORY_RECORDS, idField: 'so_cccd', headerName: 'x-access' },
   { path: '/tra-cuu/phuong-tien', records: VEHICLE_OWNERSHIP_RECORDS, idField: 'so_cccd', headerName: 'x-access' },
   { path: '/tra-cuu/ho-tich', records: FAMILY_EVENTS_RECORDS, idField: 'so_cccd', headerName: 'x-access' },
-  { path: '/tra-cuu/anh-mat', records: FACE_PHOTO_RECORDS, idField: 'soCCCD', headerName: 'x-access-key' },
 ];
 
 // `headerName` must match each datasource's `transport.auth.header` in
@@ -216,13 +242,21 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  // Shared /find endpoint for the 3 real-spec datasources — X-Access-Key
+  // Shared /find endpoint for all 4 real-spec datasources — X-Access-Key
   // only (X-Request-Type picks the dataset, not a fixed value like X-ReqType
-  // above). Envelope ({code,data:[{data,errorDescription}],message,status})
-  // matches a real customer curl sample for this vendor exactly.
+  // above). find-face uses a FLATTER envelope than the other 3 — confirmed
+  // against real samples, this vendor is not internally consistent across
+  // its own request types, so don't assume one shape for the whole group.
   if (url.pathname === '/find' && req.method === 'POST') {
     if (!checkAuth(req, res, { headerName: 'x-access-key' })) return;
     const reqType = req.headers['x-request-type'];
+
+    if (reqType === 'find-face') {
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ data: FIND_FACE_RECORDS, errorDescription: '', status: '200' }));
+      return;
+    }
+
     const data = FIND_RECORDS[reqType];
     if (!data) {
       res.writeHead(400, { 'Content-Type': 'application/json' });
@@ -245,6 +279,7 @@ server.listen(PORT, () => {
   for (const r of SIMPLE_ROUTES) {
     console.log(`[mock-upstream] POST ${r.path}  { "${r.idField}": "001099001234" }`);
   }
-  console.log(`[mock-upstream] POST /find  (X-Request-Type: find-immihistory|find-passport|find-driverlicense)`);
-  console.log(`[mock-upstream] requires headers: X-Access: ${API_KEY}   X-ReqType: ${REQ_TYPE} (/tra-cuu/* routes only, not /find)`);
+  console.log(`[mock-upstream] POST /find  (X-Request-Type: find-immihistory|find-passport|find-driverlicense|find-face)`);
+  console.log(`[mock-upstream] headers — /tra-cuu/* (except anh-mat, now under /find): X-Access: ${API_KEY}, X-ReqType: ${REQ_TYPE}`);
+  console.log(`[mock-upstream] headers — /find: X-Access-Key: ${API_KEY}`);
 });

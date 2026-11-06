@@ -1081,7 +1081,7 @@
             "label": "Số CMND/CCCD",
             "type": "string",
             "required": false,
-            "mapTo": "soCMND"
+            "mapTo": "soCCCD"
           },
           {
             "name": "fullName",
@@ -1392,10 +1392,10 @@
       "transport": {
         "kind": "http",
         "baseUrl": "${FACE_PHOTO_BASE_URL}",
-        "path": "/tra-cuu/anh-mat",
+        "path": "/find",
         "method": "POST",
         "headers": {
-          "X-ReqType": "LOOKUP"
+          "X-Request-Type": "find-face"
         },
         "timeoutMs": 10000,
         "auth": {
@@ -1438,7 +1438,8 @@
             "name": "capturedAt",
             "label": "Thời gian nhận ảnh",
             "from": "created_at",
-            "type": "datetime"
+            "type": "datetime",
+            "format": "DD/MM/YYYY HH:mm:ss"
           }
         ]
       },
