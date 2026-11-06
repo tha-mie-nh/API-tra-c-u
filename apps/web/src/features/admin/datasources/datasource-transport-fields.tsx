@@ -32,11 +32,15 @@ export function DatasourceTransportFields({ register, watch, setValue, control, 
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-1.5">
         <Label htmlFor="transportKind">{t.fieldTransportKind}</Label>
-        <Select value={kind} onValueChange={(v) => setValue('transportKind', v as 'mock' | 'http')}>
+        <Select
+          value={kind || undefined}
+          onValueChange={(v) => setValue('transportKind', (v === '__none__' ? '' : v) as 'mock' | 'http')}
+        >
           <SelectTrigger id="transportKind" className="w-full">
-            <SelectValue />
+            <SelectValue placeholder={t.clearSelectionOption} />
           </SelectTrigger>
           <SelectContent>
+            <SelectItem value="__none__">{t.clearSelectionOption}</SelectItem>
             <SelectItem value="mock">{t.transportKindMock}</SelectItem>
             <SelectItem value="http">{t.transportKindHttp}</SelectItem>
           </SelectContent>
@@ -87,11 +91,15 @@ export function DatasourceTransportFields({ register, watch, setValue, control, 
             </div>
             <div className="flex flex-col gap-1.5">
               <Label htmlFor="httpMethod">{t.fieldMethod}</Label>
-              <Select value={watch('httpMethod')} onValueChange={(v) => setValue('httpMethod', v as 'GET' | 'POST')}>
+              <Select
+                value={watch('httpMethod') || undefined}
+                onValueChange={(v) => setValue('httpMethod', (v === '__none__' ? '' : v) as 'GET' | 'POST')}
+              >
                 <SelectTrigger id="httpMethod" className="w-full">
-                  <SelectValue />
+                  <SelectValue placeholder={t.clearSelectionOption} />
                 </SelectTrigger>
                 <SelectContent>
+                  <SelectItem value="__none__">{t.clearSelectionOption}</SelectItem>
                   <SelectItem value="GET">GET</SelectItem>
                   <SelectItem value="POST">POST</SelectItem>
                 </SelectContent>

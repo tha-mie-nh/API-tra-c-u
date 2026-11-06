@@ -1,0 +1,12 @@
+
+  Phía Backend (BE) — khi admin thêm/xóa qua giao diện:
+  1. BE validate cấu hình mới (schema + ràng buộc chéo) trong bộ nhớ trước — chưa ghi file vội.
+  2. Hợp lệ mới ghi file: tạo file tạm → ghi xong mới đổi tên đè vào config.json (an toàn, không bao giờ để file dở dang), giữ 1 bản .bak để rollback.
+  3. Ngay sau đó, chính tiến trình api đang chạy tự nạp lại cấu hình mới trong bộ nhớ (không phải đọc lại từ đầu, không restart container) — swap sang danh sách datasource mới.
+  4. Nếu thêm mới: đồng bộ thêm quyền api:<mã> vào Postgres (để RBAC có cái mà cấp cho user).
+  5. Nếu xóa: endpoint/datasource đó biến mất khỏi danh sách phục vụ ngay — nhưng quyền api:<mã> cũ trong DB không bị xóa theo (giữ lại lịch sử phân quyền, tránh lỗi nếu ai đó group trước đó có quyền này).
+
+  Phía Frontend (FE) — hoàn toàn không cần biết gì đã thay đổi:
+  - FE không hardcode danh sách datasource nào cả — mỗi lần vào trang Tra cứu, FE gọi GET /api/v1/datasources để lấy danh sách hiện tại, rồi tự sinh form nhập + bảng kết quả từ chính dữ liệu đó.
+  - Nên khi admin xóa 1 datasource: lần fetch tiếp theo (vào lại trang, hoặc sau khi submit form admin thành công FE tự gọi lại API này), mục đó tự biến mất khỏi menu — không cần sửa 1 dòng code FE nào.
+  - Khi admin thêm mới: y hệt — lần fetch tiếp theo, mục mới tự xuất hiện trong menu, kèm đúng form input/output đã cấu hình.

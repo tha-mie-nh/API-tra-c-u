@@ -61,11 +61,15 @@ export function DatasourceOutputFieldsEditor({ control, register, watch, setValu
       <div className="mt-2 grid grid-cols-3 gap-3">
         <div className="flex flex-col gap-1.5">
           <Label>{t.timestampFieldLabel}</Label>
-          <Select value={watch('outputTimestampField')} onValueChange={(v) => setValue('outputTimestampField', v)}>
+          <Select
+            value={watch('outputTimestampField') || undefined}
+            onValueChange={(v) => setValue('outputTimestampField', v === '__none__' ? '' : v)}
+          >
             <SelectTrigger className="w-full" aria-invalid={!!errors.outputTimestampField}>
               <SelectValue placeholder={t.selectFieldPlaceholder} />
             </SelectTrigger>
             <SelectContent>
+              <SelectItem value="__none__">{t.clearSelectionOption}</SelectItem>
               {fieldNames.map((name) => (
                 <SelectItem key={name} value={name}>
                   {name}
@@ -77,11 +81,15 @@ export function DatasourceOutputFieldsEditor({ control, register, watch, setValu
         </div>
         <div className="flex flex-col gap-1.5">
           <Label>{t.identityFieldLabel}</Label>
-          <Select value={watch('outputIdentityField')} onValueChange={(v) => setValue('outputIdentityField', v)}>
+          <Select
+            value={watch('outputIdentityField') || undefined}
+            onValueChange={(v) => setValue('outputIdentityField', v === '__none__' ? '' : v)}
+          >
             <SelectTrigger className="w-full" aria-invalid={!!errors.outputIdentityField}>
               <SelectValue placeholder={t.selectFieldPlaceholder} />
             </SelectTrigger>
             <SelectContent>
+              <SelectItem value="__none__">{t.clearSelectionOption}</SelectItem>
               {fieldNames.map((name) => (
                 <SelectItem key={name} value={name}>
                   {name}
@@ -93,11 +101,15 @@ export function DatasourceOutputFieldsEditor({ control, register, watch, setValu
         </div>
         <div className="flex flex-col gap-1.5">
           <Label>{t.sortOrderLabel}</Label>
-          <Select value={watch('outputSortOrder')} onValueChange={(v) => setValue('outputSortOrder', v as 'asc' | 'desc')}>
+          <Select
+            value={watch('outputSortOrder') || undefined}
+            onValueChange={(v) => setValue('outputSortOrder', (v === '__none__' ? '' : v) as 'asc' | 'desc')}
+          >
             <SelectTrigger className="w-full">
-              <SelectValue />
+              <SelectValue placeholder={t.clearSelectionOption} />
             </SelectTrigger>
             <SelectContent>
+              <SelectItem value="__none__">{t.clearSelectionOption}</SelectItem>
               <SelectItem value="desc">{t.sortOrderDesc}</SelectItem>
               <SelectItem value="asc">{t.sortOrderAsc}</SelectItem>
             </SelectContent>

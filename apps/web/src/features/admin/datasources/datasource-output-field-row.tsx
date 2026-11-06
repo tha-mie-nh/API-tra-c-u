@@ -69,11 +69,17 @@ export function DatasourceOutputFieldRow({
           title={t.outputFieldFromHint}
           {...register(`outputFields.${index}.from`)}
         />
-        <Select value={row.type} onValueChange={(v) => setValue(`outputFields.${index}.type`, v as (typeof FIELD_TYPE_VALUES)[number])}>
+        <Select
+          value={row.type || undefined}
+          onValueChange={(v) =>
+            setValue(`outputFields.${index}.type`, (v === '__none__' ? '' : v) as (typeof FIELD_TYPE_VALUES)[number])
+          }
+        >
           <SelectTrigger className="w-36 shrink-0">
-            <SelectValue />
+            <SelectValue placeholder={t.clearSelectionOption} />
           </SelectTrigger>
           <SelectContent>
+            <SelectItem value="__none__">{t.clearSelectionOption}</SelectItem>
             {FIELD_TYPE_VALUES.map((type) => (
               <SelectItem key={type} value={type}>
                 {t.fieldTypeLabels[type]}

@@ -1320,154 +1320,66 @@
       }
     },
     {
-      "code": "MST_LOOKUP",
-      "name": "Tra cứu mã số thuế doanh nghiệp",
-      "description": "Demo: datasource dùng transport HTTP THẬT (không phải mock file) — gọi ra server scripts/mock-upstream-server.js qua header X-Access/X-ReqType, minh họa cách điền baseUrl/path/headers/auth khi nối API thật.",
+      "code": "BHXH_LOOPUP",
+      "name": "tra cứu thông tin bảo hiểm xã hội",
       "type": "info",
       "enabled": true,
       "transport": {
         "kind": "http",
-        "baseUrl": "${MOCK_UPSTREAM_BASE_URL}",
-        "path": "/tra-cuu/ma-so-thue",
+        "baseUrl": "${IMMIGRATION_HISTORY_BASE_URL}",
+        "path": "/find",
         "method": "POST",
         "headers": {
-          "X-ReqType": "LOOKUP"
+          "X-Request-Type": ""
         },
+        "timeoutMs": 10000,
         "auth": {
           "kind": "apiKeyHeader",
           "header": "X-Access",
-          "valueEnv": "MOCK_UPSTREAM_API_KEY"
-        },
-        "timeoutMs": 5000
-      },
-      "limits": {
-        "maxResults": 50,
-        "pageSize": 10
+          "valueEnv": "IMMIGRATION_HISTORY_API_KEY"
+        }
       },
       "input": {
         "fields": [
           {
-            "name": "mst",
-            "label": "Mã số thuế",
-            "type": "string",
-            "required": true,
-            "mapTo": "mst"
+            "name": "citizenId",
+            "label": "Số CCCD",
+            "type": "string"
+          },
+          {
+            "name": "fullName",
+            "label": "Họ và tên",
+            "type": "string"
           }
+        ],
+        "atLeastOneOf": [
+          "citizenId"
         ]
       },
       "output": {
-        "recordsPath": "data.items",
-        "timestampField": "ngayCapNhat",
+        "timestampField": "soCCCD",
         "sortOrder": "desc",
-        "identityField": "mst",
+        "identityField": "soCCCD",
         "fields": [
           {
-            "name": "mst",
-            "label": "Mã số thuế",
-            "from": "mst",
-            "type": "string"
+            "name": "soCCCD",
+            "label": "Số CCCD",
+            "type": "string",
+            "from": "citizenId"
           },
           {
-            "name": "tenDoanhNghiep",
-            "label": "Tên doanh nghiệp",
-            "from": "tenDoanhNghiep",
-            "type": "string"
-          },
-          {
-            "name": "diaChi",
-            "label": "Địa chỉ",
-            "from": "diaChi",
-            "type": "string"
-          },
-          {
-            "name": "trangThai",
-            "label": "Trạng thái",
-            "from": "trangThai",
-            "type": "enum",
-            "valueMap": {
-              "1": "Đang hoạt động",
-              "2": "Đã ngừng"
-            }
-          },
-          {
-            "name": "ngayCapNhat",
-            "label": "Ngày cập nhật",
-            "from": "ngayCapNhat",
-            "type": "datetime"
+            "name": "BHXH",
+            "label": "id BHXH",
+            "type": "string",
+            "from": "BHXH"
           }
         ]
-      },
-      "permissionCode": "api:mst_lookup"
-    },
-    {
-      "code": "GPKD_LOOKUP",
-      "name": "Tra cứu giấy phép kinh doanh",
-      "description": "Demo: API hoàn toàn mới thứ 2, dùng chung baseUrl/API key với MST_LOOKUP nhưng khác path — minh họa 1 server thật có thể phục vụ nhiều datasource.",
-      "type": "info",
-      "enabled": true,
-      "transport": {
-        "kind": "http",
-        "baseUrl": "${MOCK_UPSTREAM_BASE_URL}",
-        "path": "/tra-cuu/giay-phep-kinh-doanh",
-        "method": "POST",
-        "headers": {
-          "X-ReqType": "LOOKUP"
-        },
-        "auth": {
-          "kind": "apiKeyHeader",
-          "header": "X-Access",
-          "valueEnv": "MOCK_UPSTREAM_API_KEY"
-        },
-        "timeoutMs": 5000
       },
       "limits": {
-        "maxResults": 50,
-        "pageSize": 10
+        "maxResults": 12,
+        "pageSize": 7
       },
-      "input": {
-        "fields": [
-          {
-            "name": "soGPKD",
-            "label": "Số giấy phép kinh doanh",
-            "type": "string",
-            "required": true,
-            "mapTo": "soGPKD"
-          }
-        ]
-      },
-      "output": {
-        "recordsPath": "data.items",
-        "timestampField": "ngayCap",
-        "sortOrder": "desc",
-        "identityField": "soGPKD",
-        "fields": [
-          {
-            "name": "soGPKD",
-            "label": "Số GPKD",
-            "from": "soGPKD",
-            "type": "string"
-          },
-          {
-            "name": "tenDoanhNghiep",
-            "label": "Tên doanh nghiệp",
-            "from": "tenDoanhNghiep",
-            "type": "string"
-          },
-          {
-            "name": "nganhNghe",
-            "label": "Ngành nghề",
-            "from": "nganhNghe",
-            "type": "string"
-          },
-          {
-            "name": "ngayCap",
-            "label": "Ngày cấp",
-            "from": "ngayCap",
-            "type": "datetime"
-          }
-        ]
-      },
-      "permissionCode": "api:gpkd_lookup"
+      "permissionCode": "api:bhxh_loopup"
     }
   ]
 }

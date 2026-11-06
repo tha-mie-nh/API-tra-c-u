@@ -148,6 +148,7 @@ export const viAdminDatasources = {
   sortOrderDesc: 'Mới nhất trước (desc)',
   sortOrderAsc: 'Cũ nhất trước (asc)',
   selectFieldPlaceholder: '— Chọn trường —',
+  clearSelectionOption: '— Chưa chọn —',
   recordsPathLabel: 'Đường dẫn danh sách bản ghi (recordsPath)',
   recordsPathHint: 'VD: data.items (để trống nếu response đã là danh sách)',
   totalPathLabel: 'Đường dẫn tổng số bản ghi (totalPath)',

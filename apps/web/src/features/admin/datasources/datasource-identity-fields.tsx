@@ -85,11 +85,15 @@ export function DatasourceIdentityFields({
       <div className="grid grid-cols-2 gap-4">
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="type">{t.fieldType}</Label>
-          <Select value={watch('type')} onValueChange={(v) => setValue('type', v as DatasourceFormValues['type'])}>
+          <Select
+            value={watch('type') || undefined}
+            onValueChange={(v) => setValue('type', (v === '__none__' ? '' : v) as DatasourceFormValues['type'])}
+          >
             <SelectTrigger id="type" className="w-full">
-              <SelectValue />
+              <SelectValue placeholder={t.clearSelectionOption} />
             </SelectTrigger>
             <SelectContent>
+              <SelectItem value="__none__">{t.clearSelectionOption}</SelectItem>
               <SelectItem value="info">{t.typeInfo}</SelectItem>
               <SelectItem value="image">{t.typeImage}</SelectItem>
             </SelectContent>
