@@ -1320,15 +1320,25 @@
       }
     },
     {
-      "code": "BHXH_LOOKUP",
-      "name": "Tra cứu Bảo hiểm xã hội",
-      "description": "Demo: minh họa thêm 1 API HOÀN TOÀN MỚI, không thuộc nhóm dữ liệu công dân có sẵn — chứng minh cơ chế config-driven không hardcode riêng cho citizen data.",
+      "code": "MST_LOOKUP",
+      "name": "Tra cứu mã số thuế doanh nghiệp",
+      "description": "Demo: datasource dùng transport HTTP THẬT (không phải mock file) — gọi ra server scripts/mock-upstream-server.js qua header X-Access/X-ReqType, minh họa cách điền baseUrl/path/headers/auth khi nối API thật.",
       "type": "info",
       "enabled": true,
       "transport": {
-        "kind": "mock",
-        "dataFile": "mock-data/bhxh-lookup.json",
-        "timeoutMs": 10000
+        "kind": "http",
+        "baseUrl": "${MOCK_UPSTREAM_BASE_URL}",
+        "path": "/tra-cuu/ma-so-thue",
+        "method": "POST",
+        "headers": {
+          "X-ReqType": "LOOKUP"
+        },
+        "auth": {
+          "kind": "apiKeyHeader",
+          "header": "X-Access",
+          "valueEnv": "MOCK_UPSTREAM_API_KEY"
+        },
+        "timeoutMs": 5000
       },
       "limits": {
         "maxResults": 50,
@@ -1337,80 +1347,127 @@
       "input": {
         "fields": [
           {
-            "name": "maSoBHXH",
-            "label": "Mã số BHXH",
+            "name": "mst",
+            "label": "Mã số thuế",
             "type": "string",
-            "required": false,
-            "mapTo": "ma_so_bhxh"
-          },
-          {
-            "name": "cccd",
-            "label": "Số CCCD",
-            "type": "string",
-            "required": false,
-            "pattern": "^[0-9]{12}$",
-            "mapTo": "cccd"
+            "required": true,
+            "mapTo": "mst"
           }
-        ],
-        "atLeastOneOf": [
-          "maSoBHXH",
-          "cccd"
         ]
       },
       "output": {
-        "timestampField": "thoiDiem",
+        "recordsPath": "data.items",
+        "timestampField": "ngayCapNhat",
         "sortOrder": "desc",
-        "identityField": "maSoBHXH",
+        "identityField": "mst",
         "fields": [
           {
-            "name": "maSoBHXH",
-            "label": "Mã số BHXH",
-            "from": "ma_so_bhxh",
+            "name": "mst",
+            "label": "Mã số thuế",
+            "from": "mst",
             "type": "string"
           },
           {
-            "name": "hoTen",
-            "label": "Họ tên",
-            "from": "ho_ten",
+            "name": "tenDoanhNghiep",
+            "label": "Tên doanh nghiệp",
+            "from": "tenDoanhNghiep",
             "type": "string"
           },
           {
-            "name": "donVi",
-            "label": "Đơn vị công tác",
-            "from": "don_vi",
+            "name": "diaChi",
+            "label": "Địa chỉ",
+            "from": "diaChi",
             "type": "string"
-          },
-          {
-            "name": "mucLuongDong",
-            "label": "Mức lương đóng BHXH",
-            "from": "muc_luong_dong",
-            "type": "number"
-          },
-          {
-            "name": "soThangDong",
-            "label": "Số tháng đã đóng",
-            "from": "so_thang_dong",
-            "type": "number"
           },
           {
             "name": "trangThai",
-            "label": "Trạng thái tham gia",
-            "from": "trang_thai",
+            "label": "Trạng thái",
+            "from": "trangThai",
             "type": "enum",
             "valueMap": {
-              "1": "Đang tham gia",
-              "2": "Đã nghỉ"
+              "1": "Đang hoạt động",
+              "2": "Đã ngừng"
             }
           },
           {
-            "name": "thoiDiem",
-            "label": "Thời điểm ghi nhận",
-            "from": "thoi_diem",
+            "name": "ngayCapNhat",
+            "label": "Ngày cập nhật",
+            "from": "ngayCapNhat",
             "type": "datetime"
           }
         ]
       },
-      "permissionCode": "api:bhxh_lookup"
+      "permissionCode": "api:mst_lookup"
+    },
+    {
+      "code": "GPKD_LOOKUP",
+      "name": "Tra cứu giấy phép kinh doanh",
+      "description": "Demo: API hoàn toàn mới thứ 2, dùng chung baseUrl/API key với MST_LOOKUP nhưng khác path — minh họa 1 server thật có thể phục vụ nhiều datasource.",
+      "type": "info",
+      "enabled": true,
+      "transport": {
+        "kind": "http",
+        "baseUrl": "${MOCK_UPSTREAM_BASE_URL}",
+        "path": "/tra-cuu/giay-phep-kinh-doanh",
+        "method": "POST",
+        "headers": {
+          "X-ReqType": "LOOKUP"
+        },
+        "auth": {
+          "kind": "apiKeyHeader",
+          "header": "X-Access",
+          "valueEnv": "MOCK_UPSTREAM_API_KEY"
+        },
+        "timeoutMs": 5000
+      },
+      "limits": {
+        "maxResults": 50,
+        "pageSize": 10
+      },
+      "input": {
+        "fields": [
+          {
+            "name": "soGPKD",
+            "label": "Số giấy phép kinh doanh",
+            "type": "string",
+            "required": true,
+            "mapTo": "soGPKD"
+          }
+        ]
+      },
+      "output": {
+        "recordsPath": "data.items",
+        "timestampField": "ngayCap",
+        "sortOrder": "desc",
+        "identityField": "soGPKD",
+        "fields": [
+          {
+            "name": "soGPKD",
+            "label": "Số GPKD",
+            "from": "soGPKD",
+            "type": "string"
+          },
+          {
+            "name": "tenDoanhNghiep",
+            "label": "Tên doanh nghiệp",
+            "from": "tenDoanhNghiep",
+            "type": "string"
+          },
+          {
+            "name": "nganhNghe",
+            "label": "Ngành nghề",
+            "from": "nganhNghe",
+            "type": "string"
+          },
+          {
+            "name": "ngayCap",
+            "label": "Ngày cấp",
+            "from": "ngayCap",
+            "type": "datetime"
+          }
+        ]
+      },
+      "permissionCode": "api:gpkd_lookup"
     }
   ]
 }

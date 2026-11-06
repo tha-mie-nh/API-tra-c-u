@@ -104,6 +104,35 @@ Muốn tự tay tạo 1 cái khác (đúng kịch bản live demo cho leader xem
 4. Bảng **"Các trường đầu vào"**/**"đầu ra"** — thêm/xóa từng dòng trực quan (không cần gõ JSON tay).
 5. Lưu lại → datasource mới xuất hiện ngay trong **Tra cứu**, menu tự sinh form nhập liệu + bảng kết quả hoàn toàn tự động từ cấu hình vừa nhập.
 
+### Demo C — nối API THẬT qua mạng (không phải mock file) + cách điền prefix/header
+
+Demo A và B ở trên dùng `Loại kết nối = Giả lập (mock)` — đọc từ file JSON nội bộ, chưa chứng minh được phần leader hay hỏi nhất: **điền `Base URL`/`Đường dẫn`/`Headers`/`Xác thực` để gọi ra 1 API thật qua mạng thì đúng hình dạng thế nào**. Để demo được mà chưa có API thật trong tay, có sẵn 1 server giả lập API thật (`scripts/mock-upstream-server.js`) — chạy thật trên 1 cổng riêng, yêu cầu đúng kiểu header mà API thật hay dùng (`X-Access` cho API key, `X-ReqType` cố định — đúng pattern leader từng hỏi).
+
+**Bật server này trước khi demo** (1 lần, để chạy nền suốt buổi demo):
+```bash
+node scripts/mock-upstream-server.js
+# [mock-upstream] listening on http://localhost:4100
+```
+
+Đã có sẵn 2 datasource sống nối vào server này — vào **Tra cứu** là thấy `MST_LOOKUP` (Tra cứu mã số thuế) và `GPKD_LOOKUP` (Tra cứu giấy phép kinh doanh), dùng thử ngay:
+- Mã số thuế: `0101234567`
+- Số giấy phép kinh doanh: `GP-2024-001122`
+
+**Mở lại chính `MST_LOOKUP` trong Quản trị → Nguồn dữ liệu → Sửa để xem CÁCH ĐÃ ĐIỀN** (đây là phần leader hỏi "điền prefix ở đâu"):
+
+| Trường | Giá trị đã điền | Giải thích |
+|---|---|---|
+| Loại kết nối | `HTTP (API thật)` | |
+| Base URL | `${MOCK_UPSTREAM_BASE_URL}` | Cú pháp `${TÊN_BIẾN}` — **không gõ URL trực tiếp**, hệ thống tự thay bằng giá trị thật trong `.env`/`.env.prod` lúc chạy |
+| Đường dẫn (path) | `/tra-cuu/ma-so-thue` | Copy nguyên từ tài liệu API thật |
+| Phương thức | `POST` | **Chỉ dùng POST** — hệ thống hiện chỉ gửi tham số qua JSON body, GET sẽ không gắn được tham số nào (giới hạn hiện tại, đã ghi lại) |
+| Headers tĩnh | `X-ReqType: LOOKUP` | Header cố định, không chứa bí mật — gõ thẳng giá trị vào đây được |
+| Xác thực → Loại | `apiKeyHeader` | |
+| Xác thực → Tên header | `X-Access` | Đây chính là "prefix"/tên header mà API thật yêu cầu — gõ đúng tên theo tài liệu API (ví dụ cũng có thể là `Authorization`, `X-Api-Key`...) |
+| Xác thực → Biến chứa giá trị | `MOCK_UPSTREAM_API_KEY` | **Chỉ chọn tên biến env đã có sẵn** — không bao giờ gõ thẳng API key thật vào ô này |
+
+Đổi `Loại kết nối` sang `HTTP` cho 1 trong các datasource thật (`IMMIGRATION_HISTORY`, `PASSPORT_INFO`...) khi có tài liệu API thật cũng điền đúng y hệt format này — chỉ khác giá trị `Base URL`/`Đường dẫn`/tên header theo tài liệu thật.
+
 ### Test trực tiếp qua API (không qua giao diện) — dùng Swagger hoặc curl
 
 ```bash
@@ -124,11 +153,18 @@ curl -s -X PATCH http://localhost:3000/api/v1/admin/datasources/CITIZEN_BASIC/en
 curl -s -X POST http://localhost:3000/api/v1/query/BHXH_LOOKUP \
   -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
   -d '{"params": {"cccd": "001099001234"}}'
+
+# 3c. Demo C — query qua HTTP THẬT (api gọi ra scripts/mock-upstream-server.js
+#     qua mạng, kèm header X-Access/X-ReqType đã cấu hình — nhớ bật server
+#     mock trước: node scripts/mock-upstream-server.js)
+curl -s -X POST http://localhost:3000/api/v1/query/MST_LOOKUP \
+  -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
+  -d '{"params": {"mst": "0101234567"}}'
 ```
 
 Toàn bộ endpoint `admin/datasources/*` (list/tạo/sửa/xóa/bật-tắt/reload-từ-file) có sẵn trong Swagger (`/api/v1/docs`, nhóm **Admin Datasources**) — tự bấm "Try it out" thử trực tiếp không cần nhớ cú pháp curl.
 
-**Lưu ý khi demo:** mọi thay đổi ghi thẳng vào `config/config.json` thật (có backup `.bak` tự động) — demo thoải mái, nhưng nếu muốn trả về trạng thái ban đầu thì tắt lại/xóa datasource vừa tạo sau khi demo xong. `BHXH_LOOKUP` là ví dụ cố định, giữ nguyên để dùng demo nhiều lần — nếu tự tạo thêm 1 cái nữa để luyện tay thì nhớ xóa sau khi xong.
+**Lưu ý khi demo:** mọi thay đổi ghi thẳng vào `config/config.json` thật (có backup `.bak` tự động) — demo thoải mái, nhưng nếu muốn trả về trạng thái ban đầu thì tắt lại/xóa datasource vừa tạo sau khi demo xong. `BHXH_LOOKUP`/`MST_LOOKUP`/`GPKD_LOOKUP` là các ví dụ cố định, giữ nguyên để dùng demo nhiều lần — nếu tự tạo thêm 1 cái nữa để luyện tay thì nhớ xóa sau khi xong. `MST_LOOKUP`/`GPKD_LOOKUP` cần server mock đang chạy (`node scripts/mock-upstream-server.js`) mới query được — không bật server thì sẽ báo lỗi kết nối (đúng hành vi thật khi 1 API thật bị down, cũng là điểm hay để minh họa thông báo lỗi trông thế nào).
 
 ## Câu hỏi thường gặp khi demo
 
