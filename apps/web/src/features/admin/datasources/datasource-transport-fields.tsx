@@ -53,7 +53,7 @@ export function DatasourceTransportFields({ register, watch, setValue, control, 
             <div className="flex gap-2">
               <Input id="httpBaseUrl" aria-invalid={!!errors.httpBaseUrl} {...register('httpBaseUrl')} />
               {!!envRefs?.baseUrlEnvNames.length && (
-                <Select onValueChange={(name) => setValue('httpBaseUrl', `${watch('httpBaseUrl') ?? ''}\${${name}}`)}>
+                <Select onValueChange={(name) => setValue('httpBaseUrl', `\${${name}}`)}>
                   <SelectTrigger className="w-auto" title={t.fieldBaseUrlEnvPicker}>
                     <SelectValue placeholder={t.fieldBaseUrlEnvPicker} />
                   </SelectTrigger>
@@ -67,7 +67,11 @@ export function DatasourceTransportFields({ register, watch, setValue, control, 
                 </Select>
               )}
             </div>
-            {errors.httpBaseUrl && <p className="text-destructive text-sm">{errors.httpBaseUrl.message}</p>}
+            {errors.httpBaseUrl ? (
+              <p className="text-destructive text-sm">{errors.httpBaseUrl.message}</p>
+            ) : (
+              <p className="text-muted-foreground text-xs">{t.fieldBaseUrlHint}</p>
+            )}
           </div>
 
           <div className="grid grid-cols-2 gap-4">
