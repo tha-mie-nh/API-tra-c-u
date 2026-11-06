@@ -1,0 +1,32 @@
+[
+  {
+    "ma_so_bhxh": "0123456789",
+    "cccd": "001099001234",
+    "ho_ten": "Nguyễn Văn A",
+    "don_vi": "Công ty TNHH ABC",
+    "muc_luong_dong": 8500000,
+    "so_thang_dong": 36,
+    "trang_thai": "1",
+    "thoi_diem": "2026-01-10T08:00:00Z"
+  },
+  {
+    "ma_so_bhxh": "0123456789",
+    "cccd": "001099001234",
+    "ho_ten": "Nguyễn Văn A",
+    "don_vi": "Công ty CP XYZ",
+    "muc_luong_dong": 7200000,
+    "so_thang_dong": 18,
+    "trang_thai": "2",
+    "thoi_diem": "2024-03-01T08:00:00Z"
+  },
+  {
+    "ma_so_bhxh": "0199009999",
+    "cccd": "001099009999",
+    "ho_ten": "Trần Thị B",
+    "don_vi": "Công ty TNHH Dịch vụ B",
+    "muc_luong_dong": 6000000,
+    "so_thang_dong": 24,
+    "trang_thai": "1",
+    "thoi_diem": "2026-02-15T08:00:00Z"
+  }
+]

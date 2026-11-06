@@ -40,6 +40,7 @@ coverage/
 .turbo/
 backups/
 deploy-check.zip
+config/config.json.bak
 
 # Real citizen sample data / demo photos / internal review docs — not code,
 # never push to an external repo (PII).

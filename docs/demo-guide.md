@@ -79,7 +79,9 @@ Vào **Lịch sử** — mỗi lần tra cứu ở mục 1 đều được ghi l
 
 Vào **Quản trị → Nguồn dữ liệu** (`/quan-tri/nguon-du-lieu`). Đây là tính năng admin tự cấu hình API mà không cần sửa file/không cần restart container — leader yêu cầu thêm ngày 2026-11-03.
 
-### Demo ấn tượng nhất: bật 1 datasource đang tắt, thấy hiệu lực ngay lập tức
+Phải cover được **2 tình huống** — leader hay hỏi cả 2:
+
+### Demo A — API cũ (đã có sẵn trong hệ thống): bật lên, thấy hiệu lực ngay lập tức
 
 1. Trong danh sách, tìm `CITIZEN_BASIC` (đang **tắt**).
 2. Bấm công tắc **Kích hoạt** ở cột cuối → bật lên.
@@ -88,13 +90,19 @@ Vào **Quản trị → Nguồn dữ liệu** (`/quan-tri/nguon-du-lieu`). Đây
 
 Đây chính là điểm khác biệt với trước đây: trước kia phải sửa tay `config/config.json` + restart `api` container; giờ chỉ cần 1 click trên UI, có hiệu lực tức thì.
 
-### Demo tạo datasource hoàn toàn mới
+### Demo B — API HOÀN TOÀN MỚI (chưa từng tồn tại trong hệ thống)
+
+Để chứng minh hệ thống không hardcode riêng cho dữ liệu công dân (CCCD/hộ chiếu/GPLX...), mà thật sự **config-driven cho bất kỳ loại API nào**, đã tạo sẵn 1 ví dụ sống: **`BHXH_LOOKUP` — Tra cứu Bảo hiểm xã hội** (hoàn toàn không liên quan tới nhóm dữ liệu công dân có sẵn). Vào **Tra cứu** là thấy ngay trong menu, dùng thử được luôn — tự sinh form nhập (Mã số BHXH / CCCD) + bảng kết quả (đơn vị công tác, mức lương đóng, số tháng đóng, trạng thái...) hoàn toàn tự động, không có 1 dòng code nào viết riêng cho nó.
+
+Thử query mẫu: CCCD `001099001234` hoặc Mã số BHXH `0199009999`.
+
+Muốn tự tay tạo 1 cái khác (đúng kịch bản live demo cho leader xem):
 
 1. Bấm **"Thêm datasource mới"**.
-2. Có thể chọn **"Sao chép từ nguồn có sẵn"** để đỡ phải điền lại từ đầu (copy toàn bộ cấu hình của 1 datasource đang có, chỉ cần đổi `Mã` vì mã phải duy nhất).
+2. Có thể chọn **"Sao chép từ nguồn có sẵn"** để đỡ phải điền lại từ đầu (copy toàn bộ cấu hình của 1 datasource đang có, chỉ cần đổi `Mã` vì mã phải duy nhất) — hoặc điền từ đầu để chứng minh không có gì "cheat".
 3. Điền `Loại kết nối = HTTP (API thật)` để minh họa việc trỏ API thật: `Base URL`, `Đường dẫn (path)`, `Headers`, `Xác thực` (chỉ **chọn tên** biến env có sẵn trong `.env.prod`, không bao giờ gõ thẳng API key thật vào form).
 4. Bảng **"Các trường đầu vào"**/**"đầu ra"** — thêm/xóa từng dòng trực quan (không cần gõ JSON tay).
-5. Lưu lại → datasource mới xuất hiện ngay trong **Tra cứu**, menu tự sinh form nhập liệu + bảng kết quả hoàn toàn tự động từ cấu hình vừa nhập, không có dòng code nào viết riêng cho datasource này.
+5. Lưu lại → datasource mới xuất hiện ngay trong **Tra cứu**, menu tự sinh form nhập liệu + bảng kết quả hoàn toàn tự động từ cấu hình vừa nhập.
 
 ### Test trực tiếp qua API (không qua giao diện) — dùng Swagger hoặc curl
 
@@ -107,20 +115,20 @@ TOKEN=$(curl -s -X POST http://localhost:3000/api/v1/auth/login \
 # 2. Xem danh sách tên biến env có thể gán cho datasource (chỉ tên, không lộ giá trị thật)
 curl -s http://localhost:3000/api/v1/admin/datasources/env-refs -H "Authorization: Bearer $TOKEN"
 
-# 3. Bật/tắt 1 datasource qua API thẳng (tương đương bước demo ở trên)
+# 3a. Demo A — bật/tắt 1 datasource CŨ qua API thẳng (tương đương bước demo ở trên)
 curl -s -X PATCH http://localhost:3000/api/v1/admin/datasources/CITIZEN_BASIC/enabled \
   -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
   -d '{"enabled": true}'
 
-# 4. Query thử ngay sau khi bật — không cần đợi gì cả
-curl -s -X POST http://localhost:3000/api/v1/query/CITIZEN_BASIC \
+# 3b. Demo B — query thử API HOÀN TOÀN MỚI (đã sống sẵn, không cần tạo lại)
+curl -s -X POST http://localhost:3000/api/v1/query/BHXH_LOOKUP \
   -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
-  -d '{"params": {"citizenId": "001099001234"}}'
+  -d '{"params": {"cccd": "001099001234"}}'
 ```
 
 Toàn bộ endpoint `admin/datasources/*` (list/tạo/sửa/xóa/bật-tắt/reload-từ-file) có sẵn trong Swagger (`/api/v1/docs`, nhóm **Admin Datasources**) — tự bấm "Try it out" thử trực tiếp không cần nhớ cú pháp curl.
 
-**Lưu ý khi demo:** mọi thay đổi ghi thẳng vào `config/config.json` thật (có backup `.bak` tự động) — demo thoải mái, nhưng nếu muốn trả về trạng thái ban đầu thì tắt lại/xóa datasource vừa tạo sau khi demo xong.
+**Lưu ý khi demo:** mọi thay đổi ghi thẳng vào `config/config.json` thật (có backup `.bak` tự động) — demo thoải mái, nhưng nếu muốn trả về trạng thái ban đầu thì tắt lại/xóa datasource vừa tạo sau khi demo xong. `BHXH_LOOKUP` là ví dụ cố định, giữ nguyên để dùng demo nhiều lần — nếu tự tạo thêm 1 cái nữa để luyện tay thì nhớ xóa sau khi xong.
 
 ## Câu hỏi thường gặp khi demo
 
