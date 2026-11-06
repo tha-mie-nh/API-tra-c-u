@@ -133,6 +133,23 @@ node scripts/mock-upstream-server.js
 
 Đổi `Loại kết nối` sang `HTTP` cho 1 trong các datasource thật (`IMMIGRATION_HISTORY`, `PASSPORT_INFO`...) khi có tài liệu API thật cũng điền đúng y hệt format này — chỉ khác giá trị `Base URL`/`Đường dẫn`/tên header theo tài liệu thật.
 
+### Demo C2 — tự tay bật HTTP trên chính 1 trong 4 datasource thật (không phải datasource mới)
+
+Khác Demo C ở trên (dùng datasource MỚI tạo), đây là thao tác đúng với datasource THẬT sẽ dùng sau này — làm trực tiếp trên `IMMIGRATION_HISTORY`. Server mock có sẵn route `/find` giả lập đúng hình dạng 4 API thật trong tài liệu (1 endpoint dùng chung, phân biệt bằng header `X-Request-Type`).
+
+1. Bật server mock nếu chưa bật: `node scripts/mock-upstream-server.js`.
+2. Vào **Quản trị → Nguồn dữ liệu → `IMMIGRATION_HISTORY` → Sửa**.
+3. Đổi `Loại kết nối` → `HTTP (API thật)`. Điền:
+   - Base URL: `${IMMIGRATION_HISTORY_BASE_URL}`
+   - Đường dẫn (path): `/find`
+   - Phương thức: `POST`
+   - Headers tĩnh: thêm 1 dòng `X-Request-Type` = `find-immihistory`
+   - Xác thực → Loại: `apiKeyHeader`, Tên header: `X-Access`, Biến chứa giá trị: `IMMIGRATION_HISTORY_API_KEY`
+4. Lưu lại → vào **Tra cứu → Tra cứu dữ liệu xuất nhập cảnh**, nhập Số hộ chiếu `E00123456` → ra đúng dữ liệu thật qua HTTP (không phải file mock nữa), đủ mọi trường kể cả enum dịch nghĩa + icon xuất/nhập cảnh.
+5. **Làm xong demo thì đổi `Loại kết nối` lại về `Giả lập (mock)`** (Tệp dữ liệu mẫu: `mock-data/immigration-history.json`) để trả `IMMIGRATION_HISTORY` về đúng trạng thái chờ API thật — datasource này không nên để trỏ vĩnh viễn vào server demo.
+
+`PASSPORT_INFO`/`DRIVER_LICENSE` dùng chung route `/find`, chỉ khác `X-Request-Type` (`find-passport`/`find-driverlicense`) — làm y hệt bước trên. `FACE_PHOTO` trả ảnh base64 nên chưa có sẵn trong server mock, chưa demo được qua HTTP (vẫn demo được qua mock file như mục 1).
+
 ### Test trực tiếp qua API (không qua giao diện) — dùng Swagger hoặc curl
 
 ```bash
