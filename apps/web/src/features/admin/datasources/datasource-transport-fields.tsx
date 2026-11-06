@@ -41,19 +41,10 @@ export function DatasourceTransportFields({ register, watch, setValue, control, 
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="__none__">{t.clearSelectionOption}</SelectItem>
-            <SelectItem value="mock">{t.transportKindMock}</SelectItem>
             <SelectItem value="http">{t.transportKindHttp}</SelectItem>
           </SelectContent>
         </Select>
       </div>
-
-      {kind === 'mock' && (
-        <div className="flex flex-col gap-1.5">
-          <Label htmlFor="mockDataFile">{t.fieldDataFile}</Label>
-          <Input id="mockDataFile" aria-invalid={!!errors.mockDataFile} {...register('mockDataFile')} />
-          {errors.mockDataFile && <p className="text-destructive text-sm">{errors.mockDataFile.message}</p>}
-        </div>
-      )}
 
       {kind === 'http' && (
         <>
