@@ -39,7 +39,7 @@ cd /opt/app-tra-cuu/deploy-check
 deploy-check/
 ├── docker-compose.prod.yml
 ├── .env.prod
-├── config/                        (config.json, config.schema.json, mock-data/)
+├── config/                        (config.json, config.schema.json)
 ├── schema/                        (3 file .sql — chỉ cần nếu dùng PG có sẵn, xem "Về Postgres")
 ├── deployment-guide.md            (file này)
 ├── docker-images-explained.md     (tùy chọn — giải thích image Docker đóng gói gì)
@@ -183,11 +183,21 @@ không dùng tới — chỉ là input cho container `postgres` tự chứa, kh�
      chính container đó, **không phải máy host** — dùng IP/DNS thật của máy chạy API (vd
      `http://172.22.142.171:4000`), và mở firewall giữa 2 máy nếu cần.
 2. Trong `config/config.json`, tìm đúng datasource (`IMMIGRATION_HISTORY`, `PASSPORT_INFO`,
-   `DRIVER_LICENSE`, hoặc `FACE_PHOTO`), sửa khối `"transport"` từ:
+   `DRIVER_LICENSE`, hoặc `FACE_PHOTO`) — mặc định nó đang trỏ vào server demo
+   (`scripts/mock-upstream-server.js`, qua biến `*_BASE_URL`), sửa khối `"transport"` từ dạng:
    ```json
-   "transport": { "kind": "mock", "dataFile": "mock-data/immigration-history.json", "timeoutMs": 10000 }
+   "transport": {
+     "kind": "http",
+     "baseUrl": "${IMMIGRATION_HISTORY_BASE_URL}",
+     "path": "/find",
+     "method": "POST",
+     "headers": { "X-Request-Type": "find-immihistory" },
+     "auth": { "kind": "apiKeyHeader", "header": "X-Access", "valueEnv": "IMMIGRATION_HISTORY_API_KEY" },
+     "timeoutMs": 10000
+   }
    ```
-   thành:
+   thành (điền `path`/`headers` theo đúng tài liệu API thật, giữ nguyên `baseUrl`/`auth.valueEnv`
+   — chỉ cần đổi GIÁ TRỊ của 2 biến env đó trong `.env.prod` ở bước 1, không cần đổi tên biến):
    ```json
    "transport": {
      "kind": "http",
@@ -207,8 +217,8 @@ không dùng tới — chỉ là input cho container `postgres` tự chứa, kh�
    - `auth.header`: tên header **xác thực** theo tài liệu (`X-Access`, `X-Api-Key`... tùy API
      thật đặt tên gì, điền đúng tên đó). `auth.valueEnv`: tên biến env chứa giá trị thật (đã có
      sẵn, vd `IMMIGRATION_HISTORY_API_KEY`) — không ghi giá trị thật vào `config.json`.
-   - Chỉ đổi `kind` sang `http` cho datasource **đang bật** (`enabled: true`). Datasource đang tắt
-     để nguyên `mock` — `http` mà thiếu `baseUrl`/`path` có thể làm app lỗi lúc nạp config.
+   - Mọi datasource đều đã là `"kind": "http"` — không còn kiểu `"mock"` (đọc file JSON tĩnh)
+     nữa. Thiếu `baseUrl`/`path` khi `kind` là `http` làm app lỗi lúc nạp config.
    - **Cấu trúc response của API thật phải khớp phần `output`** của datasource đó: `recordsPath`
      (vd `data.0.data`) và `from` của từng field. API thật trả JSON khác mẫu mock thì sửa
      `recordsPath`/`from` cho khớp, nếu không app trả rỗng hoặc thiếu field dù gọi thành công.

@@ -28,11 +28,11 @@ Lệnh in ra `username`/`tempPassword` — dùng đăng nhập, hệ thống b�
 
 Vào **Tra cứu** ở menu trái, chọn từng mục dưới đây.
 
-> Đã tắt toàn bộ 8 datasource demo/mock ban đầu (2026-09-30) — chỉ giữ lại 4 datasource API thật bên dưới. Việc tắt chỉ set `enabled: false` trong `config/config.json` (không xóa code/mock-data), có thể bật lại bất kỳ lúc nào nếu cần minh họa lại cơ chế adapter generic.
+> Đã tắt toàn bộ 7 datasource demo ban đầu (2026-09-30) — chỉ giữ lại 4 datasource API thật bên dưới. Việc tắt chỉ set `enabled: false` trong `config/config.json` (không xóa code), có thể bật lại bất kỳ lúc nào nếu cần minh họa lại cơ chế adapter generic.
 
 ### Nhóm API thật (theo `spec upstream` — 4 mục)
 
-Đang chạy ở chế độ mock (chưa có base URL/token thật), nhưng field mapping đã đúng 100% theo tài liệu — khi có API thật chỉ cần đổi `transport.kind` trong `config/config.json`, không sửa code.
+`transport.baseUrl` của cả 4 đang trỏ vào server demo `scripts/mock-upstream-server.js` (chưa có base URL/token thật từ leader), nhưng field mapping đã đúng 100% theo tài liệu — khi có API thật chỉ cần đổi giá trị 2 biến `*_BASE_URL`/`*_API_KEY` tương ứng trong `.env`, không sửa `config.json` hay code.
 
 | Mục tra cứu | Cách nhập | Giá trị mẫu | Điểm cần xem |
 |---|---|---|---|
@@ -92,11 +92,9 @@ Phải cover được **2 tình huống** — leader hay hỏi cả 2:
 
 ### Demo B — API HOÀN TOÀN MỚI (chưa từng tồn tại trong hệ thống)
 
-Để chứng minh hệ thống không hardcode riêng cho dữ liệu công dân (CCCD/hộ chiếu/GPLX...), mà thật sự **config-driven cho bất kỳ loại API nào**, đã tạo sẵn 1 ví dụ sống: **`BHXH_LOOKUP` — Tra cứu Bảo hiểm xã hội** (hoàn toàn không liên quan tới nhóm dữ liệu công dân có sẵn). Vào **Tra cứu** là thấy ngay trong menu, dùng thử được luôn — tự sinh form nhập (Mã số BHXH / CCCD) + bảng kết quả (đơn vị công tác, mức lương đóng, số tháng đóng, trạng thái...) hoàn toàn tự động, không có 1 dòng code nào viết riêng cho nó.
+Để chứng minh hệ thống không hardcode riêng cho dữ liệu công dân (CCCD/hộ chiếu/GPLX...), mà thật sự **config-driven cho bất kỳ loại API nào**, tạo sống ngay trong buổi demo 1 datasource hoàn toàn mới, không liên quan gì tới nhóm dữ liệu công dân có sẵn — ví dụ **"Tra cứu Bảo hiểm xã hội" (`BHXH_LOOKUP`)** — để leader thấy menu **Tra cứu** tự sinh form nhập + bảng kết quả hoàn toàn tự động từ cấu hình vừa nhập, không có 1 dòng code nào viết riêng cho nó.
 
-Thử query mẫu: CCCD `001099001234` hoặc Mã số BHXH `0199009999`.
-
-Muốn tự tay tạo 1 cái khác (đúng kịch bản live demo cho leader xem):
+Kịch bản live demo cho leader xem:
 
 1. Bấm **"Thêm datasource mới"**.
 2. Có thể chọn **"Sao chép từ nguồn có sẵn"** để đỡ phải điền lại từ đầu (copy toàn bộ cấu hình của 1 datasource đang có, chỉ cần đổi `Mã` vì mã phải duy nhất) — hoặc điền từ đầu để chứng minh không có gì "cheat".
@@ -104,9 +102,9 @@ Muốn tự tay tạo 1 cái khác (đúng kịch bản live demo cho leader xem
 4. Bảng **"Các trường đầu vào"**/**"đầu ra"** — thêm/xóa từng dòng trực quan (không cần gõ JSON tay).
 5. Lưu lại → datasource mới xuất hiện ngay trong **Tra cứu**, menu tự sinh form nhập liệu + bảng kết quả hoàn toàn tự động từ cấu hình vừa nhập.
 
-### Demo C — nối API THẬT qua mạng (không phải mock file) + cách điền prefix/header
+### Demo C — nối API THẬT qua mạng + cách điền prefix/header
 
-Demo A và B ở trên dùng `Loại kết nối = Giả lập (mock)` — đọc từ file JSON nội bộ, chưa chứng minh được phần leader hay hỏi nhất: **điền `Base URL`/`Đường dẫn`/`Headers`/`Xác thực` để gọi ra 1 API thật qua mạng thì đúng hình dạng thế nào**. Để demo được mà chưa có API thật trong tay, có sẵn 1 server giả lập API thật (`scripts/mock-upstream-server.js`) — chạy thật trên 1 cổng riêng, yêu cầu đúng kiểu header mà API thật hay dùng (`X-Access` cho API key, `X-ReqType` cố định — đúng pattern leader từng hỏi).
+Phần leader hay hỏi nhất: **điền `Base URL`/`Đường dẫn`/`Headers`/`Xác thực` để gọi ra 1 API thật qua mạng thì đúng hình dạng thế nào**. Để demo được mà chưa có API thật trong tay, có sẵn 1 server giả lập API thật (`scripts/mock-upstream-server.js`) — chạy thật trên 1 cổng riêng, yêu cầu đúng kiểu header mà API thật hay dùng (`X-Access` cho API key, `X-ReqType` cố định — đúng pattern leader từng hỏi).
 
 **Bật server này trước khi demo** (1 lần, để chạy nền suốt buổi demo):
 ```bash
@@ -114,13 +112,13 @@ node scripts/mock-upstream-server.js
 # [mock-upstream] listening on http://localhost:4100
 ```
 
-Đã có sẵn 2 datasource sống nối vào server này — vào **Tra cứu** là thấy `MST_LOOKUP` (Tra cứu mã số thuế) và `GPKD_LOOKUP` (Tra cứu giấy phép kinh doanh), dùng thử ngay:
+Tạo sống 2 datasource ví dụ nối vào server này (bấm **"Thêm datasource mới"** giống Demo B) — ví dụ `MST_LOOKUP` (Tra cứu mã số thuế) và `GPKD_LOOKUP` (Tra cứu giấy phép kinh doanh). Sau khi tạo, vào **Tra cứu** dùng thử ngay:
 - Mã số thuế: `0101234567`
 - Số giấy phép kinh doanh: `GP-2024-001122`
 
-**Mở lại chính `MST_LOOKUP` trong Quản trị → Nguồn dữ liệu → Sửa để xem CÁCH ĐÃ ĐIỀN** (đây là phần leader hỏi "điền prefix ở đâu"):
+**Điền `MST_LOOKUP` như sau** (đây là phần leader hỏi "điền prefix ở đâu"):
 
-| Trường | Giá trị đã điền | Giải thích |
+| Trường | Điền | Giải thích |
 |---|---|---|
 | Loại kết nối | `HTTP (API thật)` | |
 | Base URL | `${MOCK_UPSTREAM_BASE_URL}` | Cú pháp `${TÊN_BIẾN}` — **không gõ URL trực tiếp**, hệ thống tự thay bằng giá trị thật trong `.env`/`.env.prod` lúc chạy |
@@ -133,31 +131,30 @@ node scripts/mock-upstream-server.js
 
 Đổi `Loại kết nối` sang `HTTP` cho 1 trong các datasource thật (`IMMIGRATION_HISTORY`, `PASSPORT_INFO`...) khi có tài liệu API thật cũng điền đúng y hệt format này — chỉ khác giá trị `Base URL`/`Đường dẫn`/tên header theo tài liệu thật.
 
-### Demo C2 — tự tay bật HTTP trên chính 1 trong 4 datasource thật (không phải datasource mới)
+### Demo C2 — xem cách 1 trong 4 datasource thật đã được điền HTTP (không phải datasource mới)
 
-**Vì sao làm bước này:** mục đích KHÔNG phải là hệ thống "phụ thuộc" vào server mock — hệ thống đã tự scale sẵn với bất kỳ API nào qua đúng 4 ô (`Base URL`/`Đường dẫn`/`Headers`/`Xác thực`), không cần sửa code. Vấn đề là **hiện chưa có URL API thật từ leader** để thử, nên server mock chỉ đóng vai "giả vờ là API thật" — y hệt cách `mock-data/*.json` giả vờ là dữ liệu thật. Khi nào có API thật, chỉ đổi lại đúng 1 ô `Base URL`/`Đường dẫn`/`Headers` (bước 3 dưới đây) sang giá trị thật là xong, không đổi gì khác.
+**Vì sao làm bước này:** không còn cơ chế "file mock tĩnh" trong hệ thống nữa — MỌI datasource (cả 11) đều là `transport.kind: "http"`, luôn gọi ra một API thật qua mạng. 4 datasource ở mục 1 hiện đang trỏ `Base URL` vào server demo (`scripts/mock-upstream-server.js`, cổng 4100) vì **chưa có URL API thật từ leader** — khi có, chỉ cần đổi giá trị 2 biến `*_BASE_URL`/`*_API_KEY` tương ứng trong `.env`/`.env.prod`, không cần sửa `config.json`/form Admin UI.
 
-Khác Demo C ở trên (tạo datasource MỚI), đây là thao tác đúng với 1 trong 4 datasource THẬT sẽ dùng sau này — làm trực tiếp trên `IMMIGRATION_HISTORY`.
+Khác Demo C ở trên (tạo datasource MỚI), đây là xem lại cách đã điền trên 1 trong 4 datasource THẬT — `IMMIGRATION_HISTORY`.
 
 1. Bật server mock nếu chưa bật: `node scripts/mock-upstream-server.js` (để chạy nền, không tắt terminal).
-2. Vào **Quản trị → Nguồn dữ liệu** → tìm dòng `IMMIGRATION_HISTORY` → bấm **Sửa**.
-3. Đổi **Loại kết nối** từ `Giả lập (mock)` → `HTTP (API thật)`, điền **chính xác** từng ô sau (gõ y nguyên, kể cả dấu `${...}`):
+2. Vào **Quản trị → Nguồn dữ liệu** → tìm dòng `IMMIGRATION_HISTORY` → bấm **Sửa** → xem các ô đã điền sẵn:
 
-   | Ô trong form | Gõ chính xác | |
+   | Ô trong form | Giá trị đã điền | |
    |---|---|---|
-   | Base URL | `${IMMIGRATION_HISTORY_BASE_URL}` | ← dấu `${...}` nghĩa là "lấy giá trị từ biến môi trường tên này", không phải gõ URL thật vào đây |
+   | Loại kết nối | `HTTP (API thật)` | |
+   | Base URL | `${IMMIGRATION_HISTORY_BASE_URL}` | ← dấu `${...}` nghĩa là "lấy giá trị từ biến môi trường tên này", không phải URL thật |
    | Đường dẫn (path) | `/find` | |
-   | Phương thức | `POST` | chọn trong dropdown |
-   | Headers tĩnh | bấm **"+ Thêm header"** → cột 1 gõ `X-Request-Type`, cột 2 gõ `find-immihistory` | đây là header CỐ ĐỊNH, không phải bí mật, gõ thẳng giá trị vào được |
-   | Xác thực → Loại | `apiKeyHeader` | chọn trong dropdown |
-   | Xác thực → Tên header | `X-Access` | đây chính là "tên prefix" mà API thật yêu cầu — sau này đổi API thật thì đổi đúng tên header theo tài liệu họ đưa |
-   | Xác thực → Biến chứa giá trị | `IMMIGRATION_HISTORY_API_KEY` | bấm vào ô này sẽ hiện dropdown chọn tên biến có sẵn, **không tự gõ tay** |
+   | Phương thức | `POST` | |
+   | Headers tĩnh | `X-Request-Type: find-immihistory` | header CỐ ĐỊNH, không phải bí mật |
+   | Xác thực → Loại | `apiKeyHeader` | |
+   | Xác thực → Tên header | `X-Access` | đây chính là "tên prefix" mà API thật yêu cầu — khi đổi API thật thì đổi đúng tên header theo tài liệu họ đưa |
+   | Xác thực → Biến chứa giá trị | `IMMIGRATION_HISTORY_API_KEY` | chọn qua dropdown tên biến có sẵn, không tự gõ tay |
 
-4. Bấm **Lưu**.
-5. Vào menu **Tra cứu → Tra cứu dữ liệu xuất nhập cảnh**, ô "Số hộ chiếu" gõ `E00123456` → bấm Tra cứu → ra đúng dữ liệu (họ tên "Nguyễn Văn A", xuất cảnh ngày 2026-01-15, cửa khẩu Sân bay Nội Bài...) — lần này dữ liệu đi qua mạng thật (server mock cổng 4100), không còn đọc file mock nữa.
-6. **Làm xong demo thì đổi lại:** quay lại **Sửa** → **Loại kết nối** → chọn lại `Giả lập (mock)` → ô "Tệp dữ liệu mẫu" gõ `mock-data/immigration-history.json` → **Lưu**. Làm bước này để `IMMIGRATION_HISTORY` về đúng trạng thái "đang chờ API thật" như ban đầu, không để trỏ vĩnh viễn vào server demo.
+3. Vào menu **Tra cứu → Tra cứu dữ liệu xuất nhập cảnh**, ô "Số hộ chiếu" gõ `E00123456` → bấm Tra cứu → ra đúng 2 bản ghi (1 xuất 1 nhập, họ tên "Nguyễn Văn A") — dữ liệu đi qua mạng thật tới server demo, không đọc file nào cả.
+4. **Khi có API thật:** quay lại **Sửa**, chỉ cần đổi `Đường dẫn`/`Headers tĩnh` (và/hoặc tên header xác thực) theo đúng tài liệu API thật nhận được — `Base URL`/`Biến chứa giá trị` giữ nguyên tên biến, chỉ đổi GIÁ TRỊ của 2 biến đó trong `.env`.
 
-`PASSPORT_INFO`/`DRIVER_LICENSE` dùng chung route `/find`, chỉ khác giá trị header `X-Request-Type` (`find-passport`/`find-driverlicense`) — làm y hệt 6 bước trên, chỉ đổi 2 chỗ: tên datasource đang sửa, và giá trị `X-Request-Type`. `FACE_PHOTO` trả ảnh base64 nên chưa có sẵn trong server mock, chưa demo được qua HTTP (vẫn demo được qua mock file như mục 1).
+`PASSPORT_INFO`/`DRIVER_LICENSE` dùng chung route `/find`, chỉ khác giá trị header `X-Request-Type` (`find-passport`/`find-driverlicense`). `FACE_PHOTO` có route riêng (`/tra-cuu/anh-mat`, trả ảnh base64) — tra cứu với Số CMND/CCCD `001099001234` để xem demo.
 
 **Gặp lỗi "menu Tra cứu trống, dù đăng nhập được"?** Đây là tình huống riêng của **môi trường test mới dựng lần đầu** (xem "Môi trường test" trong `docs/deployment-guide.md`) — không phải lỗi backend. Nguyên nhân: `seed` chạy TRƯỚC khi `api` kịp đồng bộ danh sách quyền `api:*` vào DB (chỉ xảy ra khi API khởi động lần đầu trên 1 DB hoàn toàn mới), nên lúc `seed` chạy chưa có quyền nào để cấp cho ADMIN. Sửa bằng cách chạy lại `seed` một lần nữa (lúc này `api` đã chạy, đã có đủ quyền để cấp):
 ```bash

@@ -58,7 +58,6 @@ packages/shared/src/    Type dùng chung FE+BE: datasource-config.types.ts (DSL 
 config/
   config.json           Định nghĩa MỌI datasource (xem mục 4) — sửa file này KHÔNG cần rebuild
   config.schema.json     JSON Schema validate config.json lúc boot
-  mock-data/             Dữ liệu giả cho các datasource đang chạy mock
 ```
 
 ## 4. Cơ chế config-driven (đọc kỹ mục này trước khi sửa bất kỳ datasource nào)
@@ -68,9 +67,12 @@ Mỗi datasource là 1 entry trong `config/config.json`, gồm:
 - `code` — khóa bất biến, join key với `permissions.code` (`api:<code lowercase>`) và
   `query_logs.datasource_code`. **Không đổi sau khi đã chạy.**
 - `type` — `"info"` (bảng dữ liệu) hoặc `"image"` (ảnh)
-- `transport.kind` — cách gọi ra ngoài lấy dữ liệu:
-  - `"mock"` — đọc từ file JSON tĩnh trong `config/mock-data/` (dùng khi chưa có API thật)
-  - `"http"` — gọi API thật (base URL/key đọc từ biến môi trường qua `${VAR}`, không hardcode secret)
+- `transport.kind` — luôn là `"http"`: gọi ra một API thật qua mạng (base URL/key đọc từ biến
+  môi trường qua `${VAR}`, không hardcode secret). Không còn kiểu `"mock"` (đọc file JSON tĩnh)
+  trong `config.json` nữa — khi chưa có API thật, trỏ `baseUrl` vào server demo
+  `scripts/mock-upstream-server.js` (có data mẫu cho đủ cả 11 datasource) thay vì dùng file tĩnh.
+  Code backend vẫn còn hỗ trợ `"mock"` ở tầng adapter (không xoá), nhưng UI Admin không còn cho
+  chọn nữa và `config.json` hiện tại không dùng kiểu này ở bất kỳ đâu.
 - `input.fields` — field trên form tra cứu, kèm `mapTo` (tên field khi gửi lên upstream)
 - `input.requireGroups` — validate kiểu "cần đủ nhóm A HOẶC đủ nhóm B" (vd: số hộ chiếu HOẶC
   đủ cả họ tên+ngày sinh+giới tính)
@@ -96,13 +98,13 @@ trực tiếp). Quyền ADMIN-only: `admin:datasources` (seed tự cấp cho rol
 hành: [`docs/deployment-guide.md`](./deployment-guide.md) mục "Quản lý nguồn dữ liệu trên giao
 diện quản trị".
 
-### 4 datasource đang bật (+ 8 đã tắt)
+### 4 datasource đang bật (+ 7 đã tắt)
 
 | Nhóm | Code | Ghi chú |
 |---|---|---|
-| API thật (theo `spec upstream`, mock cho tới khi có base URL/token) | `IMMIGRATION_HISTORY`, `PASSPORT_INFO`, `DRIVER_LICENSE`, `FACE_PHOTO` | Field mapping khớp 100% tài liệu — chỉ cần đổi `transport.kind` sang `"http"` khi có API thật |
+| API thật (theo `spec upstream`) | `IMMIGRATION_HISTORY`, `PASSPORT_INFO`, `DRIVER_LICENSE`, `FACE_PHOTO` | Field mapping khớp 100% tài liệu — `transport.baseUrl` trỏ server demo (`scripts/mock-upstream-server.js`), đổi giá trị `*_BASE_URL`/`*_API_KEY` trong `.env` sang API thật khi có |
 
-Đã `enabled: false` (2026-09-30) — vẫn còn nguyên trong `config.json`/`mock-data/`, bật lại được bất kỳ lúc nào nếu cần minh họa kiến trúc adapter generic: `CITIZEN_BASIC`, `CITIZEN_EXTENDED`, `CITIZEN_RESIDENCE`, `CITIZEN_PHOTO` (MinIO thật), `CCCD_HISTORY`, `VEHICLE_OWNERSHIP`, `FAMILY_EVENTS`, `XUAT_NHAP_CANH` (demo cũ trùng domain với `IMMIGRATION_HISTORY`).
+Đã `enabled: false` (2026-09-30) — vẫn còn nguyên trong `config.json` (đã là `transport.kind: "http"`, cũng trỏ server demo), bật lại được bất kỳ lúc nào nếu cần minh họa kiến trúc adapter generic: `CITIZEN_BASIC`, `CITIZEN_EXTENDED`, `CITIZEN_RESIDENCE`, `CCCD_HISTORY`, `VEHICLE_OWNERSHIP`, `FAMILY_EVENTS`, `XUAT_NHAP_CANH` (demo cũ trùng domain với `IMMIGRATION_HISTORY`).
 
 ## 5. Auth & RBAC
 

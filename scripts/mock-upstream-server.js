@@ -1,17 +1,18 @@
 #!/usr/bin/env node
 // Standalone fake "real" upstream API server — demo-only, never part of any
-// deployed image. Purpose: every datasource in config/config.json so far
-// uses transport.kind:"mock" (reads a local JSON fixture) — none actually
-// exercises the transport.kind:"http" path (real baseUrl/path/headers/auth
-// over the network). This server gives that path something real to call,
-// so an admin can see exactly how to fill in Base URL / Đường dẫn / Headers
-// / Xác thực when wiring a genuinely new upstream API — including the
-// custom-header pattern (X-Access, X-ReqType) leader asked about.
+// deployed image. Every datasource in config/config.json uses
+// transport.kind:"http" and points here (no static mock-data file
+// mechanism exists anymore) — this server is what actually answers those
+// calls, with real demo data so query results have content to show.
 //
 // Usage: node scripts/mock-upstream-server.js
 // Port:    MOCK_UPSTREAM_PORT (default 4100)
 // API key: MOCK_UPSTREAM_API_KEY (default "demo-mst-secret-123") — must match
 //          whatever datasource.transport.auth.valueEnv resolves to.
+//
+// Demo citizen used across CITIZEN_*/XUAT_NHAP_CANH/CCCD_HISTORY/
+// VEHICLE_OWNERSHIP/FAMILY_EVENTS/FACE_PHOTO so one CCCD ("001099001234")
+// returns a result on every one of those datasources in a live demo.
 const http = require('node:http');
 const { URL } = require('node:url');
 
@@ -60,6 +61,21 @@ const FIND_RECORDS = {
       cuaKhau: 'Sân bay Nội Bài',
       mucDich: 'Du lịch',
     },
+    {
+      hoTen: 'Nguyễn Văn A',
+      ngaySinh: '1999-05-12',
+      defNgaySinh: 'D',
+      gioiTinh: 'M',
+      soHoChieu: 'E00123456',
+      loaiHoChieu: 'PT',
+      hanHoChieu: '2029-05-12',
+      noiCapHoChieu: 'Cục Quản lý xuất nhập cảnh',
+      quocTich: 'Việt Nam',
+      xuatNhap: 'N',
+      ngayXuatNhap: '2026-02-02T14:10:00Z',
+      cuaKhau: 'Sân bay Nội Bài',
+      mucDich: 'Du lịch',
+    },
   ],
   'find-passport': [
     {
@@ -77,6 +93,52 @@ const FIND_RECORDS = {
     { soCCCD: '001099001234', soGplx: '010123456789', ngaySinh: '1999-05-12', hangGPLX: 'B2', ngayCap: '2020-03-01' },
   ],
 };
+
+// Demo records for the 8 datasources that don't share the /find envelope —
+// each gets its own /tra-cuu/* route (same auth pattern as MST/GPKD:
+// X-Access + X-ReqType: LOOKUP), returning {"data": [...]} (recordsPath:
+// "data" on all 8 in config.json). Field keys match output.fields[].from
+// exactly (response-mapper.service.ts reads record[field.from] directly,
+// no nested path).
+const CITIZEN_BASIC_RECORDS = [
+  { cccd: '001099001234', ho_ten: 'Nguyễn Văn A', ngay_sinh: '1999-05-12', gioi_tinh: '1', dia_chi: '12 Láng Hạ, Đống Đa, Hà Nội', thoi_diem: '2026-01-10T08:00:00Z' },
+];
+const CITIZEN_EXTENDED_RECORDS = [
+  { so_cccd: '001099001234', ho_va_ten: 'Nguyễn Văn A', nam_sinh: 1999, nghe_nghiep: 'Kỹ sư phần mềm', noi_o_hien_tai: '12 Láng Hạ, Đống Đa, Hà Nội', ngay_cap_nhat: '2026-02-01T08:00:00Z' },
+];
+const CITIZEN_RESIDENCE_RECORDS = [
+  { citizen_id: '001099001234', full_name: 'Nguyễn Văn A', ho_khau_so: 'HK-001234', dia_chi_thuong_tru: '12 Láng Hạ, Đống Đa, Hà Nội', loai_dang_ky: 'TT', ngay_dang_ky: '2020-06-15T00:00:00Z' },
+];
+const XUAT_NHAP_CANH_RECORDS = [
+  { so_cccd: '001099001234', ho_ten: 'Nguyễn Văn A', chieu: 'XUAT', cua_khau: 'Sân bay Nội Bài', quoc_gia: 'Nhật Bản', muc_dich: 'Du lịch', thoi_diem: '2026-01-15T09:30:00Z' },
+];
+const CCCD_HISTORY_RECORDS = [
+  { so_cccd: '001099001234', ho_ten: 'Nguyễn Văn A', loai_giay_to: 'CCCD_CHIP', so_giay_to: '001099001234', tuoi_luc_cap: 25, chieu_cao: 170, dac_diem_nhan_dang: 'Không có', noi_cap: 'Cục Cảnh sát QLHC về TTXH', ngay_cap: '2024-03-10T00:00:00Z' },
+];
+const VEHICLE_OWNERSHIP_RECORDS = [
+  { so_cccd: '001099001234', chu_so_huu: 'Nguyễn Văn A', loai_xe: 'O_TO', hang_xe: 'Toyota', dong_xe: 'Vios', bien_so: '30A-123.45', gia_tri: 550000000, noi_dang_ky: 'Phòng CSGT Hà Nội', ngay_dang_ky: '2023-07-20T00:00:00Z' },
+];
+const FAMILY_EVENTS_RECORDS = [
+  { so_cccd: '001099001234', ho_ten: 'Nguyễn Văn A', loai_su_kien: 'KET_HON', quan_he: 'Vợ/chồng', nguoi_lien_quan: 'Trần Thị B', cccd_nguoi_lien_quan: '001099005678', noi_dang_ky: 'UBND phường Láng Hạ', ngay_su_kien: '2022-11-01T00:00:00Z' },
+];
+// 1x1 transparent PNG — stands in for a real base64 photo (every real
+// upstream in this project returns images this way, never a bucket ref).
+const DEMO_PHOTO_BASE64 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUAAarVyFEAAAAASUVORK5CYII=';
+const FACE_PHOTO_RECORDS = [
+  { soCCCD: '001099001234', hinhAnh: DEMO_PHOTO_BASE64, created_at: '2026-01-10T08:00:00Z' },
+];
+
+// path, records, idField for each /tra-cuu/* route below.
+const SIMPLE_ROUTES = [
+  { path: '/tra-cuu/cong-dan-co-ban', records: CITIZEN_BASIC_RECORDS, idField: 'cccd' },
+  { path: '/tra-cuu/cong-dan-mo-rong', records: CITIZEN_EXTENDED_RECORDS, idField: 'so_cccd' },
+  { path: '/tra-cuu/cu-tru', records: CITIZEN_RESIDENCE_RECORDS, idField: 'citizen_id' },
+  { path: '/tra-cuu/xuat-nhap-canh', records: XUAT_NHAP_CANH_RECORDS, idField: 'so_cccd' },
+  { path: '/tra-cuu/lich-su-cccd', records: CCCD_HISTORY_RECORDS, idField: 'so_cccd' },
+  { path: '/tra-cuu/phuong-tien', records: VEHICLE_OWNERSHIP_RECORDS, idField: 'so_cccd' },
+  { path: '/tra-cuu/ho-tich', records: FAMILY_EVENTS_RECORDS, idField: 'so_cccd' },
+  { path: '/tra-cuu/anh-mat', records: FACE_PHOTO_RECORDS, idField: 'soCCCD' },
+];
 
 function checkAuth(req, res, requireReqType) {
   if (req.headers['x-access'] !== API_KEY) {
@@ -127,7 +189,18 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  // Shared /find endpoint for the 4 real-spec datasources — auth header
+  const simpleRoute = SIMPLE_ROUTES.find((r) => r.path === url.pathname);
+  if (simpleRoute && req.method === 'POST') {
+    if (!checkAuth(req, res, true)) return;
+    const body = await readJsonBody(req).catch(() => ({}));
+    const filterValue = body[simpleRoute.idField];
+    const data = simpleRoute.records.filter((r) => !filterValue || r[simpleRoute.idField] === filterValue);
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ data }));
+    return;
+  }
+
+  // Shared /find endpoint for the 3 real-spec datasources — auth header
   // only (X-Request-Type picks the dataset, not a fixed value like X-ReqType
   // above), matching .env.example's documented real-world shape exactly.
   if (url.pathname === '/find' && req.method === 'POST') {
@@ -152,6 +225,9 @@ server.listen(PORT, () => {
   console.log(`[mock-upstream] listening on http://localhost:${PORT}`);
   console.log(`[mock-upstream] POST /tra-cuu/ma-so-thue              { "mst": "0101234567" }`);
   console.log(`[mock-upstream] POST /tra-cuu/giay-phep-kinh-doanh  { "soGPKD": "GP-2024-001122" }`);
+  for (const r of SIMPLE_ROUTES) {
+    console.log(`[mock-upstream] POST ${r.path}  { "${r.idField}": "001099001234" }`);
+  }
   console.log(`[mock-upstream] POST /find  (X-Request-Type: find-immihistory|find-passport|find-driverlicense)`);
-  console.log(`[mock-upstream] requires headers: X-Access: ${API_KEY}   X-ReqType: ${REQ_TYPE} (only on the first 2 routes)`);
+  console.log(`[mock-upstream] requires headers: X-Access: ${API_KEY}   X-ReqType: ${REQ_TYPE} (/tra-cuu/* routes only, not /find)`);
 });

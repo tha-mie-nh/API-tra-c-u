@@ -18,9 +18,19 @@
       "enabled": false,
       "permissionCode": "api:citizen_basic",
       "transport": {
-        "kind": "mock",
-        "dataFile": "mock-data/citizen-basic.json",
-        "timeoutMs": 10000
+        "kind": "http",
+        "baseUrl": "${CITIZEN_BASIC_BASE_URL}",
+        "path": "/tra-cuu/cong-dan-co-ban",
+        "method": "POST",
+        "headers": {
+          "X-ReqType": "LOOKUP"
+        },
+        "timeoutMs": 10000,
+        "auth": {
+          "kind": "apiKeyHeader",
+          "header": "X-Access",
+          "valueEnv": "CITIZEN_BASIC_API_KEY"
+        }
       },
       "input": {
         "fields": [
@@ -75,6 +85,7 @@
         ]
       },
       "output": {
+        "recordsPath": "data",
         "timestampField": "recordedAt",
         "sortOrder": "desc",
         "identityField": "citizenId",
@@ -135,9 +146,19 @@
       "enabled": false,
       "permissionCode": "api:citizen_extended",
       "transport": {
-        "kind": "mock",
-        "dataFile": "mock-data/citizen-extended.json",
-        "timeoutMs": 10000
+        "kind": "http",
+        "baseUrl": "${CITIZEN_EXT_BASE_URL}",
+        "path": "/tra-cuu/cong-dan-mo-rong",
+        "method": "POST",
+        "headers": {
+          "X-ReqType": "LOOKUP"
+        },
+        "timeoutMs": 10000,
+        "auth": {
+          "kind": "apiKeyHeader",
+          "header": "X-Access",
+          "valueEnv": "CITIZEN_EXT_API_KEY"
+        }
       },
       "input": {
         "fields": [
@@ -160,6 +181,7 @@
         ]
       },
       "output": {
+        "recordsPath": "data",
         "timestampField": "updatedAt",
         "sortOrder": "asc",
         "identityField": "citizenId",
@@ -216,9 +238,19 @@
       "enabled": false,
       "permissionCode": "api:citizen_residence",
       "transport": {
-        "kind": "mock",
-        "dataFile": "mock-data/citizen-residence.json",
-        "timeoutMs": 10000
+        "kind": "http",
+        "baseUrl": "${CITIZEN_RESIDENCE_BASE_URL}",
+        "path": "/tra-cuu/cu-tru",
+        "method": "POST",
+        "headers": {
+          "X-ReqType": "LOOKUP"
+        },
+        "timeoutMs": 10000,
+        "auth": {
+          "kind": "apiKeyHeader",
+          "header": "X-Access",
+          "valueEnv": "CITIZEN_RESIDENCE_API_KEY"
+        }
       },
       "input": {
         "fields": [
@@ -240,6 +272,7 @@
         ]
       },
       "output": {
+        "recordsPath": "data",
         "timestampField": "registeredAt",
         "sortOrder": "desc",
         "identityField": "citizenId",
@@ -300,9 +333,19 @@
       "enabled": false,
       "permissionCode": "api:xuat_nhap_canh",
       "transport": {
-        "kind": "mock",
-        "dataFile": "mock-data/xuat-nhap-canh.json",
-        "timeoutMs": 10000
+        "kind": "http",
+        "baseUrl": "${XUAT_NHAP_CANH_BASE_URL}",
+        "path": "/tra-cuu/xuat-nhap-canh",
+        "method": "POST",
+        "headers": {
+          "X-ReqType": "LOOKUP"
+        },
+        "timeoutMs": 10000,
+        "auth": {
+          "kind": "apiKeyHeader",
+          "header": "X-Access",
+          "valueEnv": "XUAT_NHAP_CANH_API_KEY"
+        }
       },
       "input": {
         "fields": [
@@ -334,6 +377,7 @@
         ]
       },
       "output": {
+        "recordsPath": "data",
         "timestampField": "eventAt",
         "sortOrder": "desc",
         "identityField": "citizenId",
@@ -400,9 +444,19 @@
       "enabled": false,
       "permissionCode": "api:cccd_history",
       "transport": {
-        "kind": "mock",
-        "dataFile": "mock-data/cccd-history.json",
-        "timeoutMs": 10000
+        "kind": "http",
+        "baseUrl": "${CCCD_HISTORY_BASE_URL}",
+        "path": "/tra-cuu/lich-su-cccd",
+        "method": "POST",
+        "headers": {
+          "X-ReqType": "LOOKUP"
+        },
+        "timeoutMs": 10000,
+        "auth": {
+          "kind": "apiKeyHeader",
+          "header": "X-Access",
+          "valueEnv": "CCCD_HISTORY_API_KEY"
+        }
       },
       "input": {
         "fields": [
@@ -442,6 +496,7 @@
         ]
       },
       "output": {
+        "recordsPath": "data",
         "timestampField": "issuedAt",
         "sortOrder": "desc",
         "identityField": "citizenId",
@@ -522,9 +577,19 @@
       "enabled": false,
       "permissionCode": "api:vehicle_ownership",
       "transport": {
-        "kind": "mock",
-        "dataFile": "mock-data/vehicle-ownership.json",
-        "timeoutMs": 10000
+        "kind": "http",
+        "baseUrl": "${VEHICLE_OWNERSHIP_BASE_URL}",
+        "path": "/tra-cuu/phuong-tien",
+        "method": "POST",
+        "headers": {
+          "X-ReqType": "LOOKUP"
+        },
+        "timeoutMs": 10000,
+        "auth": {
+          "kind": "apiKeyHeader",
+          "header": "X-Access",
+          "valueEnv": "VEHICLE_OWNERSHIP_API_KEY"
+        }
       },
       "input": {
         "fields": [
@@ -556,6 +621,7 @@
         ]
       },
       "output": {
+        "recordsPath": "data",
         "timestampField": "registeredAt",
         "sortOrder": "desc",
         "identityField": "citizenId",
@@ -634,9 +700,19 @@
       "enabled": false,
       "permissionCode": "api:family_events",
       "transport": {
-        "kind": "mock",
-        "dataFile": "mock-data/family-events.json",
-        "timeoutMs": 10000
+        "kind": "http",
+        "baseUrl": "${FAMILY_EVENTS_BASE_URL}",
+        "path": "/tra-cuu/ho-tich",
+        "method": "POST",
+        "headers": {
+          "X-ReqType": "LOOKUP"
+        },
+        "timeoutMs": 10000,
+        "auth": {
+          "kind": "apiKeyHeader",
+          "header": "X-Access",
+          "valueEnv": "FAMILY_EVENTS_API_KEY"
+        }
       },
       "input": {
         "fields": [
@@ -676,6 +752,7 @@
         ]
       },
       "output": {
+        "recordsPath": "data",
         "timestampField": "eventAt",
         "sortOrder": "desc",
         "identityField": "citizenId",
@@ -751,9 +828,19 @@
       "enabled": true,
       "permissionCode": "api:immigration_history",
       "transport": {
-        "kind": "mock",
-        "dataFile": "mock-data/immigration-history.json",
-        "timeoutMs": 10000
+        "kind": "http",
+        "baseUrl": "${IMMIGRATION_HISTORY_BASE_URL}",
+        "path": "/find",
+        "method": "POST",
+        "headers": {
+          "X-Request-Type": "find-immihistory"
+        },
+        "timeoutMs": 10000,
+        "auth": {
+          "kind": "apiKeyHeader",
+          "header": "X-Access",
+          "valueEnv": "IMMIGRATION_HISTORY_API_KEY"
+        }
       },
       "input": {
         "fields": [
@@ -969,9 +1056,19 @@
       "enabled": true,
       "permissionCode": "api:passport_info",
       "transport": {
-        "kind": "mock",
-        "dataFile": "mock-data/passport-info.json",
-        "timeoutMs": 10000
+        "kind": "http",
+        "baseUrl": "${PASSPORT_INFO_BASE_URL}",
+        "path": "/find",
+        "method": "POST",
+        "headers": {
+          "X-Request-Type": "find-passport"
+        },
+        "timeoutMs": 10000,
+        "auth": {
+          "kind": "apiKeyHeader",
+          "header": "X-Access",
+          "valueEnv": "PASSPORT_INFO_API_KEY"
+        }
       },
       "input": {
         "fields": [
@@ -1171,9 +1268,19 @@
       "enabled": true,
       "permissionCode": "api:driver_license",
       "transport": {
-        "kind": "mock",
-        "dataFile": "mock-data/driver-license.json",
-        "timeoutMs": 10000
+        "kind": "http",
+        "baseUrl": "${DRIVER_LICENSE_BASE_URL}",
+        "path": "/find",
+        "method": "POST",
+        "headers": {
+          "X-Request-Type": "find-driverlicense"
+        },
+        "timeoutMs": 10000,
+        "auth": {
+          "kind": "apiKeyHeader",
+          "header": "X-Access",
+          "valueEnv": "DRIVER_LICENSE_API_KEY"
+        }
       },
       "input": {
         "fields": [
@@ -1272,9 +1379,19 @@
       "enabled": true,
       "permissionCode": "api:face_photo",
       "transport": {
-        "kind": "mock",
-        "dataFile": "mock-data/face-photo.json",
-        "timeoutMs": 10000
+        "kind": "http",
+        "baseUrl": "${FACE_PHOTO_BASE_URL}",
+        "path": "/tra-cuu/anh-mat",
+        "method": "POST",
+        "headers": {
+          "X-ReqType": "LOOKUP"
+        },
+        "timeoutMs": 10000,
+        "auth": {
+          "kind": "apiKeyHeader",
+          "header": "X-Access",
+          "valueEnv": "FACE_PHOTO_API_KEY"
+        }
       },
       "input": {
         "fields": [
@@ -1318,68 +1435,6 @@
         "maxResults": 100,
         "pageSize": 20
       }
-    },
-    {
-      "code": "BHXH_LOOPUP",
-      "name": "tra cứu thông tin bảo hiểm xã hội",
-      "type": "info",
-      "enabled": true,
-      "transport": {
-        "kind": "http",
-        "baseUrl": "${IMMIGRATION_HISTORY_BASE_URL}",
-        "path": "/find",
-        "method": "POST",
-        "headers": {
-          "X-Request-Type": ""
-        },
-        "timeoutMs": 10000,
-        "auth": {
-          "kind": "apiKeyHeader",
-          "header": "X-Access",
-          "valueEnv": "IMMIGRATION_HISTORY_API_KEY"
-        }
-      },
-      "input": {
-        "fields": [
-          {
-            "name": "citizenId",
-            "label": "Số CCCD",
-            "type": "string"
-          },
-          {
-            "name": "fullName",
-            "label": "Họ và tên",
-            "type": "string"
-          }
-        ],
-        "atLeastOneOf": [
-          "citizenId"
-        ]
-      },
-      "output": {
-        "timestampField": "soCCCD",
-        "sortOrder": "desc",
-        "identityField": "soCCCD",
-        "fields": [
-          {
-            "name": "soCCCD",
-            "label": "Số CCCD",
-            "type": "string",
-            "from": "citizenId"
-          },
-          {
-            "name": "BHXH",
-            "label": "id BHXH",
-            "type": "string",
-            "from": "BHXH"
-          }
-        ]
-      },
-      "limits": {
-        "maxResults": 12,
-        "pageSize": 7
-      },
-      "permissionCode": "api:bhxh_loopup"
     }
   ]
 }

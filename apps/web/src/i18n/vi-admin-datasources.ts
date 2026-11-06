@@ -45,7 +45,6 @@ export const viAdminDatasources = {
   fieldPermissionCode: 'Mã quyền (tự sinh từ mã nguồn dữ liệu)',
 
   fieldTransportKind: 'Loại kết nối',
-  transportKindMock: 'Giả lập (mock)',
   transportKindHttp: 'HTTP (API thật)',
   fieldDataFile: 'Tệp dữ liệu mẫu (trong thư mục config/)',
   fieldBaseUrl: 'Base URL',
