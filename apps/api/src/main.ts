@@ -1,4 +1,5 @@
 import { NestFactory } from '@nestjs/core';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import { AppModule } from './app.module';
@@ -16,6 +17,22 @@ async function bootstrap() {
   // AppModule's providers just to satisfy DI for this one bootstrap call.
   app.useLogger(new PinoLoggerService());
   app.setGlobalPrefix('api/v1');
+  // SwaggerModule.setup() mounts at the EXACT path given — NOT affected by
+  // setGlobalPrefix above, so the 'api/v1/' here is written out by hand, not
+  // inherited. Must stay under that prefix: in prod, nginx only reverse-proxies
+  // /api/v1/* to this container (see docker/nginx.conf) — a path outside that
+  // prefix would 404 through the real deployed proxy even though it works
+  // fine when hitting this container directly in dev.
+  const swaggerDocument = SwaggerModule.createDocument(
+    app,
+    new DocumentBuilder()
+      .setTitle('APP Tra cứu dữ liệu — API')
+      .setDescription('Nội bộ, không public. Bearer token lấy từ POST /api/v1/auth/login.')
+      .setVersion('1.0')
+      .addBearerAuth({ type: 'http', scheme: 'bearer', bearerFormat: 'JWT' }, 'access-token')
+      .build(),
+  );
+  SwaggerModule.setup('api/v1/docs', app, swaggerDocument);
   // Security headers (HSTS, X-Content-Type-Options, X-Frame-Options, etc.).
   // CSP is left to the edge reverse proxy (docker/Caddyfile) which serves the
   // actual HTML document; the API only ever returns JSON.
