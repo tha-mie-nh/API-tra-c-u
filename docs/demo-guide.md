@@ -135,20 +135,35 @@ node scripts/mock-upstream-server.js
 
 ### Demo C2 — tự tay bật HTTP trên chính 1 trong 4 datasource thật (không phải datasource mới)
 
-Khác Demo C ở trên (dùng datasource MỚI tạo), đây là thao tác đúng với datasource THẬT sẽ dùng sau này — làm trực tiếp trên `IMMIGRATION_HISTORY`. Server mock có sẵn route `/find` giả lập đúng hình dạng 4 API thật trong tài liệu (1 endpoint dùng chung, phân biệt bằng header `X-Request-Type`).
+**Vì sao làm bước này:** mục đích KHÔNG phải là hệ thống "phụ thuộc" vào server mock — hệ thống đã tự scale sẵn với bất kỳ API nào qua đúng 4 ô (`Base URL`/`Đường dẫn`/`Headers`/`Xác thực`), không cần sửa code. Vấn đề là **hiện chưa có URL API thật từ leader** để thử, nên server mock chỉ đóng vai "giả vờ là API thật" — y hệt cách `mock-data/*.json` giả vờ là dữ liệu thật. Khi nào có API thật, chỉ đổi lại đúng 1 ô `Base URL`/`Đường dẫn`/`Headers` (bước 3 dưới đây) sang giá trị thật là xong, không đổi gì khác.
 
-1. Bật server mock nếu chưa bật: `node scripts/mock-upstream-server.js`.
-2. Vào **Quản trị → Nguồn dữ liệu → `IMMIGRATION_HISTORY` → Sửa**.
-3. Đổi `Loại kết nối` → `HTTP (API thật)`. Điền:
-   - Base URL: `${IMMIGRATION_HISTORY_BASE_URL}`
-   - Đường dẫn (path): `/find`
-   - Phương thức: `POST`
-   - Headers tĩnh: thêm 1 dòng `X-Request-Type` = `find-immihistory`
-   - Xác thực → Loại: `apiKeyHeader`, Tên header: `X-Access`, Biến chứa giá trị: `IMMIGRATION_HISTORY_API_KEY`
-4. Lưu lại → vào **Tra cứu → Tra cứu dữ liệu xuất nhập cảnh**, nhập Số hộ chiếu `E00123456` → ra đúng dữ liệu thật qua HTTP (không phải file mock nữa), đủ mọi trường kể cả enum dịch nghĩa + icon xuất/nhập cảnh.
-5. **Làm xong demo thì đổi `Loại kết nối` lại về `Giả lập (mock)`** (Tệp dữ liệu mẫu: `mock-data/immigration-history.json`) để trả `IMMIGRATION_HISTORY` về đúng trạng thái chờ API thật — datasource này không nên để trỏ vĩnh viễn vào server demo.
+Khác Demo C ở trên (tạo datasource MỚI), đây là thao tác đúng với 1 trong 4 datasource THẬT sẽ dùng sau này — làm trực tiếp trên `IMMIGRATION_HISTORY`.
 
-`PASSPORT_INFO`/`DRIVER_LICENSE` dùng chung route `/find`, chỉ khác `X-Request-Type` (`find-passport`/`find-driverlicense`) — làm y hệt bước trên. `FACE_PHOTO` trả ảnh base64 nên chưa có sẵn trong server mock, chưa demo được qua HTTP (vẫn demo được qua mock file như mục 1).
+1. Bật server mock nếu chưa bật: `node scripts/mock-upstream-server.js` (để chạy nền, không tắt terminal).
+2. Vào **Quản trị → Nguồn dữ liệu** → tìm dòng `IMMIGRATION_HISTORY` → bấm **Sửa**.
+3. Đổi **Loại kết nối** từ `Giả lập (mock)` → `HTTP (API thật)`, điền **chính xác** từng ô sau (gõ y nguyên, kể cả dấu `${...}`):
+
+   | Ô trong form | Gõ chính xác | |
+   |---|---|---|
+   | Base URL | `${IMMIGRATION_HISTORY_BASE_URL}` | ← dấu `${...}` nghĩa là "lấy giá trị từ biến môi trường tên này", không phải gõ URL thật vào đây |
+   | Đường dẫn (path) | `/find` | |
+   | Phương thức | `POST` | chọn trong dropdown |
+   | Headers tĩnh | bấm **"+ Thêm header"** → cột 1 gõ `X-Request-Type`, cột 2 gõ `find-immihistory` | đây là header CỐ ĐỊNH, không phải bí mật, gõ thẳng giá trị vào được |
+   | Xác thực → Loại | `apiKeyHeader` | chọn trong dropdown |
+   | Xác thực → Tên header | `X-Access` | đây chính là "tên prefix" mà API thật yêu cầu — sau này đổi API thật thì đổi đúng tên header theo tài liệu họ đưa |
+   | Xác thực → Biến chứa giá trị | `IMMIGRATION_HISTORY_API_KEY` | bấm vào ô này sẽ hiện dropdown chọn tên biến có sẵn, **không tự gõ tay** |
+
+4. Bấm **Lưu**.
+5. Vào menu **Tra cứu → Tra cứu dữ liệu xuất nhập cảnh**, ô "Số hộ chiếu" gõ `E00123456` → bấm Tra cứu → ra đúng dữ liệu (họ tên "Nguyễn Văn A", xuất cảnh ngày 2026-01-15, cửa khẩu Sân bay Nội Bài...) — lần này dữ liệu đi qua mạng thật (server mock cổng 4100), không còn đọc file mock nữa.
+6. **Làm xong demo thì đổi lại:** quay lại **Sửa** → **Loại kết nối** → chọn lại `Giả lập (mock)` → ô "Tệp dữ liệu mẫu" gõ `mock-data/immigration-history.json` → **Lưu**. Làm bước này để `IMMIGRATION_HISTORY` về đúng trạng thái "đang chờ API thật" như ban đầu, không để trỏ vĩnh viễn vào server demo.
+
+`PASSPORT_INFO`/`DRIVER_LICENSE` dùng chung route `/find`, chỉ khác giá trị header `X-Request-Type` (`find-passport`/`find-driverlicense`) — làm y hệt 6 bước trên, chỉ đổi 2 chỗ: tên datasource đang sửa, và giá trị `X-Request-Type`. `FACE_PHOTO` trả ảnh base64 nên chưa có sẵn trong server mock, chưa demo được qua HTTP (vẫn demo được qua mock file như mục 1).
+
+**Gặp lỗi "menu Tra cứu trống, dù đăng nhập được"?** Đây là tình huống riêng của **môi trường test mới dựng lần đầu** (xem "Môi trường test" trong `docs/deployment-guide.md`) — không phải lỗi backend. Nguyên nhân: `seed` chạy TRƯỚC khi `api` kịp đồng bộ danh sách quyền `api:*` vào DB (chỉ xảy ra khi API khởi động lần đầu trên 1 DB hoàn toàn mới), nên lúc `seed` chạy chưa có quyền nào để cấp cho ADMIN. Sửa bằng cách chạy lại `seed` một lần nữa (lúc này `api` đã chạy, đã có đủ quyền để cấp):
+```bash
+docker compose -f docker-compose.test.yml --env-file .env.test --profile "*" run --rm seed
+```
+Sau đó F5 lại trang web và đăng nhập lại.
 
 ### Test trực tiếp qua API (không qua giao diện) — dùng Swagger hoặc curl
 
