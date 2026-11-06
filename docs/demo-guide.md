@@ -4,20 +4,25 @@ Tài liệu để tự thử toàn bộ chức năng hệ thống. Không cần 
 
 ## Truy cập
 
-- Web: http://localhost:5173
-- API: http://localhost:3000/api/v1/health
+Hai bản đang chạy song song để so sánh:
+
+| | Dev (hot-reload, dùng để test/sửa) | Production (image thật `api-v7`/`web-v11`, build sẵn) |
+|---|---|---|
+| Web | http://localhost:5173 | http://localhost:80 |
+| API | http://localhost:3000/api/v1/health | qua nginx, không lộ port riêng |
+| Swagger (test API trực tiếp, không qua UI) | http://localhost:3000/api/v1/docs | http://localhost/api/v1/docs |
+
+Bấm **"Authorize"** trên Swagger rồi dán `accessToken` lấy từ response của `POST /auth/login` — sau đó test trực tiếp mọi endpoint ngay trên trang, không cần Postman/curl.
 
 ## Đăng nhập
 
-| Username | Mật khẩu tạm | Ghi chú |
-|---|---|---|
-| `admin` | `r2lfivtSYqn8X1ZeY6NU` | Bắt buộc đổi mật khẩu ngay lần đăng nhập đầu tiên |
-
-Nếu mật khẩu tạm này đã hết hiệu lực (đã đổi qua lần đăng nhập trước), dùng lệnh sau để cấp mật khẩu tạm mới:
+Username luôn là `admin`. Mật khẩu tạm đổi mỗi lần cấp lại nên **không ghi cố định vào tài liệu này** — lấy mật khẩu tạm mới nhất bằng lệnh sau (chạy trên máy đang host dev; không áp dụng cho production — xem `docs/deployment-guide.md` nếu cần reset production):
 
 ```bash
-pnpm --filter api run reset-admin-password admin
+pnpm --filter api exec ts-node apps/api/scripts/reset-admin-password.ts admin
 ```
+
+Lệnh in ra `username`/`tempPassword` — dùng đăng nhập, hệ thống bắt đổi mật khẩu ngay lần đầu.
 
 ## 1. Tra cứu dữ liệu — 4 nguồn dữ liệu (API thật theo `spec upstream`)
 
@@ -45,10 +50,6 @@ Vào **Tra cứu** ở menu trái, chọn từng mục dưới đây.
 
 ## 2. Quên mật khẩu (không qua email)
 
-**Đã có sẵn 1 yêu cầu "admin" đang chờ duyệt** — đăng nhập vào **Quản trị → Người dùng** là thấy ngay khung **"Yêu cầu đặt lại mật khẩu"** ở đầu trang với badge "1". Bấm **Duyệt** hoặc **Từ chối** để thử ngay, không cần tạo yêu cầu mới trước.
-
-Muốn thử từ đầu (tự tạo yêu cầu mới):
-
 1. Ở trang đăng nhập, bấm **"Quên mật khẩu?"**.
 2. Nhập username bất kỳ (ví dụ `admin`) → luôn nhận thông báo giống nhau (dù username có tồn tại hay không — chống dò tài khoản).
 3. Đăng nhập lại bằng `admin`, vào **Quản trị → Người dùng** → thấy khung yêu cầu ở trên với badge số lượng đang chờ.
@@ -68,10 +69,58 @@ Vào menu **Quản trị**:
 | Người dùng | Tạo user mới, khóa/mở khóa, gán vai trò, đặt lại mật khẩu, xem khung yêu cầu quên mật khẩu (mục 2) |
 | Vai trò | Tạo vai trò mới, tick/untick quyền truy cập từng mục tra cứu (4 mục đang bật ở mục 1) — vai trò không có quyền thì mục tra cứu đó **biến mất khỏi menu** của user thuộc vai trò đó |
 | Nhật ký quản trị | Xem lại mọi hành động admin (tạo user, khóa, đổi vai trò, duyệt/từ chối yêu cầu quên mật khẩu...) — có before/after |
+| Nguồn dữ liệu | Thêm/sửa/xóa/bật-tắt datasource qua giao diện trực quan, có hiệu lực ngay — xem mục 5 |
 
 ## 4. Lịch sử tra cứu
 
 Vào **Lịch sử** — mỗi lần tra cứu ở mục 1 đều được ghi lại: người tra, thời điểm, tham số tìm kiếm (đã ẩn field nhạy cảm), kết quả thành công/lỗi.
+
+## 5. Quản lý nguồn dữ liệu động — tính năng mới nhất
+
+Vào **Quản trị → Nguồn dữ liệu** (`/quan-tri/nguon-du-lieu`). Đây là tính năng admin tự cấu hình API mà không cần sửa file/không cần restart container — leader yêu cầu thêm ngày 2026-11-03.
+
+### Demo ấn tượng nhất: bật 1 datasource đang tắt, thấy hiệu lực ngay lập tức
+
+1. Trong danh sách, tìm `CITIZEN_BASIC` (đang **tắt**).
+2. Bấm công tắc **Kích hoạt** ở cột cuối → bật lên.
+3. Ngay lập tức (không F5, không restart) qua menu **Tra cứu** — "Tra cứu thông tin công dân" đã xuất hiện, dùng được luôn.
+4. Tắt lại để về trạng thái demo ban đầu nếu muốn.
+
+Đây chính là điểm khác biệt với trước đây: trước kia phải sửa tay `config/config.json` + restart `api` container; giờ chỉ cần 1 click trên UI, có hiệu lực tức thì.
+
+### Demo tạo datasource hoàn toàn mới
+
+1. Bấm **"Thêm datasource mới"**.
+2. Có thể chọn **"Sao chép từ nguồn có sẵn"** để đỡ phải điền lại từ đầu (copy toàn bộ cấu hình của 1 datasource đang có, chỉ cần đổi `Mã` vì mã phải duy nhất).
+3. Điền `Loại kết nối = HTTP (API thật)` để minh họa việc trỏ API thật: `Base URL`, `Đường dẫn (path)`, `Headers`, `Xác thực` (chỉ **chọn tên** biến env có sẵn trong `.env.prod`, không bao giờ gõ thẳng API key thật vào form).
+4. Bảng **"Các trường đầu vào"**/**"đầu ra"** — thêm/xóa từng dòng trực quan (không cần gõ JSON tay).
+5. Lưu lại → datasource mới xuất hiện ngay trong **Tra cứu**, menu tự sinh form nhập liệu + bảng kết quả hoàn toàn tự động từ cấu hình vừa nhập, không có dòng code nào viết riêng cho datasource này.
+
+### Test trực tiếp qua API (không qua giao diện) — dùng Swagger hoặc curl
+
+```bash
+# 1. Đăng nhập lấy token
+TOKEN=$(curl -s -X POST http://localhost:3000/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"admin","password":"<mật khẩu của bạn>"}' | python3 -c "import json,sys;print(json.load(sys.stdin)['accessToken'])")
+
+# 2. Xem danh sách tên biến env có thể gán cho datasource (chỉ tên, không lộ giá trị thật)
+curl -s http://localhost:3000/api/v1/admin/datasources/env-refs -H "Authorization: Bearer $TOKEN"
+
+# 3. Bật/tắt 1 datasource qua API thẳng (tương đương bước demo ở trên)
+curl -s -X PATCH http://localhost:3000/api/v1/admin/datasources/CITIZEN_BASIC/enabled \
+  -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
+  -d '{"enabled": true}'
+
+# 4. Query thử ngay sau khi bật — không cần đợi gì cả
+curl -s -X POST http://localhost:3000/api/v1/query/CITIZEN_BASIC \
+  -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
+  -d '{"params": {"citizenId": "001099001234"}}'
+```
+
+Toàn bộ endpoint `admin/datasources/*` (list/tạo/sửa/xóa/bật-tắt/reload-từ-file) có sẵn trong Swagger (`/api/v1/docs`, nhóm **Admin Datasources**) — tự bấm "Try it out" thử trực tiếp không cần nhớ cú pháp curl.
+
+**Lưu ý khi demo:** mọi thay đổi ghi thẳng vào `config/config.json` thật (có backup `.bak` tự động) — demo thoải mái, nhưng nếu muốn trả về trạng thái ban đầu thì tắt lại/xóa datasource vừa tạo sau khi demo xong.
 
 ## Câu hỏi thường gặp khi demo
 
