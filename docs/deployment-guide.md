@@ -191,7 +191,7 @@ không dùng tới — chỉ là input cho container `postgres` tự chứa, kh�
      "baseUrl": "${IMMIGRATION_HISTORY_BASE_URL}",
      "path": "/find",
      "method": "POST",
-     "headers": { "X-Request-Type": "find-immihistory" },
+     "headers": { "X-Request-Type": "find_immihistory" },
      "auth": { "kind": "apiKeyHeader", "header": "X-Access", "valueEnv": "IMMIGRATION_HISTORY_API_KEY" },
      "timeoutMs": 10000
    }

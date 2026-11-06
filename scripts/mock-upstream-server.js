@@ -59,7 +59,7 @@ const DEMO_PHOTO_DATA_URI = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAA
 // this mock data in the same non-ISO shape so the demo actually exercises
 // that normalization path, not just a shape it happens to already handle.
 const FIND_RECORDS = {
-  'find-immihistory': [
+  'find_immihistory': [
     {
       hoTen: 'Nguyễn Văn A',
       ngaySinh: '12/05/1999',
@@ -279,7 +279,7 @@ server.listen(PORT, () => {
   for (const r of SIMPLE_ROUTES) {
     console.log(`[mock-upstream] POST ${r.path}  { "${r.idField}": "001099001234" }`);
   }
-  console.log(`[mock-upstream] POST /find  (X-Request-Type: find-immihistory|find-passport|find-driverlicense|find-face)`);
+  console.log(`[mock-upstream] POST /find  (X-Request-Type: find_immihistory|find-passport|find-driverlicense|find-face)`);
   console.log(`[mock-upstream] headers — /tra-cuu/* (except anh-mat, now under /find): X-Access: ${API_KEY}, X-ReqType: ${REQ_TYPE}`);
   console.log(`[mock-upstream] headers — /find: X-Access-Key: ${API_KEY}`);
 });

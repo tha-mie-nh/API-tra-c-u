@@ -146,7 +146,7 @@ Khác Demo C ở trên (tạo datasource MỚI), đây là xem lại cách đã 
    | Base URL | `${IMMIGRATION_HISTORY_BASE_URL}` | ← dấu `${...}` nghĩa là "lấy giá trị từ biến môi trường tên này", không phải URL thật |
    | Đường dẫn (path) | `/find` | |
    | Phương thức | `POST` | |
-   | Headers tĩnh | `X-Request-Type: find-immihistory` | header CỐ ĐỊNH, không phải bí mật |
+   | Headers tĩnh | `X-Request-Type: find_immihistory` | header CỐ ĐỊNH, không phải bí mật |
    | Xác thực → Loại | `apiKeyHeader` | |
    | Xác thực → Tên header | `X-Access` | đây chính là "tên prefix" mà API thật yêu cầu — khi đổi API thật thì đổi đúng tên header theo tài liệu họ đưa |
    | Xác thực → Biến chứa giá trị | `IMMIGRATION_HISTORY_API_KEY` | chọn qua dropdown tên biến có sẵn, không tự gõ tay |

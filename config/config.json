@@ -833,7 +833,7 @@
         "path": "/find",
         "method": "POST",
         "headers": {
-          "X-Request-Type": "find-immihistory"
+          "X-Request-Type": "find_immihistory"
         },
         "timeoutMs": 10000,
         "auth": {
