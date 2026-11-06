@@ -19,6 +19,8 @@ interface DatasourceTransportFieldsProps {
   envRefs?: DatasourceEnvRefs;
 }
 
+const CUSTOM_BASE_URL_OPTION = '__custom__';
+
 /** Transport mock|http subform (phase-03 Architecture). `minio-pg` is
  * intentionally never offered — the backend rejects it on write
  * (phase-02 Key Insights). */
@@ -27,6 +29,10 @@ export function DatasourceTransportFields({ register, watch, setValue, control, 
   const authKind = watch('authKind');
   const { fields, append, remove } = useFieldArray({ control, name: 'headers' });
   const t = vi.admin.datasources;
+
+  const baseUrlValue = watch('httpBaseUrl') ?? '';
+  const matchedEnvName = envRefs?.baseUrlEnvNames.find((name) => baseUrlValue === `\${${name}}`);
+  const baseUrlMode = baseUrlValue === '' ? undefined : (matchedEnvName ?? CUSTOM_BASE_URL_OPTION);
 
   return (
     <div className="flex flex-col gap-4">
@@ -50,28 +56,31 @@ export function DatasourceTransportFields({ register, watch, setValue, control, 
         <>
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="httpBaseUrl">{t.fieldBaseUrl}</Label>
-            <div className="flex gap-2">
-              <Input id="httpBaseUrl" aria-invalid={!!errors.httpBaseUrl} {...register('httpBaseUrl')} />
-              {!!envRefs?.baseUrlEnvNames.length && (
-                <Select onValueChange={(name) => setValue('httpBaseUrl', `\${${name}}`)}>
-                  <SelectTrigger className="w-auto" title={t.fieldBaseUrlEnvPicker}>
-                    <SelectValue placeholder={t.fieldBaseUrlEnvPicker} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {envRefs.baseUrlEnvNames.map((name) => (
-                      <SelectItem key={name} value={name}>
-                        {name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              )}
-            </div>
-            {errors.httpBaseUrl ? (
-              <p className="text-destructive text-sm">{errors.httpBaseUrl.message}</p>
-            ) : (
-              <p className="text-muted-foreground text-xs">{t.fieldBaseUrlHint}</p>
+            <Select
+              value={baseUrlMode}
+              onValueChange={(v) => setValue('httpBaseUrl', v === CUSTOM_BASE_URL_OPTION ? '' : `\${${v}}`)}
+            >
+              <SelectTrigger id="httpBaseUrl" className="w-full" aria-invalid={!!errors.httpBaseUrl}>
+                <SelectValue placeholder={t.fieldBaseUrlPlaceholder} />
+              </SelectTrigger>
+              <SelectContent>
+                {envRefs?.baseUrlEnvNames.map((name) => (
+                  <SelectItem key={name} value={name}>
+                    {name}
+                  </SelectItem>
+                ))}
+                <SelectItem value={CUSTOM_BASE_URL_OPTION}>{t.fieldBaseUrlCustomOption}</SelectItem>
+              </SelectContent>
+            </Select>
+            {baseUrlMode === CUSTOM_BASE_URL_OPTION && (
+              <Input
+                aria-invalid={!!errors.httpBaseUrl}
+                placeholder={t.fieldBaseUrlCustomPlaceholder}
+                value={baseUrlValue}
+                onChange={(e) => setValue('httpBaseUrl', e.target.value)}
+              />
             )}
+            {errors.httpBaseUrl && <p className="text-destructive text-sm">{errors.httpBaseUrl.message}</p>}
           </div>
 
           <div className="grid grid-cols-2 gap-4">
