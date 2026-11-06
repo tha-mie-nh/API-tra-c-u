@@ -121,6 +121,7 @@ export function DatasourceOutputFieldsEditor({ control, register, watch, setValu
         <div className="flex flex-col gap-1.5">
           <Label>{t.recordsPathLabel}</Label>
           <Input placeholder={t.recordsPathHint} {...register('outputRecordsPath')} />
+          <p className="text-destructive text-xs">{t.recordsPathWarning}</p>
         </div>
         <div className="flex flex-col gap-1.5">
           <Label>{t.totalPathLabel}</Label>
