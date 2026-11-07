@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Param, Patch, Post, Put, Query, Req, UsePipes } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Post, Put, Query, Req, UsePipes } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import type { Request } from 'express';
 import { FEATURE_PERMISSION_CODES } from '@app/shared';
@@ -105,5 +105,13 @@ export class UsersController {
     @CurrentUser() actor: JwtUser,
   ) {
     return this.usersService.setRoles(id, body.roleIds, actor.id);
+  }
+
+  @Delete(':id')
+  @HttpCode(HttpStatus.OK)
+  @AuditAction('user.delete', 'user')
+  async delete(@Param('id') id: string, @CurrentUser() actor: JwtUser, @Req() req: Request) {
+    req.auditBefore = await this.usersService.findOne(id);
+    return this.usersService.delete(id, actor.id);
   }
 }

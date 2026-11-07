@@ -24,6 +24,7 @@ export const viAdminUsers = {
   actionUnlock: 'Mở khóa tài khoản',
   actionAssignRoles: 'Gán vai trò',
   actionResetPassword: 'Đặt lại mật khẩu',
+  actionDelete: 'Xóa người dùng',
   createTitle: 'Tạo người dùng mới',
   editTitle: 'Sửa thông tin người dùng',
   fieldUsername: 'Tên đăng nhập',
@@ -46,6 +47,10 @@ export const viAdminUsers = {
   resetPasswordConfirmTitle: 'Đặt lại mật khẩu?',
   resetPasswordConfirmBody: (username: string) =>
     `Mật khẩu hiện tại của "${username}" sẽ bị vô hiệu và người dùng phải đổi mật khẩu ở lần đăng nhập tiếp theo.`,
+  deleteConfirmTitle: 'Xóa người dùng?',
+  deleteConfirmBody: (username: string) =>
+    `Tài khoản "${username}" sẽ bị vô hiệu hóa vĩnh viễn và đăng xuất ngay lập tức — không thể tự đăng nhập lại. Lịch sử tra cứu/nhật ký của tài khoản này vẫn được giữ nguyên, không bị xóa.`,
+  deleteSuccess: 'Đã xóa người dùng',
   resetPasswordResultTitle: 'Mật khẩu tạm thời',
   resetPasswordWarning:
     'Mật khẩu này chỉ hiển thị một lần duy nhất và sẽ không thể xem lại. Hãy sao chép và gửi cho người dùng qua kênh an toàn.',

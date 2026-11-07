@@ -153,9 +153,79 @@ export class UsersService {
   }
 
   async setRoles(id: string, roleIds: string[], actorId: string): Promise<{ id: string; roleIds: string[] }> {
-    await this.findOneRaw(id);
+    // Self-guard: same reasoning as lock()'s self-guard below — an ADMIN
+    // removing their OWN Administrator role (or any role) locks themselves
+    // out of admin screens with no other action to undo it from the UI.
+    // Hard block rather than relying on the "would this leave 0 active
+    // admins" check alone, since self-demotion is a mistake regardless of
+    // whether other admins exist.
+    if (id === actorId) {
+      throw new ConflictException({
+        code: 'CANNOT_MODIFY_OWN_ROLES',
+        message: 'Không thể tự thay đổi vai trò của chính tài khoản đang đăng nhập',
+      });
+    }
+
+    const target = await this.findOneRaw(id);
+
+    // Last-active-ADMIN guard: mirrors lock()'s — removing ADMIN from the
+    // only other active admin account would leave nobody able to manage
+    // roles/users at all.
+    const isTargetAdmin = target.userRoles.some((ur) => ur.role.code === 'ADMIN');
+    const keepsAdmin = await this.prisma.role.findFirst({ where: { id: { in: roleIds }, code: 'ADMIN' } });
+    if (isTargetAdmin && !keepsAdmin) {
+      const activeAdminCount = await this.prisma.user.count({
+        where: { status: UserStatus.ACTIVE, userRoles: { some: { role: { code: 'ADMIN' } } } },
+      });
+      if (activeAdminCount <= 1) {
+        throw new ConflictException({
+          code: 'LAST_ACTIVE_ADMIN',
+          message: 'Không thể bỏ vai trò Quản trị viên của tài khoản ADMIN đang hoạt động cuối cùng trong hệ thống',
+        });
+      }
+    }
+
     await this.replaceRoles(id, roleIds, actorId);
     return { id, roleIds };
+  }
+
+  async delete(id: string, actorId: string): Promise<PublicUser> {
+    // Same self-guard as lock()/setRoles() — never let an admin remove
+    // their own account out from under themselves mid-session.
+    if (id === actorId) {
+      throw new ConflictException({
+        code: 'CANNOT_DELETE_SELF',
+        message: 'Không thể tự xóa tài khoản đang đăng nhập của chính mình',
+      });
+    }
+
+    const target = await this.findOneRaw(id);
+
+    // ADMIN accounts are never deletable through this action (blanket
+    // rule, not just "the last one") — demote via "Gán vai trò" first if
+    // the account genuinely needs removing.
+    const isTargetAdmin = target.userRoles.some((ur) => ur.role.code === 'ADMIN');
+    if (isTargetAdmin) {
+      throw new ConflictException({
+        code: 'CANNOT_DELETE_ADMIN',
+        message: 'Không thể xóa tài khoản có vai trò Quản trị viên — bỏ vai trò Quản trị viên trước nếu thực sự cần xóa',
+      });
+    }
+
+    // Soft-delete: set DISABLED (an existing, already-login-blocked status —
+    // see auth.service.ts — just never settable from the UI until now)
+    // instead of a hard DELETE FROM users. A hard delete would either
+    // violate the FK from query_logs/audit_logs/user_roles (RESTRICT, no
+    // cascade configured — see schema.prisma) for any user with real
+    // history, or require cascading those away and losing the audit trail
+    // this app otherwise never discards (same reasoning as permissions
+    // being "kept, never hard-deleted" in PermissionSyncService).
+    const user = await this.prisma.user.update({
+      where: { id },
+      data: { status: UserStatus.DISABLED, updatedBy: actorId },
+    });
+    await this.tokenService.revokeAllForUser(id);
+    return toPublicUser(user);
   }
 
   private async replaceRoles(userId: string, roleIds: string[], grantedBy: string): Promise<void> {

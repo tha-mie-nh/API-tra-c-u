@@ -11,7 +11,7 @@ import { ConfirmDialog } from '@/components/common/confirm-dialog';
 import { ApiError } from '@/lib/api-client';
 import { useAuthStore } from '@/lib/auth-store';
 import { vi } from '@/i18n/vi';
-import { fetchUsers, lockUser, resetUserPassword, unlockUser } from './users-api';
+import { deleteUser, fetchUsers, lockUser, resetUserPassword, unlockUser } from './users-api';
 import { UsersTable } from './users-table';
 import { UserFormDialog } from './user-form-dialog';
 import { AssignRolesDialog } from './assign-roles-dialog';
@@ -34,6 +34,7 @@ export function UsersPage() {
   const [lockTarget, setLockTarget] = useState<AdminUser | null>(null);
   const [unlockTarget, setUnlockTarget] = useState<AdminUser | null>(null);
   const [resetTarget, setResetTarget] = useState<AdminUser | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<AdminUser | null>(null);
   const [tempPasswordResult, setTempPasswordResult] = useState<{ username: string; tempPassword: string } | null>(null);
 
   const query = useQuery<AdminUsersListResponse>({
@@ -68,6 +69,16 @@ export function UsersPage() {
     onSuccess: (result, user) => {
       setTempPasswordResult({ username: user.username, tempPassword: result.tempPassword });
       setResetTarget(null);
+    },
+    onError: (error) => toast.error(error instanceof ApiError ? error.message : vi.adminCommon.genericError),
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (user: AdminUser) => deleteUser(user.id),
+    onSuccess: async () => {
+      toast.success(vi.admin.users.deleteSuccess);
+      await invalidate();
+      setDeleteTarget(null);
     },
     onError: (error) => toast.error(error instanceof ApiError ? error.message : vi.adminCommon.genericError),
   });
@@ -123,6 +134,7 @@ export function UsersPage() {
             onUnlock={setUnlockTarget}
             onAssignRoles={setRolesUser}
             onResetPassword={setResetTarget}
+            onDelete={setDeleteTarget}
           />
           <ListPagination page={query.data.page} pageSize={query.data.pageSize} total={query.data.total} onPageChange={setPage} />
         </>
@@ -162,6 +174,15 @@ export function UsersPage() {
         destructive
         isPending={resetMutation.isPending}
         onConfirm={() => resetTarget && resetMutation.mutate(resetTarget)}
+      />
+      <ConfirmDialog
+        open={!!deleteTarget}
+        onOpenChange={(open) => !open && setDeleteTarget(null)}
+        title={vi.admin.users.deleteConfirmTitle}
+        description={deleteTarget ? vi.admin.users.deleteConfirmBody(deleteTarget.username) : ''}
+        destructive
+        isPending={deleteMutation.isPending}
+        onConfirm={() => deleteTarget && deleteMutation.mutate(deleteTarget)}
       />
     </div>
   );

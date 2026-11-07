@@ -15,21 +15,22 @@ import { UserStatusBadge } from './user-status-badge';
 
 interface UsersTableProps {
   items: AdminUser[];
-  /** Row whose "Khóa" action must be hidden — the backend hard-blocks
-   * self-lock too, but hiding it here avoids the confirm-dialog round trip
-   * for an action that can never succeed. */
+  /** Row whose "Khóa"/"Gán vai trò"/"Xóa" actions must be hidden — the
+   * backend hard-blocks all 3 for self too, but hiding here avoids the
+   * confirm-dialog round trip for an action that can never succeed. */
   currentUserId?: string;
   onEdit: (user: AdminUser) => void;
   onLock: (user: AdminUser) => void;
   onUnlock: (user: AdminUser) => void;
   onAssignRoles: (user: AdminUser) => void;
   onResetPassword: (user: AdminUser) => void;
+  onDelete: (user: AdminUser) => void;
 }
 
 const columnHelper = createColumnHelper<AdminUser>();
 
 /** Users list (S5) — TanStack Table v8, same as history/query tables (DRY). */
-export function UsersTable({ items, currentUserId, onEdit, onLock, onUnlock, onAssignRoles, onResetPassword }: UsersTableProps) {
+export function UsersTable({ items, currentUserId, onEdit, onLock, onUnlock, onAssignRoles, onResetPassword, onDelete }: UsersTableProps) {
   const columns = [
     columnHelper.accessor('username', { header: vi.admin.users.columnUsername }),
     columnHelper.accessor('fullName', { header: vi.admin.users.columnFullName }),
@@ -45,6 +46,8 @@ export function UsersTable({ items, currentUserId, onEdit, onLock, onUnlock, onA
       header: vi.admin.users.columnActions,
       cell: (c) => {
         const user = c.row.original;
+        const isSelf = user.id === currentUserId;
+        const isAdmin = user.roles?.some((r) => r.code === 'ADMIN') ?? false;
         return (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -54,16 +57,21 @@ export function UsersTable({ items, currentUserId, onEdit, onLock, onUnlock, onA
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem onSelect={() => onEdit(user)}>{vi.admin.users.actionEdit}</DropdownMenuItem>
-              <DropdownMenuItem onSelect={() => onAssignRoles(user)}>{vi.admin.users.actionAssignRoles}</DropdownMenuItem>
+              {!isSelf && <DropdownMenuItem onSelect={() => onAssignRoles(user)}>{vi.admin.users.actionAssignRoles}</DropdownMenuItem>}
               <DropdownMenuItem onSelect={() => onResetPassword(user)}>{vi.admin.users.actionResetPassword}</DropdownMenuItem>
               {user.status === 'LOCKED' ? (
                 <DropdownMenuItem onSelect={() => onUnlock(user)}>{vi.admin.users.actionUnlock}</DropdownMenuItem>
               ) : (
-                user.id !== currentUserId && (
+                !isSelf && (
                   <DropdownMenuItem variant="destructive" onSelect={() => onLock(user)}>
                     {vi.admin.users.actionLock}
                   </DropdownMenuItem>
                 )
+              )}
+              {!isSelf && !isAdmin && (
+                <DropdownMenuItem variant="destructive" onSelect={() => onDelete(user)}>
+                  {vi.admin.users.actionDelete}
+                </DropdownMenuItem>
               )}
             </DropdownMenuContent>
           </DropdownMenu>

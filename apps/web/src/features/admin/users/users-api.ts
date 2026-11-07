@@ -65,6 +65,12 @@ export function setUserRoles(id: string, roleIds: string[]): Promise<SetUserRole
   return apiFetch<SetUserRolesResult>(`/admin/users/${id}/roles`, { method: 'PUT', body: { roleIds } });
 }
 
+/** Soft-delete (sets status DISABLED, revokes sessions) — never a real
+ * DELETE FROM users, see users.service.ts. */
+export function deleteUser(id: string): Promise<AdminUser> {
+  return apiFetch<AdminUser>(`/admin/users/${id}`, { method: 'DELETE' });
+}
+
 /** `GET /admin/users/password-reset-requests` — self-service "forgot password" requests awaiting admin action. */
 export function fetchPasswordResetRequests(): Promise<PasswordResetRequestItem[]> {
   return apiFetch<PasswordResetRequestItem[]>('/admin/users/password-reset-requests');
