@@ -76,7 +76,7 @@ services:
     # pulled/local image as-is; `docker compose build`/`up --build` still
     # rebuilds from source. Lets a reviewer who only has this compose file +
     # .env.prod (no source checkout) run `docker compose pull && up -d`.
-    image: gthanh/app_tra_cuu:api-v7
+    image: gthanh/app_tra_cuu:api-v8
     build:
       context: .
       dockerfile: docker/api.Dockerfile
@@ -114,7 +114,7 @@ services:
   # db-setup -f docker-compose.prod.yml --env-file .env.prod run --rm seed`.
   seed:
     profiles: ['db-setup']
-    image: gthanh/app_tra_cuu:api-v7
+    image: gthanh/app_tra_cuu:api-v8
     build:
       context: .
       dockerfile: docker/api.Dockerfile
@@ -139,7 +139,7 @@ services:
     restart: 'no'
 
   api:
-    image: gthanh/app_tra_cuu:api-v7
+    image: gthanh/app_tra_cuu:api-v8
     build:
       context: .
       dockerfile: docker/api.Dockerfile
@@ -191,7 +191,7 @@ services:
   # intended to sit behind an org-owned proxy/gateway that owns TLS, or on a
   # trusted LAN/VPN with no TLS at all.
   web:
-    image: gthanh/app_tra_cuu:web-v11
+    image: gthanh/app_tra_cuu:web-v12
     build:
       context: .
       dockerfile: docker/web.Dockerfile

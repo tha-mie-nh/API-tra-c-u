@@ -29,6 +29,8 @@ customer's review before go-live.
 | Mock `dataFile` path containment | Done (pre-existing, re-verified for admin writes) | `apps/api/src/datasources/config-cross-field-validator.ts` resolves `transport.dataFile` against `configDir` and rejects anything that escapes it (`path.resolve` + prefix check) — runs in the SAME dry-run-before-write path admin-UI saves go through (`config-snapshot-builder.ts`), so an admin can't point a mock datasource at an arbitrary file on the container filesystem. |
 | Admin config writes need a writable host directory | Done — documented deploy prerequisite | `docker-compose.prod.yml`'s `./config` mount is read-write (was `:ro`); atomic write (tmp + `.bak` + rename) needs the host dir itself owned/writable by the container's uid 1000. Widens blast radius of an `api` RCE (can now rewrite `config.json`, not just read it) — accepted: config holds no secrets (only `${VAR}` names) and mock is blocked in prod (`enforceNoMockInProduction`). See `docs/deployment-guide.md`'s chown prerequisite. |
 
+| `api-v8`/`web-v12` built + scanned (2026-11-09) | Done | Rebuild from the 20-commit batch covering the full HTTP-datasource conversion, date-format normalization (`response-mapper.service.ts`), the `X-Access-Key`/`find_immihistory` real-API reconciliation, the Base URL/auth env-var picker UX fixes, and the new user-delete + role self-protection guards — `api-v7`/`web-v11` predate all of it. ClamAV scan clean on both (`scan-reports/clamav-gthanh_app_tra_cuu_api-v8-20261109-100839.txt`, `...web-v12-20261109-100845.txt`, 0 infected). |
+
 ## Explicitly out of scope / deferred (YAGNI at 50 users)
 
 - No Kubernetes, no autoscaling, no Prometheus/Grafana — single host + Docker Compose is the right
