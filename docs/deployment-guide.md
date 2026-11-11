@@ -101,6 +101,18 @@ Mở trình duyệt `http://<IP-server>` → thấy trang đăng nhập.
 - Bắt buộc đổi mật khẩu lần đầu. Sau khi đổi, mật khẩu trong `.env.prod` **không còn dùng được**
   (chỉ là mật khẩu khởi tạo) — dùng mật khẩu mới.
 
+**`BOOTSTRAP_ADMIN_PASSWORD` hoạt động thế nào** (`seed` chạy mỗi lần `up -d`):
+
+| Tình huống | Kết quả |
+|---|---|
+| DB trống, `seed` chạy lần đầu | Tạo `admin` với mật khẩu = `BOOTSTRAP_ADMIN_PASSWORD`, bắt đổi mật khẩu lần đầu |
+| `admin` **chưa từng đăng nhập**, bạn sửa `BOOTSTRAP_ADMIN_PASSWORD` rồi `up -d` lại | Mật khẩu `admin` **tự cập nhật theo env** (sửa nhầm/sai mật khẩu khởi tạo thì chỉ cần sửa lại env rồi `up -d`) |
+| `admin` **đã đăng nhập** (đã tự đổi mật khẩu), env đổi hay không | Giữ nguyên mật khẩu của người dùng, **không** ghi đè |
+
+Xem `seed` đã làm gì: `docker compose -f docker-compose.prod.yml --env-file .env.prod logs seed`
+(dòng `Bootstrap admin "admin": created / re-synced / kept ...`). Ký tự `$` trong mật khẩu bị
+Compose hiểu là biến — tránh `$`, hoặc viết `$$`.
+
 **Tài liệu API (Swagger)**: `http://<IP-server>/api/v1/docs` — sinh tự động từ code, luôn khớp
 API thật. Bấm "Authorize" rồi dán access token (lấy từ response của `POST /api/v1/auth/login`,
 hoặc copy từ devtools trình duyệt sau khi đăng nhập qua giao diện) để test được cả route cần
@@ -268,6 +280,8 @@ sửa `config.json` bằng tay, không cần restart `api`** cho các trường 
 (sửa `config.json` + restart, mục "4 API thật" trên) vẫn dùng được, xem "Escape hatch" dưới đây.
 
 ### Chuẩn bị (1 lần)
+
+> Image `api` tự `chown` thư mục `/repo/config` lúc khởi động (`docker/api-entrypoint.sh`: container khởi động bằng root chỉ để chown, rồi hạ xuống `node` bằng `setpriv` trước khi chạy app — tiến trình Node không chạy bằng root). Vì vậy dù host `./config` thuộc `root`, bấm **Lưu** trên trang Admin vẫn không bị `EACCES`, kể cả khi compose cũ không có `config-perms`. Service `config-perms` trong `docker-compose.prod.yml` vẫn giữ làm lớp bảo đảm thứ hai. Phần dưới chỉ áp dụng khi chạy `api` với `user:` cố định hoặc trên mount không cho `chown` (NFS root_squash, read-only) — khi đó log có dòng `[entrypoint] warning: could not chown`.
 
 Host `./config` phải **ghi được** bởi user chạy trong container (`uid 1000`, user `node` — xem
 `docker/api.Dockerfile`), vì mỗi lần lưu, API ghi file tạm + `.bak` + rename ngay trong thư mục
@@ -482,6 +496,40 @@ hoặc mount đang `:ro` (bản `docker-compose.prod.yml` cũ), hoặc host `./c
 
 **Quên mật khẩu admin:** trang đăng nhập → "Quên mật khẩu?" → admin khác duyệt trong Quản trị →
 Người dùng. Chỉ có 1 admin duy nhất thì cần người có quyền truy cập DB reset trực tiếp.
+
+**Đăng nhập `admin` báo "Sai tên đăng nhập hoặc mật khẩu" dù đúng `BOOTSTRAP_ADMIN_PASSWORD`:**
+1. Xem seed đã làm gì: `... logs seed` — dòng `Bootstrap admin "admin": ...`. `kept` nghĩa là
+   `admin` đã từng đăng nhập (mật khẩu đã là của người dùng, env không còn áp dụng) → bước 3.
+   Không có dòng nào / `Seed failed` → `COMPOSE_PROFILES` thiếu `db-setup` hoặc
+   `BOOTSTRAP_ADMIN_PASSWORD` rỗng.
+2. Đang mở nhầm địa chỉ? Mỗi stack có DB riêng — kiểm tra đúng cổng (`WEB_PORT`) / tab trình duyệt
+   không phải stack khác chạy cùng máy (vd `localhost:8081` là stack test cục bộ, không phải server).
+3. Reset thẳng trong container (image prod không có script `reset-admin-password.ts`; đoạn dưới
+   là bản tương đương, in mật khẩu tạm mới, bắt đổi khi đăng nhập):
+   ```bash
+   cat <<'EOF' | docker exec -i -w /repo/apps/api <tên-container-api> node -
+   const { PrismaClient } = require('@prisma/client');
+   const argon2 = require('argon2');
+   const { randomBytes } = require('node:crypto');
+   (async () => {
+     const prisma = new PrismaClient();
+     const user = await prisma.user.findUnique({ where: { username: 'admin' } });
+     if (!user) { console.error('User admin not found'); process.exit(1); }
+     const tempPassword = randomBytes(20).toString('base64url').slice(0, 20);
+     const passwordHash = await argon2.hash(tempPassword, { type: argon2.argon2id });
+     await prisma.user.update({ where: { id: user.id }, data: { passwordHash, mustChangePassword: true, status: 'ACTIVE', lockedUntil: null, failedLoginCount: 0 } });
+     await prisma.refreshToken.updateMany({ where: { userId: user.id, revokedAt: null }, data: { revokedAt: new Date() } });
+     console.log('username: admin');
+     console.log('tempPassword: ' + tempPassword);
+     await prisma.$disconnect();
+   })().catch((e) => { console.error(e.message); process.exit(1); });
+   EOF
+   ```
+
+**Chạy thêm một stack song song trên cùng máy (vd thư mục `kit` cạnh stack cũ):** `docker-compose.prod.yml`
+cố định `name: app-tra-cuu-du-lieu-prod` — copy sang thư mục khác mà giữ nguyên tên sẽ **tạo lại
+container và dùng chung volume DB của stack đầu tiên**. Trước lần `up -d` đầu: đổi `name:` (vd
+`app-tra-cuu-kit`) hoặc luôn thêm `-p <tên>`, và đặt `WEB_PORT` khác cổng đang dùng trong `.env.prod`.
 
 ## Backup
 
