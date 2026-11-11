@@ -42,6 +42,7 @@ services:
 
   migrate:
     image: ${TEST_API_IMAGE:?set TEST_API_IMAGE in .env.test, e.g. gthanh/app_tra_cuu:api-v6}
+    user: '1000:1000' # image has no USER (api-entrypoint.sh drops privileges); entrypoint overridden here
     env_file: [.env.test]
     environment:
       DATABASE_URL: ${DATABASE_URL}
@@ -56,6 +57,7 @@ services:
   seed:
     image: ${TEST_API_IMAGE:?set TEST_API_IMAGE in .env.test}
     working_dir: /repo/apps/api
+    user: '1000:1000' # see `migrate`
     env_file: [.env.test]
     environment:
       DATABASE_URL: ${DATABASE_URL}
@@ -66,6 +68,15 @@ services:
       migrate: { condition: service_completed_successfully }
     networks: [test-backend]
     restart: 'no'
+
+  config-perms:
+    image: alpine:3.20
+    user: '0:0'
+    volumes:
+      - ./deploy-check/config:/repo/config
+    command: ['sh', '-c', 'chown -R 1000:1000 /repo/config']
+    restart: 'no'
+    networks: [test-backend]
 
   api:
     image: ${TEST_API_IMAGE:?set TEST_API_IMAGE in .env.test}
@@ -78,12 +89,14 @@ services:
     # repo's own working/demo state (scratch datasources come and go there);
     # deploy-check/ is the actual release artifact handed to leader, so
     # that's what a pre-release verification run should boot against.
-    # Read-only (unlike prod's rw mount) — this is a throwaway verification
-    # run, not where you'd click through the admin-datasources live-reload
-    # feature; that's covered by dev.
+    # Writable (same as prod) so the admin-datasources "Lưu" can be tested
+    # here; `config-perms` makes the dir writable by uid 1000. Note: saving
+    # in the UI modifies deploy-check/config/config.json — `git checkout` it
+    # before handing the artifact over.
     volumes:
-      - ./deploy-check/config:/repo/config:ro
+      - ./deploy-check/config:/repo/config
     depends_on:
+      config-perms: { condition: service_completed_successfully }
       postgres: { condition: service_healthy }
       seed: { condition: service_completed_successfully }
     healthcheck:

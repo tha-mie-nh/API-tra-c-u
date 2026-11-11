@@ -76,10 +76,13 @@ services:
     # pulled/local image as-is; `docker compose build`/`up --build` still
     # rebuilds from source. Lets a reviewer who only has this compose file +
     # .env.prod (no source checkout) run `docker compose pull && up -d`.
-    image: gthanh/app_tra_cuu:api-v8
+    image: gthanh/app_tra_cuu:api-v10
     build:
       context: .
       dockerfile: docker/api.Dockerfile
+    # Image no longer sets `USER node` (api-entrypoint.sh drops privileges for
+    # the long-running api); this one-shot overrides entrypoint, so pin non-root.
+    user: '1000:1000'
     env_file: [.env.prod]
     environment:
       DATABASE_URL: ${DATABASE_URL}
@@ -114,11 +117,12 @@ services:
   # db-setup -f docker-compose.prod.yml --env-file .env.prod run --rm seed`.
   seed:
     profiles: ['db-setup']
-    image: gthanh/app_tra_cuu:api-v8
+    image: gthanh/app_tra_cuu:api-v10
     build:
       context: .
       dockerfile: docker/api.Dockerfile
     working_dir: /repo/apps/api
+    user: '1000:1000' # see `migrate`: image has no USER, entrypoint overridden here
     env_file: [.env.prod]
     environment:
       DATABASE_URL: ${DATABASE_URL}
@@ -138,8 +142,22 @@ services:
     networks: [backend]
     restart: 'no'
 
+  # One-shot init — makes host ./config writable by the `api` container's
+  # `node` user (uid 1000) so admin-UI datasource saves can write config.json
+  # (tmp file + .bak + rename). Without it a fresh clone owned by another
+  # uid/root makes every "Lưu" fail (EACCES). Idempotent, runs as root,
+  # touches only ./config.
+  config-perms:
+    image: alpine:3.20
+    user: '0:0'
+    volumes:
+      - ./config:/repo/config
+    command: ['sh', '-c', 'chown -R 1000:1000 /repo/config']
+    restart: 'no'
+    networks: [backend]
+
   api:
-    image: gthanh/app_tra_cuu:api-v8
+    image: gthanh/app_tra_cuu:api-v10
     build:
       context: .
       dockerfile: docker/api.Dockerfile
@@ -158,6 +176,8 @@ services:
       # (no rebuild either way).
       - ./config:/repo/config
     depends_on:
+      config-perms:
+        condition: service_completed_successfully
       postgres:
         condition: service_healthy
         required: false # see `migrate`'s depends_on comment above

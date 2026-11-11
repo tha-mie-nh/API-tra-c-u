@@ -152,11 +152,18 @@ RUN rm -rf /usr/local/lib/node_modules/npm /usr/local/bin/npm /usr/local/bin/npx
 # (COPY --chown / chown inside the install RUN) rather than a trailing
 # `RUN chown -R /repo`, which would otherwise duplicate the entire
 # node_modules tree into a new layer (~350MB) just to flip ownership bits.
-USER node
+# No `USER node` here on purpose: the container starts as root so
+# docker/api-entrypoint.sh can chown the bind-mounted /repo/config (otherwise
+# admin-UI saves fail with EACCES when the host dir is root-owned), then the
+# script drops to `node` (setpriv) before exec'ing the app — the Node process
+# never runs as root. One-shot services that override `entrypoint` (migrate /
+# seed in docker-compose.prod.yml) pin `user: '1000:1000'` to stay non-root.
+COPY docker/api-entrypoint.sh /usr/local/bin/api-entrypoint.sh
+RUN chmod 0755 /usr/local/bin/api-entrypoint.sh
 
 EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
   CMD curl -fsS http://127.0.0.1:3000/api/v1/health || exit 1
 
-ENTRYPOINT ["/usr/bin/tini", "--"]
+ENTRYPOINT ["/usr/bin/tini", "--", "/usr/local/bin/api-entrypoint.sh"]
 CMD ["node", "apps/api/dist/main.js"]
