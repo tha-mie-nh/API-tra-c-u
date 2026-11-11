@@ -326,12 +326,10 @@
       }
     },
     {
-      "code": "XUAT_NHAP_CANH",
       "name": "Tra cứu lịch sử xuất nhập cảnh",
       "description": "Tra cứu lịch sử xuất nhập cảnh (demo cũ). (Đã tắt)",
       "type": "info",
       "enabled": false,
-      "permissionCode": "api:xuat_nhap_canh",
       "transport": {
         "kind": "http",
         "baseUrl": "${XUAT_NHAP_CANH_BASE_URL}",
@@ -434,7 +432,9 @@
       "limits": {
         "maxResults": 100,
         "pageSize": 20
-      }
+      },
+      "code": "XUAT_NHAP_CANH",
+      "permissionCode": "api:xuat_nhap_canh"
     },
     {
       "code": "CCCD_HISTORY",

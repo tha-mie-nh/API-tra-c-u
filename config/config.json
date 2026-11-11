@@ -16,7 +16,6 @@
       "description": "Tra cứu thông tin công dân theo họ tên/ngày sinh/giới tính. (Đã tắt)",
       "type": "info",
       "enabled": false,
-      "permissionCode": "api:citizen_basic",
       "transport": {
         "kind": "http",
         "baseUrl": "${CITIZEN_BASIC_BASE_URL}",
@@ -38,7 +37,6 @@
             "name": "citizenId",
             "label": "Số CCCD",
             "type": "string",
-            "required": false,
             "pattern": "^[0-9]{12}$",
             "mapTo": "cccd"
           },
@@ -46,7 +44,6 @@
             "name": "fullName",
             "label": "Họ và tên",
             "type": "string",
-            "required": false,
             "minLength": 2,
             "maxLength": 100,
             "mapTo": "ho_ten"
@@ -55,15 +52,14 @@
             "name": "dob",
             "label": "Ngày sinh",
             "type": "date",
-            "required": false,
-            "mapTo": "ngay_sinh",
-            "format": "YYYY-MM-DD"
+            "format": "YYYY-MM-DD",
+            "mapTo": "ngay_sinh"
           },
           {
             "name": "gender",
             "label": "Giới tính",
             "type": "enum",
-            "required": false,
+            "mapTo": "gioi_tinh",
             "options": [
               {
                 "value": "M",
@@ -73,8 +69,12 @@
                 "value": "F",
                 "label": "Nữ"
               }
-            ],
-            "mapTo": "gioi_tinh"
+            ]
+          },
+          {
+            "name": "licenseClass",
+            "label": "Hạng GPLX",
+            "type": "string"
           }
         ],
         "atLeastOneOf": [
@@ -85,7 +85,6 @@
         ]
       },
       "output": {
-        "recordsPath": "data",
         "timestampField": "recordedAt",
         "sortOrder": "desc",
         "identityField": "citizenId",
@@ -93,27 +92,27 @@
           {
             "name": "citizenId",
             "label": "Số CCCD",
-            "from": "cccd",
             "type": "string",
+            "from": "cccd",
             "sensitive": true
           },
           {
             "name": "fullName",
             "label": "Họ và tên",
-            "from": "ho_ten",
-            "type": "string"
+            "type": "string",
+            "from": "ho_ten"
           },
           {
             "name": "dob",
             "label": "Ngày sinh",
-            "from": "ngay_sinh",
-            "type": "date"
+            "type": "date",
+            "from": "ngay_sinh"
           },
           {
             "name": "gender",
             "label": "Giới tính",
-            "from": "gioi_tinh",
             "type": "enum",
+            "from": "gioi_tinh",
             "valueMap": {
               "1": "Nam",
               "2": "Nữ"
@@ -122,21 +121,29 @@
           {
             "name": "address",
             "label": "Địa chỉ",
-            "from": "dia_chi",
-            "type": "string"
+            "type": "string",
+            "from": "dia_chi"
           },
           {
             "name": "recordedAt",
             "label": "Thời điểm ghi nhận",
-            "from": "thoi_diem",
-            "type": "datetime"
+            "type": "datetime",
+            "from": "thoi_diem"
+          },
+          {
+            "name": "job",
+            "label": "Job",
+            "type": "string",
+            "from": "job"
           }
-        ]
+        ],
+        "recordsPath": "data"
       },
       "limits": {
         "maxResults": 100,
         "pageSize": 20
-      }
+      },
+      "permissionCode": "api:citizen_basic"
     },
     {
       "code": "CITIZEN_EXTENDED",
@@ -326,12 +333,10 @@
       }
     },
     {
-      "code": "XUAT_NHAP_CANH",
       "name": "Tra cứu lịch sử xuất nhập cảnh",
       "description": "Tra cứu lịch sử xuất nhập cảnh (demo cũ). (Đã tắt)",
       "type": "info",
       "enabled": false,
-      "permissionCode": "api:xuat_nhap_canh",
       "transport": {
         "kind": "http",
         "baseUrl": "${XUAT_NHAP_CANH_BASE_URL}",
@@ -434,7 +439,9 @@
       "limits": {
         "maxResults": 100,
         "pageSize": 20
-      }
+      },
+      "code": "XUAT_NHAP_CANH",
+      "permissionCode": "api:xuat_nhap_canh"
     },
     {
       "code": "CCCD_HISTORY",
@@ -826,7 +833,6 @@
       "description": "Tra cứu lịch sử xuất nhập cảnh theo số hộ chiếu, hoặc họ tên + ngày sinh + giới tính.",
       "type": "info",
       "enabled": true,
-      "permissionCode": "api:immigration_history",
       "transport": {
         "kind": "http",
         "baseUrl": "${IMMIGRATION_HISTORY_BASE_URL}",
@@ -1050,7 +1056,8 @@
       "limits": {
         "maxResults": 100,
         "pageSize": 20
-      }
+      },
+      "permissionCode": "api:immigration_history"
     },
     {
       "code": "PASSPORT_INFO",
@@ -1447,6 +1454,70 @@
         "maxResults": 100,
         "pageSize": 20
       }
+    },
+    {
+      "code": "BHXH_LOOKUP",
+      "name": "tra cứu thông tin bảo hiểm xã hội",
+      "description": "Điền cccd để tra cứu",
+      "type": "info",
+      "enabled": true,
+      "transport": {
+        "kind": "http",
+        "baseUrl": "${MOCK_UPSTREAM_BASE_URL}",
+        "path": "/tra-cuu/bao-hiem-xa-hoi",
+        "method": "POST",
+        "headers": {
+          "X-ReqType": "LOOKUP"
+        },
+        "timeoutMs": 10000,
+        "auth": {
+          "kind": "apiKeyHeader",
+          "header": "X-Access",
+          "valueEnv": "MOCK_UPSTREAM_API_KEY"
+        }
+      },
+      "input": {
+        "fields": [
+          {
+            "name": "cccd",
+            "label": "Số CCCD",
+            "type": "string"
+          }
+        ]
+      },
+      "output": {
+        "timestampField": "cccd",
+        "sortOrder": "desc",
+        "identityField": "cccd",
+        "fields": [
+          {
+            "name": "cccd",
+            "label": "Số CCCD",
+            "type": "string",
+            "from": "cccd"
+          },
+          {
+            "name": "hoTen",
+            "label": "Họ và tên",
+            "type": "string",
+            "from": "hoTen"
+          },
+          {
+            "name": "soBHXH",
+            "label": "Số BHXH",
+            "type": "string",
+            "from": "soBHXH"
+          },
+          {
+            "name": "donViCongTac",
+            "label": "Đơn vị công tác",
+            "type": "string",
+            "from": "donViCongTac"
+          }
+        ],
+        "recordsPath": "data"
+      },
+      "permissionCode": "api:bhxh_lookup"
     }
   ]
 }
