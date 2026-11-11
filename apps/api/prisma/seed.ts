@@ -125,34 +125,63 @@ async function seedBootstrapAdmin(adminRoleId: string) {
   const passwordHash = await argon2.hash(password, { type: argon2.argon2id });
   const email = process.env.BOOTSTRAP_ADMIN_EMAIL ?? null;
 
-  const admin = await prisma.user.upsert({
-    where: { username: BOOTSTRAP_ADMIN_USERNAME },
-    update: {}, // never overwrite an existing admin's password/state on re-seed
-    create: {
-      username: BOOTSTRAP_ADMIN_USERNAME,
-      email,
-      fullName: 'System Administrator',
-      passwordHash,
-      mustChangePassword: true,
-    },
-  });
+  // BOOTSTRAP_ADMIN_PASSWORD is the INITIAL password only. Until the admin has
+  // logged in successfully once (lastLoginAt === null) the env value stays
+  // authoritative, so fixing a wrong/typo'd value and re-running seed takes
+  // effect (previously `update: {}` silently kept the first hash, making
+  // "I changed BOOTSTRAP_ADMIN_PASSWORD but can't log in" the #1 first-deploy
+  // trap). After the first successful login the password belongs to the user
+  // and re-seeding never touches it (incl. temp passwords from a reset).
+  const existing = await prisma.user.findUnique({ where: { username: BOOTSTRAP_ADMIN_USERNAME } });
+  let admin = existing;
+  let outcome: BootstrapAdminOutcome = 'kept';
+
+  if (!existing) {
+    admin = await prisma.user.create({
+      data: {
+        username: BOOTSTRAP_ADMIN_USERNAME,
+        email,
+        fullName: 'System Administrator',
+        passwordHash,
+        mustChangePassword: true,
+      },
+    });
+    outcome = 'created';
+  } else if (existing.lastLoginAt === null) {
+    const alreadyMatches = await argon2.verify(existing.passwordHash, password).catch(() => false);
+    if (!alreadyMatches) {
+      admin = await prisma.user.update({
+        where: { id: existing.id },
+        data: { passwordHash, mustChangePassword: true, status: 'ACTIVE', lockedUntil: null, failedLoginCount: 0 },
+      });
+      outcome = 'synced-from-env';
+    }
+  }
 
   await prisma.userRole.upsert({
-    where: { userId_roleId: { userId: admin.id, roleId: adminRoleId } },
+    where: { userId_roleId: { userId: admin!.id, roleId: adminRoleId } },
     update: {},
-    create: { userId: admin.id, roleId: adminRoleId },
+    create: { userId: admin!.id, roleId: adminRoleId },
   });
 
-  return admin;
+  return { admin: admin!, outcome };
 }
+
+type BootstrapAdminOutcome = 'created' | 'synced-from-env' | 'kept';
+
+const OUTCOME_MESSAGE: Record<BootstrapAdminOutcome, string> = {
+  created: 'created with BOOTSTRAP_ADMIN_PASSWORD (must change password on first login)',
+  'synced-from-env': 'password re-synced from BOOTSTRAP_ADMIN_PASSWORD (admin never logged in yet)',
+  kept: 'kept as is — admin already logged in / already matches env, password NOT overwritten',
+};
 
 async function main() {
   const permissions = await seedFeaturePermissions();
   const { admin } = await seedRoles(permissions.map((p) => p.id));
-  const adminUser = await seedBootstrapAdmin(admin.id);
+  const { admin: adminUser, outcome } = await seedBootstrapAdmin(admin.id);
 
   console.log(`Seed complete. Feature permissions: ${permissions.length}.`);
-  console.log(`Bootstrap admin: username="${adminUser.username}" (must_change_password=true).`);
+  console.log(`Bootstrap admin "${adminUser.username}": ${OUTCOME_MESSAGE[outcome]}.`);
 }
 
 main()
