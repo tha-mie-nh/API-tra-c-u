@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, Logger, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
+import { ConflictException, HttpException, HttpStatus, Injectable, Logger, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
 import type { AdminDatasource, DatasourceConfigFile, DatasourceEntry, DatasourceEnvRefs } from '@app/shared';
 import { DatasourceConfigLoaderService } from '../datasources/datasource-config.loader';
 import { DatasourceRegistryService } from '../datasources/datasource-registry.service';
@@ -135,7 +135,23 @@ export class AdminDatasourcesService {
       const entries = this.registry.buildEntries(snapshot);
 
       if (write) {
-        await writeJsonFileAtomically(this.loader.getConfigPath(), candidate);
+        try {
+          await writeJsonFileAtomically(this.loader.getConfigPath(), candidate);
+        } catch (err) {
+          const fsCode = (err as NodeJS.ErrnoException).code;
+          if (fsCode === 'EROFS' || fsCode === 'EACCES' || fsCode === 'EPERM') {
+            this.logger.error(`Cannot write ${this.loader.getConfigPath()}: ${fsCode}`);
+            throw new HttpException(
+              {
+                code: 'CONFIG_NOT_WRITABLE',
+                message:
+                  'Không ghi được config.json (thư mục config đang read-only hoặc sai quyền). Mount ./config ở chế độ ghi được cho uid 1000.',
+              },
+              HttpStatus.INTERNAL_SERVER_ERROR,
+            );
+          }
+          throw err;
+        }
       }
 
       this.loader.applySnapshot(snapshot);
