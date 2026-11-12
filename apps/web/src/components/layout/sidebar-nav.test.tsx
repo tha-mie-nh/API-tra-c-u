@@ -63,4 +63,26 @@ describe('SidebarNav', () => {
     expect(screen.queryByText('Vai trò & quyền')).not.toBeInTheDocument();
     expect(screen.queryByText('Nhật ký quản trị')).not.toBeInTheDocument();
   });
+
+  it('shows Thống kê tra cứu only for admin:query_stats holders', () => {
+    setPermissions([FEATURE_PERMISSION_CODES.ADMIN_QUERY_STATS]);
+    const { unmount } = renderSidebar();
+    expect(screen.getByRole('link', { name: /Thống kê tra cứu/ })).toBeInTheDocument();
+    unmount();
+
+    setPermissions([FEATURE_PERMISSION_CODES.ADMIN_USERS]);
+    renderSidebar();
+    expect(screen.queryByText('Thống kê tra cứu')).not.toBeInTheDocument();
+  });
+
+  it('shows Phân tích tra cứu only for history:view_all holders', () => {
+    setPermissions([FEATURE_PERMISSION_CODES.HISTORY_VIEW_ALL]);
+    const { unmount } = renderSidebar();
+    expect(screen.getByRole('link', { name: /Phân tích tra cứu/ })).toHaveAttribute('href', '/quan-tri/phan-tich-tra-cuu');
+    unmount();
+
+    setPermissions([FEATURE_PERMISSION_CODES.HISTORY_VIEW_OWN, FEATURE_PERMISSION_CODES.ADMIN_USERS]);
+    renderSidebar();
+    expect(screen.queryByText('Phân tích tra cứu')).not.toBeInTheDocument();
+  });
 });

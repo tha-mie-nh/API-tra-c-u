@@ -3,6 +3,7 @@ import { QueryStatus, type Prisma } from '@prisma/client';
 import type { QueryLogStatus } from '@app/shared';
 import { PrismaService } from '../prisma/prisma.service';
 import { DatasourceRegistryService } from '../datasources/datasource-registry.service';
+import { normalizeClientIp } from '../common/utils/client-ip.util';
 import { summarizeQueryParams } from './sensitive-value-mask.util';
 
 export interface RecordQueryLogInput {
@@ -75,7 +76,7 @@ export class QueryLogService {
           recordCount: input.recordCount ?? null,
           upstreamRequestId: input.upstreamRequestId ?? null,
           durationMs: input.durationMs ?? null,
-          ip: input.ip ?? null,
+          ip: normalizeClientIp(input.ip),
           userAgent: input.userAgent ?? null,
         },
       });

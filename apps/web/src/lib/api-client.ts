@@ -124,15 +124,20 @@ export function apiFetch<T>(path: string, options: ApiFetchOptions = {}): Promis
   return request<T>(path, options, true);
 }
 
+/** Binary response plus headers (e.g. `Content-Disposition` filename for CSV). */
+export interface ApiBlobResult {
+  blob: Blob;
+  headers: Headers;
+}
+
 /**
- * Fetches a backend-proxied image (`GET /query/:code/image/:recordId[/thumb]`,
- * Phase 07 photo timeline/lightbox) as a `Blob`, with the same
- * Authorization/refresh-retry semantics as `apiFetch`. A plain `<img src>`
- * cannot carry the in-memory Bearer access token, so photo `<img>` sources
- * are always an `URL.createObjectURL(blob)` built from this — never a raw
- * MinIO URL (reference-config-schema.md Security Considerations).
+ * Fetches a binary endpoint (image proxy `GET /query/:code/image/:recordId[/thumb]`,
+ * CSV export) as a `Blob`, with the same Authorization/refresh-retry semantics
+ * as `apiFetch`. A plain `<img src>` / `<a href>` cannot carry the in-memory
+ * Bearer token, so images use `URL.createObjectURL(blob)` and downloads use
+ * a blob link — never a raw MinIO URL (reference-config-schema.md Security).
  */
-async function requestBlob(path: string, allowRetry: boolean): Promise<Blob> {
+async function requestBlob(path: string, allowRetry: boolean): Promise<ApiBlobResult> {
   const res = await fetch(`${API_BASE}${path}`, { headers: buildHeaders(false), credentials: 'include' });
 
   if (res.status === 401 && allowRetry) {
@@ -143,9 +148,13 @@ async function requestBlob(path: string, allowRetry: boolean): Promise<Blob> {
   }
 
   if (!res.ok) throw await parseError(res);
-  return res.blob();
+  return { blob: await res.blob(), headers: res.headers };
 }
 
-export function apiFetchImageBlob(path: string): Promise<Blob> {
+export function apiFetchBlob(path: string): Promise<ApiBlobResult> {
   return requestBlob(path, true);
+}
+
+export async function apiFetchImageBlob(path: string): Promise<Blob> {
+  return (await requestBlob(path, true)).blob;
 }

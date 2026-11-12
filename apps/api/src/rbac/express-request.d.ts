@@ -12,6 +12,8 @@ declare global {
     interface User extends JwtUser {}
     interface Request {
       auditBefore?: unknown;
+      /** Extra fields merged into audit `after` for capture:'request' (e.g. CSV row count). */
+      auditExtra?: Record<string, unknown>;
     }
   }
 }

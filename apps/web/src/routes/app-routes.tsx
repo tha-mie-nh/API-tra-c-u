@@ -30,6 +30,28 @@ const AuditLogPage = lazy(() =>
 const DatasourcesAdminPage = lazy(() =>
   import('@/features/admin/datasources/datasources-admin-page').then((m) => ({ default: m.DatasourcesAdminPage })),
 );
+const QueryStatsOverviewPage = lazy(() =>
+  import('@/features/admin/query-stats/query-stats-overview-page').then((m) => ({ default: m.QueryStatsOverviewPage })),
+);
+const QueryStatsDatasourceDetailPage = lazy(() =>
+  import('@/features/admin/query-stats/query-stats-datasource-detail-page').then((m) => ({
+    default: m.QueryStatsDatasourceDetailPage,
+  })),
+);
+
+const QueryInsightsPage = lazy(() =>
+  import('@/features/admin/query-insights/query-insights-page').then((m) => ({ default: m.QueryInsightsPage })),
+);
+const QueryInsightsUserActivityPage = lazy(() =>
+  import('@/features/admin/query-insights/query-insights-user-activity-page').then((m) => ({
+    default: m.QueryInsightsUserActivityPage,
+  })),
+);
+const QueryInsightsIpActivityPage = lazy(() =>
+  import('@/features/admin/query-insights/query-insights-ip-activity-page').then((m) => ({
+    default: m.QueryInsightsIpActivityPage,
+  })),
+);
 
 function RouteLoading() {
   return <div className="text-muted-foreground p-6 text-sm">{vi.common.loading}</div>;
@@ -109,6 +131,46 @@ export function AppRoutes() {
             element={
               <RequirePermission anyOf={[FEATURE_PERMISSION_CODES.ADMIN_DATASOURCES]}>
                 <DatasourcesAdminPage />
+              </RequirePermission>
+            }
+          />
+          <Route
+            path="quan-tri/thong-ke"
+            element={
+              <RequirePermission anyOf={[FEATURE_PERMISSION_CODES.ADMIN_QUERY_STATS]}>
+                <QueryStatsOverviewPage />
+              </RequirePermission>
+            }
+          />
+          <Route
+            path="quan-tri/thong-ke/:code"
+            element={
+              <RequirePermission anyOf={[FEATURE_PERMISSION_CODES.ADMIN_QUERY_STATS]}>
+                <QueryStatsDatasourceDetailPage />
+              </RequirePermission>
+            }
+          />
+          <Route
+            path="quan-tri/phan-tich-tra-cuu"
+            element={
+              <RequirePermission anyOf={[FEATURE_PERMISSION_CODES.HISTORY_VIEW_ALL]}>
+                <QueryInsightsPage />
+              </RequirePermission>
+            }
+          />
+          <Route
+            path="quan-tri/phan-tich-tra-cuu/nguoi-dung/:userId"
+            element={
+              <RequirePermission anyOf={[FEATURE_PERMISSION_CODES.HISTORY_VIEW_ALL]}>
+                <QueryInsightsUserActivityPage />
+              </RequirePermission>
+            }
+          />
+          <Route
+            path="quan-tri/phan-tich-tra-cuu/ip/:ip"
+            element={
+              <RequirePermission anyOf={[FEATURE_PERMISSION_CODES.HISTORY_VIEW_ALL]}>
+                <QueryInsightsIpActivityPage />
               </RequirePermission>
             }
           />

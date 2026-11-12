@@ -345,6 +345,15 @@ Giống mục "4 API thật" bước 4: quyền `api:<code>` được tạo và 
 không cần chạy lại `seed`. Role khác (OPERATOR, AUDITOR) vẫn phải cấp tay qua **Quản trị → Vai
 trò & quyền**.
 
+### Quyền xem thống kê và xuất CSV (`admin:query_stats`, `history:export`)
+
+- Quyền feature do `seed` tạo, chỉ ADMIN được cấp tự động. Chế độ tự chứa (`COMPOSE_PROFILES=local-db,db-setup`):
+  service `seed` nằm trong profile `db-setup` nên `up -d` tự chạy lại, ADMIN có quyền ngay sau khi nâng cấp.
+- Chế độ PG có sẵn (profile `db-setup` đã bỏ, không có `seed` tự động): chạy lại lệnh `seed` ở mục "Về Postgres", bước 4, **1 lần** sau khi nâng cấp.
+- Role tuỳ chỉnh: tick quyền `admin:query_stats` (Thống kê tra cứu) và `history:export` (Export query history (CSV)) ở **Quản trị → Vai trò & quyền**.
+  AUDITOR mặc định có `history:view_all` nhưng **không** có `history:export`.
+- Chi tiết API và công thức: [`query-stats-dashboard.md`](./query-stats-dashboard.md); drill-down và xuất CSV: [`query-log-drilldown-and-insights.md`](./query-log-drilldown-and-insights.md).
+
 ### Escape hatch — sửa `config.json` bằng tay khi cần
 
 SSH thẳng vào máy sửa `config/config.json` vẫn hợp lệ (vd debug, hoặc máy chưa chown được).
@@ -415,6 +424,75 @@ Dữ liệu trong `postgres-data` không mất.
 **Có thay đổi cấu trúc bảng (schema):** chế độ tự chứa tự áp khi `up -d` (qua `migrate`). Chế độ
 dùng PG có sẵn — nhận thêm file `.sql` đánh số tiếp theo (vd `04-...sql`) trong `schema/`, áp
 bằng tay giống Bước "Về Postgres" bước 1, rồi mới `pull`/`up -d` cho `api`/`web`.
+
+### Nâng cấp lên image có drill-down và phân tích
+
+Thay đổi cần làm (ngoài `pull`/`up -d` thông thường):
+
+| Việc | Chế độ tự chứa | Chế độ PG có sẵn |
+|---|---|---|
+| Quyền `history:export` cho ADMIN | Tự có khi `up -d` (service `seed`) | Chạy `seed` tay (lệnh bên dưới) |
+| 2 index `query_logs` | Tự áp qua `migrate` (xem dưới, nên làm tay nếu bảng lớn) | Áp tay bằng SQL (xem dưới) |
+| `TRUST_PROXY` | Sửa `.env.prod`, rồi `up -d api` | Như vậy |
+
+**Quyền (seed).** Chế độ PG có sẵn:
+```bash
+docker compose -f docker-compose.prod.yml --env-file .env.prod --profile db-setup run --rm seed
+```
+Lệnh chạy được nhiều lần (upsert). Lưu ý: nếu admin **chưa từng đăng nhập**, seed đặt lại mật khẩu admin theo
+`BOOTSTRAP_ADMIN_PASSWORD` (log `synced-from-env`). Sau khi admin đã đăng nhập ít nhất 1 lần thì seed không đè mật khẩu nữa.
+
+**Migration 2 index** — migration `20261111180000_add_query_logs_ip_and_upstream_request_id_indexes`:
+- `query_logs_ip_created_at_idx` trên `(ip, created_at DESC)`;
+- `query_logs_upstream_request_id_idx` trên `(upstream_request_id)`.
+
+Bảng nhỏ: để `prisma migrate deploy` tự tạo. **Bảng lớn** (hàng triệu dòng): `CREATE INDEX` thường giữ khoá ghi
+trên `query_logs` suốt lúc build, trong lúc đó lượt tra cứu phải chờ ghi log. Nên tạo bằng `CONCURRENTLY` trước
+(Prisma chạy migration trong transaction, mà `CONCURRENTLY` không chạy được trong transaction), rồi đánh dấu migration đã áp:
+
+```bash
+# Chế độ tự chứa: chạy trong container postgres
+docker compose -f docker-compose.prod.yml --env-file .env.prod exec postgres sh -c '
+  psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c "CREATE INDEX CONCURRENTLY IF NOT EXISTS query_logs_ip_created_at_idx ON app.query_logs (ip, created_at DESC);" &&
+  psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c "CREATE INDEX CONCURRENTLY IF NOT EXISTS query_logs_upstream_request_id_idx ON app.query_logs (upstream_request_id);"'
+
+# Kiểm tra: cả 2 dòng phải có indisvalid = t
+docker compose -f docker-compose.prod.yml --env-file .env.prod exec postgres sh -c '
+  psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c "SELECT indexrelid::regclass, indisvalid FROM pg_index WHERE indexrelid IN (\"app\".\"query_logs_ip_created_at_idx\"::regclass, \"app\".\"query_logs_upstream_request_id_idx\"::regclass);"'
+
+# Đánh dấu migration đã áp để migrate deploy không tạo lại (chạy trước khi up -d)
+docker compose -f docker-compose.prod.yml --env-file .env.prod --profile db-setup run --rm migrate \
+  node apps/api/node_modules/prisma/build/index.js migrate resolve --applied 20261111180000_add_query_logs_ip_and_upstream_request_id_indexes --schema=apps/api/prisma/schema.prisma
+```
+
+- Chế độ PG có sẵn: chạy 2 lệnh `CREATE INDEX CONCURRENTLY` bằng `psql` với connection string của bên quản lý
+  Postgres. Không có bước `migrate resolve` vì không có `migrate` tự động. Bộ deploy hiện chưa có file `schema/04-*.sql` cho 2 index này.
+- Nếu `CONCURRENTLY` lỗi giữa chừng, index sẽ ở trạng thái `INVALID`: xoá bằng `DROP INDEX CONCURRENTLY IF EXISTS <tên>` rồi chạy lại.
+- Chạy `up -d` sau khi đã `resolve`, để `migrate deploy` không thấy migration còn pending.
+
+**Sau nâng cấp, kiểm tra nhanh:** `GET /api/v1/health` trả OK; đăng nhập ADMIN thấy menu **Phân tích tra cứu**
+và nút xuất CSV ở Lịch sử; nếu log API có dòng `Invalid TRUST_PROXY` thì sửa `TRUST_PROXY` (mục dưới).
+
+## TRUST_PROXY: IP thật sau reverse proxy
+
+Biến `TRUST_PROXY` trong `.env.prod` quyết định `request.ip`, là IP được ghi vào `query_logs.ip` và `audit_logs.ip`.
+Mặc định **để trống = tắt** (IP là địa chỉ TCP trực tiếp).
+
+**Vì sao quan trọng:** container `web` (nginx) đứng trước API và đặt `X-Forwarded-For`. Nếu không bật `TRUST_PROXY`,
+mọi lượt tra cứu đều có IP của container proxy. Khi đó cột IP vô nghĩa, trang "Hoạt động theo IP" không dùng được,
+và "IP dùng chung" đánh dấu mọi user là cùng một nhóm.
+
+| Giá trị | Ý nghĩa | Khi nào dùng |
+|---|---|---|
+| (trống) hoặc `false` | Không tin header, IP = địa chỉ TCP trực tiếp | API mở trực tiếp, không có proxy |
+| Số nguyên `N` (vd `1`) | Tin đúng `N` hop cuối của `X-Forwarded-For` | Khuyến nghị khi biết số proxy: `1` nếu chỉ có nginx của container `web`; `2` nếu có thêm 1 proxy/LB bên ngoài |
+| `loopback`, `uniquelocal`, `linklocal` | Tin mọi proxy trong dải loopback/private | Proxy nằm trong mạng docker nội bộ |
+| IP hoặc CIDR, cách nhau bằng dấu phẩy (vd `172.16.0.0/12`) | Tin các proxy trong dải đó | Biết rõ subnet của proxy |
+| `true` | Tin **mọi** hop, client tự gửi `X-Forwarded-For` giả được | **Tránh**: làm vô hiệu cảnh báo IP dùng chung |
+| Giá trị khác (vd `yes`) | Bị bỏ qua, log cảnh báo `Invalid TRUST_PROXY="..." ignored`, trust proxy **tắt** | Sửa lại giá trị |
+
+Sau khi sửa `.env.prod`: `docker compose -f docker-compose.prod.yml --env-file .env.prod up -d api`.
+Chỉ dùng `restart` khi không đổi biến môi trường.
 
 ## Môi trường test — verify image đã push trước khi báo "xong"
 

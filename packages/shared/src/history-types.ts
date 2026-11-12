@@ -31,6 +31,8 @@ export interface QueryLogDetail extends QueryLogListItem {
   queryParams: Record<string, unknown>;
   errorMessage: string | null;
   upstreamRequestId: string | null;
+  ip: string | null;
+  userAgent: string | null;
 }
 
 export interface HistoryListResponse {
@@ -39,3 +41,26 @@ export interface HistoryListResponse {
   pageSize: number;
   total: number;
 }
+
+export type HistorySortField = 'createdAt' | 'durationMs' | 'recordCount';
+
+/** `GET /history/summary` — same filter/scope as the list, so `total` equals list `total`. */
+export interface HistorySummaryResponse {
+  total: number;
+  success: number;
+  failed: number;
+  denied: number;
+  /** success AND record_count > 0 */
+  answered: number;
+  /** total - answered */
+  gap: number;
+  /** success AND COALESCE(record_count,0) <= 0 */
+  empty: number;
+  /** success / total; null when total = 0 */
+  successRate: number | null;
+  avgDurationMs: number | null;
+  p95DurationMs: number | null;
+}
+
+export const HISTORY_EXPORT_MAX_ROWS = 50_000;
+export const HISTORY_MAX_OFFSET = 10_000;

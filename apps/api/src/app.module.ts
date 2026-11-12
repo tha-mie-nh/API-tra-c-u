@@ -11,9 +11,11 @@ import { UsersModule } from './users/users.module';
 import { RolesModule } from './roles/roles.module';
 import { AuditModule } from './audit/audit.module';
 import { DatasourcesModule } from './datasources/datasources.module';
+import { QueryStatsModule } from './query-stats/query-stats.module';
 import { AdminDatasourcesModule } from './admin-datasources/admin-datasources.module';
 import { QueryModule } from './query/query.module';
 import { HistoryModule } from './history/history.module';
+import { QueryInsightsModule } from './query-insights/query-insights.module';
 import { JwtAuthGuard } from './rbac/jwt-auth.guard';
 import { PermissionGuard } from './rbac/permission.guard';
 import { AuditInterceptor } from './audit/audit.interceptor';
@@ -55,7 +57,9 @@ import { RequestIdMiddleware } from './common/middleware/request-id.middleware';
     AuditModule,
     DatasourcesModule,
     AdminDatasourcesModule,
+    QueryStatsModule,
     HistoryModule,
+    QueryInsightsModule,
     QueryModule,
   ],
   providers: [

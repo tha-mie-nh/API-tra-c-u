@@ -16,6 +16,8 @@ export const FEATURE_PERMISSION_CODES = {
    * (CCCD/passport/...) to an ADMIN, masked ("***") to everyone else —
    * separate from `HISTORY_VIEW_ALL` (which only controls whose rows you
    * see, not whether sensitive values in those rows are revealed). */
+  /** Bulk CSV export of history/insights (ADMIN only via seed). */
+  HISTORY_EXPORT: 'history:export',
   HISTORY_VIEW_SENSITIVE: 'history:view_sensitive',
   ADMIN_USERS: 'admin:users',
   ADMIN_ROLES: 'admin:roles',
@@ -23,6 +25,8 @@ export const FEATURE_PERMISSION_CODES = {
   /** Phase 02 (admin datasource config live reload): CRUD + enable/disable
    * of `config.json` entries from the web UI. */
   ADMIN_DATASOURCES: 'admin:datasources',
+  /** Query statistics dashboard (ADMIN only, not granted to AUDITOR). */
+  ADMIN_QUERY_STATS: 'admin:query_stats',
 } as const;
 
 export type FeaturePermissionCode =

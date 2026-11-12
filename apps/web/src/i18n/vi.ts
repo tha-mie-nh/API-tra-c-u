@@ -2,6 +2,8 @@ import { viAdminUsers } from './vi-admin-users';
 import { viAdminRoles } from './vi-admin-roles';
 import { viAdminAudit } from './vi-admin-audit';
 import { viAdminDatasources } from './vi-admin-datasources';
+import { viAdminQueryStats } from './vi-admin-query-stats';
+import { viAdminQueryInsights } from './vi-admin-query-insights';
 import { viHistory } from './vi-history';
 
 /**
@@ -38,6 +40,8 @@ export const vi = {
     adminRoles: 'Vai trò & quyền',
     adminAudit: 'Nhật ký quản trị',
     adminDatasources: 'Nguồn dữ liệu',
+    adminQueryStats: 'Thống kê tra cứu',
+    adminQueryInsights: 'Phân tích tra cứu',
     home: 'Trang chủ',
   },
   auth: {
@@ -123,6 +127,8 @@ export const vi = {
     roles: viAdminRoles,
     audit: viAdminAudit,
     datasources: viAdminDatasources,
+    queryStats: viAdminQueryStats,
+    queryInsights: viAdminQueryInsights,
   },
   history: viHistory,
 } as const;

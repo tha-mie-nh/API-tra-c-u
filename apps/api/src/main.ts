@@ -1,3 +1,4 @@
+import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import cookieParser from 'cookie-parser';
@@ -5,6 +6,7 @@ import helmet from 'helmet';
 import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { PinoLoggerService } from './common/logging/pino-logger.service';
+import { parseTrustProxy } from './query-insights/trust-proxy.util';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { bufferLogs: true });
@@ -16,6 +18,9 @@ async function bootstrap() {
   // Instantiated directly (no constructor deps) — no need to register it in
   // AppModule's providers just to satisfy DI for this one bootstrap call.
   app.useLogger(new PinoLoggerService());
+  // TRUST_PROXY (default off): behind nginx/docker request.ip would be the proxy's IP; set e.g. 'loopback, uniquelocal' or a hop count ('true' trusts every hop => spoofable).
+  app.getHttpAdapter().getInstance().set('trust proxy', parseTrustProxy(process.env.TRUST_PROXY, (v) =>
+    new Logger('Bootstrap').warn(`Invalid TRUST_PROXY="${v}" ignored (use true | hop count | loopback/uniquelocal | CIDR list) — trust proxy is OFF`)));
   app.setGlobalPrefix('api/v1');
   // SwaggerModule.setup() mounts at the EXACT path given — NOT affected by
   // setGlobalPrefix above, so the 'api/v1/' here is written out by hand, not

@@ -1,3 +1,5 @@
+import { viHistoryFilters } from './vi-history-filters';
+
 /**
  * Vietnamese chrome strings for "Lịch sử tra cứu" (Phase 08,
  * reference-screens-and-ux.md S4). Merged into `vi.history` by `vi.ts`.
@@ -26,6 +28,7 @@ export const viHistory = {
   applyFilters: 'Tìm lịch sử',
   viewDetail: 'Xem chi tiết',
   detailTitle: 'Chi tiết tra cứu',
+  detailNotFound: 'Không tìm thấy bản ghi tra cứu này.',
   detailParams: 'Điều kiện tra cứu (đã ẩn dữ liệu nhạy cảm)',
   detailParamsFull: 'Điều kiện tra cứu (dữ liệu đầy đủ — chỉ bạn thấy được)',
   detailUpstreamRequestId: 'Mã yêu cầu upstream',
@@ -34,4 +37,5 @@ export const viHistory = {
   detailError: 'Thông báo lỗi',
   detailNoError: 'Không có lỗi',
   detailRecordCount: 'Số bản ghi trả về',
+  ...viHistoryFilters,
 } as const;

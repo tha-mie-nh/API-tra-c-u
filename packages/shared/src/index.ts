@@ -20,3 +20,7 @@ export * from './datasource-config.types';
 export * from './query-envelope.types';
 export * from './history-types';
 export * from './admin-types';
+export * from './query-stats-types';
+export * from './query-log-filter-types';
+export * from './query-log-time-range';
+export * from './query-insights-types';

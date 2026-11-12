@@ -22,7 +22,7 @@ export function summarizeQueryParams(
   params: Record<string, unknown>,
   options: { mask: boolean },
 ): { summary: string; params: Record<string, unknown> } {
-  const sensitiveNames = new Set((entry?.output.fields ?? []).filter((f) => f.sensitive).map((f) => f.name));
+  const sensitiveNames = new Set(getSensitiveInputFieldNames(entry));
   const outParams: Record<string, unknown> = {};
   const parts: string[] = [];
 
@@ -36,4 +36,11 @@ export function summarizeQueryParams(
   }
 
   return { summary: parts.join('; '), params: outParams };
+}
+
+/** Names of input fields that are also `sensitive:true` output fields
+ * (same rule as masking) — reused by anomaly detection of shared identities. */
+export function getSensitiveInputFieldNames(entry: DatasourceEntry | undefined): string[] {
+  const sensitive = new Set((entry?.output.fields ?? []).filter((f) => f.sensitive).map((f) => f.name));
+  return (entry?.input.fields ?? []).map((f) => f.name).filter((n) => sensitive.has(n));
 }

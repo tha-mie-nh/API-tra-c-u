@@ -70,10 +70,12 @@ Vào menu **Quản trị**:
 | Vai trò | Tạo vai trò mới, tick/untick quyền truy cập từng mục tra cứu (4 mục đang bật ở mục 1) — vai trò không có quyền thì mục tra cứu đó **biến mất khỏi menu** của user thuộc vai trò đó |
 | Nhật ký quản trị | Xem lại mọi hành động admin (tạo user, khóa, đổi vai trò, duyệt/từ chối yêu cầu quên mật khẩu...) — có before/after |
 | Nguồn dữ liệu | Thêm/sửa/xóa/bật-tắt datasource qua giao diện trực quan, có hiệu lực ngay — xem mục 5 |
+| Thống kê tra cứu | Số lượt vào/ra, chênh lệch, lỗi, mã lỗi theo hôm nay/hôm qua/tháng/năm/tuỳ chọn — xem mục 6 |
 
 ## 4. Lịch sử tra cứu
 
 Vào **Lịch sử** — mỗi lần tra cứu ở mục 1 đều được ghi lại: người tra, thời điểm, tham số tìm kiếm (đã ẩn field nhạy cảm), kết quả thành công/lỗi.
+Bộ lọc nằm trên URL (chia sẻ link được). Phần drill-down từ Thống kê và Phân tích: xem mục 7.
 
 ## 5. Quản lý nguồn dữ liệu động — tính năng mới nhất
 
@@ -213,6 +215,89 @@ curl -s -X POST http://localhost:3000/api/v1/query/MST_LOOKUP \
 Toàn bộ endpoint `admin/datasources/*` (list/tạo/sửa/xóa/bật-tắt/reload-từ-file) có sẵn trong Swagger (`/api/v1/docs`, nhóm **Admin Datasources**) — tự bấm "Try it out" thử trực tiếp không cần nhớ cú pháp curl.
 
 **Lưu ý khi demo:** mọi thay đổi ghi thẳng vào `config/config.json` thật (có backup `.bak` tự động) — demo thoải mái, nhưng nếu muốn trả về trạng thái ban đầu thì tắt lại/xóa datasource vừa tạo sau khi demo xong. Các **route mock** (`/tra-cuu/ma-so-thue`, `/tra-cuu/bao-hiem-xa-hoi`...) là cố định trong `scripts/mock-upstream-server.js`, luôn có sẵn để trỏ vào — nhưng **datasource trong Admin UI** (`BHXH_LOOKUP`, `MST_LOOKUP`...) phải tự tạo sống mỗi lần demo (đó chính là nội dung Demo B/C), KHÔNG có sẵn trong `config.json`. Mọi route cần server mock đang chạy (`node scripts/mock-upstream-server.js`) mới query được — không bật server thì sẽ báo lỗi kết nối (đúng hành vi thật khi 1 API thật bị down, cũng là điểm hay để minh họa thông báo lỗi trông thế nào).
+
+## 6. Thống kê tra cứu (dashboard admin)
+
+Demo sau nên làm **sau mục 1** (cần có vài lượt tra cứu trong log trước):
+
+1. Thực hiện 3–5 lượt tra cứu ở mục 1, gồm ít nhất 1 lượt lỗi (ví dụ nhập sai hoặc tắt server mock) để có số liệu lỗi.
+2. Đăng nhập admin, vào **Quản trị → Thống kê tra cứu** (`/quan-tri/thong-ke`).
+3. Giữ preset mặc định **7 ngày qua** (có thể chọn hôm nay, 24 giờ, 30/90 ngày, tháng này/trước, năm nay, hoặc **Tuỳ chọn** từ ngày/đến ngày, tối đa 366 ngày). Giải thích thẻ "Lượt truy vấn", "Có kết quả trả ra", "Chênh lệch vào-ra" (= lượt − có kết quả).
+4. Bấm 1 dòng trong bảng **Theo luồng tra cứu** để xem chi tiết (`/quan-tri/thong-ke/:code`), rồi "Quay lại tổng hợp".
+5. Xem bảng **Mã lỗi phổ biến** và thử lại với tài khoản không có quyền `admin:query_stats` (menu không hiện mục này).
+
+Lưu ý khi giải thích: "Tổng bản ghi đã trả" chỉ là số bản ghi trong các trang đã trả về, không phải tổng dữ liệu nguồn. Công thức đầy đủ: [`query-stats-dashboard.md`](./query-stats-dashboard.md).
+
+## 7. Drill-down và phân tích tra cứu (admin)
+
+Phần này cần **dữ liệu nhiều người dùng, nhiều ngày**: nạp bằng script ở mục 7.3 (chỉ môi trường dev/test).
+Chi tiết bộ lọc, công thức và ngưỡng bất thường: [`query-log-drilldown-and-insights.md`](./query-log-drilldown-and-insights.md).
+
+### 7.1 Kịch bản đi từ con số tới từng lượt tra cứu (~10 phút)
+
+Đăng nhập **admin**:
+
+1. **Thống kê** (`/quan-tri/thong-ke`), giữ 7 ngày qua. Ghi lại "Lượt truy vấn" và "Thất bại".
+2. Bấm thẻ **Chênh lệch vào-ra** → Lịch sử với `outcome=gap`. Số dòng trên đầu trang Lịch sử **bằng** số trên thẻ. Giải thích: gap = lượt − lượt có kết quả (gồm lỗi và kết quả rỗng).
+3. Bấm một **cột** trong biểu đồ (một ngày) → Lịch sử chỉ còn lượt trong ngày đó (giờ VN, không lệch UTC).
+4. Ở bảng **Mã lỗi phổ biến**, bấm một dòng (ví dụ mã lỗi 504 hoặc 422) → Lịch sử lọc đúng mã lỗi và HTTP status.
+5. Trong Lịch sử, bấm một dòng để mở **chi tiết**: tham số đã đủ (ADMIN thấy giá trị thật), `upstreamRequestId` có nút copy, IP, trình duyệt. Các liên kết trong chi tiết lọc theo cùng user + nguồn, cùng IP, cùng mã lỗi.
+6. Từ chi tiết, bấm liên kết **Hoạt động user** → dòng thời gian lượt tra cứu, tổng theo nguồn, IP và trình duyệt đã dùng, lần đầu/gần nhất.
+
+### 7.2 Kịch bản phân tích chéo và bất thường
+
+Vào **Quản trị → Phân tích tra cứu** (`/quan-tri/phan-tich-tra-cuu`), khoảng mặc định 7 ngày:
+
+1. Tab **Tổng quan**: "Người dùng tra cứu nhiều nhất" (sắp theo lượt, rồi theo "Thất bại"), "Mã lỗi phổ biến", "Luồng chậm nhất (theo P95)".
+2. Tab **Bất thường** (ngưỡng hiển thị ngay trên trang):
+   - **Tăng đột biến**: `demo-binh` có 1 ngày ~40 lượt (dữ liệu demo). Bấm số lượt để xem đúng ngày đó.
+   - **Ngoài giờ**: tỉ lệ lượt ngoài 7–18 giờ và cuối tuần của từng user.
+   - **CCCD / tham số dùng chung**: một CCCD mẫu (`HOT_CCCD` trong script) được ≥ 4 user tra. Thử đăng nhập bằng user không có `history:view_sensitive` để thấy giá trị bị che.
+   - **IP dùng chung**: IP `SHARED_IP` (`10.20.30.40`) có 3 tài khoản `demo-chi`, `demo-dung`, `demo-em`. Bấm sang trang IP để xem danh sách user và cờ "nhiều tài khoản".
+3. Bấm **Xuất CSV** của một bảng (ví dụ "Bất thường — CCCD dùng chung"): file có đúng các dòng đang hiện.
+
+### 7.3 Nạp dữ liệu demo (dev/test)
+
+Script `scripts/seed-demo-query-logs.ts` sinh lượt tra cứu nhiều ngày cho 7 user demo (`demo-an`, `demo-binh`, ...), có
+sẵn các tình huống ở mục 7.2. Chạy từ `apps/api`, cần đã chạy `db:seed` (role OPERATOR phải tồn tại):
+
+```bash
+# Xem trước số liệu, không ghi gì vào DB (không cần DB)
+pnpm --filter api exec ts-node --compiler-options '{"module":"commonjs","moduleResolution":"node"}' \
+  ../../scripts/seed-demo-query-logs.ts --dry-run --days=60 --seed=20261111
+
+# Ghi vào DB dev (port 55432): cần --confirm-write=<port>
+pnpm --filter api exec dotenv -e ../../.env -- ts-node --compiler-options '{"module":"commonjs","moduleResolution":"node"}' \
+  ../../scripts/seed-demo-query-logs.ts --confirm-write=55432 --days=60 --seed=20261111
+
+# Dọn dữ liệu demo (chỉ dòng do demo tạo: user_agent 'demo-seed/...' hoặc user 'demo-%')
+pnpm --filter api exec dotenv -e ../../.env -- ts-node --compiler-options '{"module":"commonjs","moduleResolution":"node"}' \
+  ../../scripts/seed-demo-query-logs.ts --clean --confirm-write=55432
+```
+
+- Chạy lại lệnh ghi thì dữ liệu demo cũ bị thay thế (idempotent). `--reset-passwords` tạo lại mật khẩu demo.
+- Mật khẩu tạm của user demo **chỉ in ra một lần** khi user được tạo (`tempPassword: ...`). Lưu lại ngay.
+- An toàn: từ chối `NODE_ENV=production`, DB host không phải `localhost`/`127.0.0.1`/`::1` (vd host `postgres` của docker), và port không thuộc `55432`/`55434`.
+- `--clean` xoá cả `audit_logs` do user `demo-%` thực hiện. **Chỉ dùng trên dev.** Không chạy trên prod hay DB dùng chung.
+
+Sinh lượt tra cứu **thật** qua API (đi qua đường ghi log thật, có cả 200, 422, 403):
+
+```bash
+# Cần: API ở :3000, mock upstream ở :4100 (node scripts/mock-upstream-server.js)
+LIVE_USERS='demo-an:<mat-khau-demo-an>,demo-binh:<mat-khau-demo-binh>' \
+pnpm --filter api exec ts-node --compiler-options '{"module":"commonjs","moduleResolution":"node"}' \
+  ../../scripts/generate-live-queries-through-api.ts --base=http://localhost:3000 --per-user=20
+```
+
+- Mật khẩu chỉ lấy từ biến môi trường `LIVE_USERS`, script không in ra. Mỗi user gửi tuần tự, cách nhau 2,5 giây (dưới giới hạn 30 lượt/phút/user); `--dry-run` chỉ in kế hoạch.
+- Script này ghi qua API nên không có `user_agent` `demo-seed/`. `--clean` của script 7.3 chỉ xoá lượt của user `demo-%`,
+  nên nếu `LIVE_USERS` dùng user demo thì `--clean` cũng xoá các lượt đó; user khác thì không bị ảnh hưởng.
+
+### 7.4 Kiểm tra quyền (5 phút)
+
+- Đăng nhập một user có `OPERATOR` (vd `demo-an`): Lịch sử chỉ có lượt của chính user đó; không có menu **Phân tích tra cứu**; không có **Thống kê**.
+- Nếu có user `AUDITOR`: thấy toàn bộ Lịch sử và Phân tích nhưng **không** có nút xuất CSV (thiếu `history:export`). Đây là hành vi đã chốt; xem câu hỏi mở trong tài liệu drill-down.
+- Quản trị → **Nhật ký** (audit): sau các thao tác trên có các action `query_log.view_detail`, `query_log.export_csv`, `query_insights.view_anomalies`. Nội dung ghi là bộ lọc, không có dữ liệu trả về.
 
 ## Câu hỏi thường gặp khi demo
 

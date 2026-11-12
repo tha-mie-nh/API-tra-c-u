@@ -1,5 +1,5 @@
 import type { DatasourceEntry } from '@app/shared';
-import { maskValue, summarizeQueryParams } from './sensitive-value-mask.util';
+import { getSensitiveInputFieldNames, maskValue, summarizeQueryParams } from './sensitive-value-mask.util';
 
 const entry: DatasourceEntry = {
   code: 'SAMPLE_DS',
@@ -63,5 +63,16 @@ describe('summarizeQueryParams', () => {
     const result = summarizeQueryParams(undefined, params, { mask: true });
     expect(result.params).toEqual({});
     expect(result.summary).toBe('');
+  });
+});
+
+describe('getSensitiveInputFieldNames', () => {
+  it('returns input fields whose name is a sensitive output field', () => {
+    const withSensitive = {
+      ...entry,
+      output: { ...entry.output, fields: [{ name: 'citizenId', label: 'x', sensitive: true }, { name: 'fullName', label: 'y' }] },
+    } as unknown as DatasourceEntry;
+    expect(getSensitiveInputFieldNames(withSensitive)).toEqual(['citizenId']);
+    expect(getSensitiveInputFieldNames(undefined)).toEqual([]);
   });
 });

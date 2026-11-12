@@ -29,10 +29,13 @@ export class AuditInterceptor implements NestInterceptor {
         // `:code`-keyed routes (e.g. admin datasources, Phase 02) have no
         // numeric/uuid `:id` param — fall back to `:code` before the
         // result's own `id` field.
-        const paramId = request.params?.id ?? request.params?.code;
+        const paramId =
+          (meta.targetParam ? request.params?.[meta.targetParam] : undefined) ??
+          request.params?.id ??
+          request.params?.code;
         const targetId =
           (Array.isArray(paramId) ? paramId[0] : paramId) ??
-          (result as { id?: string } | undefined)?.id ??
+          (meta.capture === 'request' ? undefined : (result as { id?: string } | undefined)?.id) ??
           null;
 
         void this.auditService.record({
@@ -40,8 +43,11 @@ export class AuditInterceptor implements NestInterceptor {
           action: meta.action,
           targetType: meta.targetType,
           targetId,
-          before: request.auditBefore,
-          after: result,
+          before: meta.capture === 'request' ? undefined : request.auditBefore,
+          after:
+            meta.capture === 'request'
+              ? { filters: request.query, params: request.params, ...request.auditExtra }
+              : result,
           ip: request.ip ?? null,
         });
       }),

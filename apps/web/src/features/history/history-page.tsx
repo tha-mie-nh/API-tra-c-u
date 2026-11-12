@@ -1,40 +1,52 @@
-import { useState } from 'react';
+import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import type { HistoryListResponse } from '@shared/index';
+import { FEATURE_PERMISSION_CODES, HISTORY_MAX_OFFSET, type HistoryListResponse } from '@shared/index';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ListPagination } from '@/components/common/list-pagination';
 import { vi } from '@/i18n/vi';
 import { ApiError } from '@/lib/api-client';
-import { fetchHistoryList, type HistoryListParams } from './history-api';
+import { useAuthStore } from '@/lib/auth-store';
+import { fetchHistoryList } from './history-api';
+import { omitViewAllOnlyFilters } from './history-search-params';
+import { useHistorySearchParams } from './use-history-search-params';
 import { HistoryFilters } from './history-filters';
 import { HistoryTable } from './history-table';
 import { HistoryDetailDialog } from './history-detail-dialog';
+import { HistorySummaryCards } from './history-summary-cards';
+import { HistoryExportCsvButton } from './history-export-csv-button';
 
-const DEFAULT_PAGE_SIZE = 20;
-
-/** `/lich-su` (S4) — filters + server-paginated table + detail dialog. */
+/** `/lich-su` (S4) — all filters/sort/page/detail live in the URL (see use-history-search-params). */
 export function HistoryPage() {
-  const [filters, setFilters] = useState<HistoryListParams>({ page: 1, pageSize: DEFAULT_PAGE_SIZE });
-  const [detailId, setDetailId] = useState<string | null>(null);
+  const canViewAll = useAuthStore((s) => s.hasPermission(FEATURE_PERMISSION_CODES.HISTORY_VIEW_ALL));
+  const h = useHistorySearchParams();
+  // view_own: the backend ignores userId/username/ip; drop them so UI and request agree.
+  const filter = useMemo(() => (canViewAll ? h.filter : omitViewAllOnlyFilters(h.filter)), [canViewAll, h.filter]);
+  const { sort, order, page, pageSize } = h.params;
+  const listParams = { ...filter, sort, order, page, pageSize };
 
   const query = useQuery<HistoryListResponse>({
-    queryKey: ['history', filters],
-    queryFn: () => fetchHistoryList(filters),
+    queryKey: ['history', listParams],
+    queryFn: () => fetchHistoryList(listParams),
   });
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-xl font-semibold">{vi.history.title}</h1>
+      <div className="flex items-center justify-between gap-3">
+        <h1 className="text-xl font-semibold">{vi.history.title}</h1>
+        <HistoryExportCsvButton filter={filter} />
+      </div>
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">{vi.adminCommon.apply}</CardTitle>
+          <CardTitle className="text-base">{vi.history.filterTitle}</CardTitle>
         </CardHeader>
         <CardContent>
-          <HistoryFilters filters={filters} onApply={setFilters} />
+          <HistoryFilters filters={filter} onApply={h.applyFilter} />
         </CardContent>
       </Card>
+
+      <HistorySummaryCards filter={filter} />
 
       <div className="flex flex-col gap-4">
         {query.isLoading && (
@@ -46,23 +58,33 @@ export function HistoryPage() {
         )}
         {query.isError && (
           <p role="alert" className="text-destructive text-sm">
-            {query.error instanceof ApiError ? query.error.message : vi.adminCommon.genericError}
+            {query.error instanceof ApiError
+              ? query.error.status === 422 && h.params.page * h.params.pageSize > HISTORY_MAX_OFFSET
+                ? vi.history.offsetLimitHint
+                : query.error.message
+              : vi.adminCommon.genericError}
           </p>
         )}
         {query.data && (
           <>
-            <HistoryTable items={query.data.items} onViewDetail={setDetailId} />
+            <HistoryTable
+              items={query.data.items}
+              onViewDetail={h.openDetail}
+              sort={h.params.sort ?? 'createdAt'}
+              order={h.params.order ?? 'desc'}
+              onSort={h.toggleSort}
+            />
             <ListPagination
               page={query.data.page}
               pageSize={query.data.pageSize}
               total={query.data.total}
-              onPageChange={(page) => setFilters((prev) => ({ ...prev, page }))}
+              onPageChange={h.setPage}
             />
           </>
         )}
       </div>
 
-      <HistoryDetailDialog id={detailId} onOpenChange={(open) => !open && setDetailId(null)} />
+      <HistoryDetailDialog id={h.detail} canViewAll={canViewAll} onOpenChange={(open) => !open && h.closeDetail()} />
     </div>
   );
 }

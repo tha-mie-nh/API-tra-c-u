@@ -208,7 +208,7 @@ model QueryLog {
   /// Denormalized on purpose: history stays readable after the user row changes/goes away.
   usernameSnapshot   String      @map("username_snapshot") @db.VarChar(100)
   datasourceCode     String      @map("datasource_code") @db.VarChar(100)
-  /// Sensitive fields (per config.json `sensitive` flag) are masked before storage.
+  /// Lưu giá trị thật; che ở read-time theo quyền `history:view_sensitive` (config.json `sensitive` flag).
   queryParams        Json        @map("query_params")
   querySummary       String?     @map("query_summary")
   status             QueryStatus
@@ -231,6 +231,8 @@ model QueryLog {
   @@index([userId, createdAt(sort: Desc)])
   @@index([datasourceCode, createdAt(sort: Desc)])
   @@index([createdAt(sort: Desc)])
+  @@index([ip, createdAt(sort: Desc)])
+  @@index([upstreamRequestId])
   @@map("query_logs")
   @@schema("app")
 }

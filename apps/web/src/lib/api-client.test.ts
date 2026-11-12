@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useAuthStore } from './auth-store';
-import { apiFetch, ApiError } from './api-client';
+import { apiFetch, apiFetchBlob, apiFetchImageBlob, ApiError } from './api-client';
 
 /**
  * Covers phase-06 success criteria: "Concurrent 401s trigger exactly one
@@ -68,5 +68,45 @@ describe('apiFetch', () => {
 
     await expect(apiFetch('/auth/login', { method: 'POST', body: {} })).rejects.toBeInstanceOf(ApiError);
     expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('apiFetchBlob', () => {
+  beforeEach(() => {
+    useAuthStore.setState({ accessToken: 'stale-token', user: null, status: 'authenticated' });
+  });
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('returns blob + headers, retrying once after refresh on 401', async () => {
+    const fetchMock = vi.fn(async (url: string, init?: RequestInit) => {
+      if (url.endsWith('/auth/refresh')) {
+        return new Response(JSON.stringify({ accessToken: 'fresh-token', expiresIn: 900, user: {} }), { status: 200 });
+      }
+      if (new Headers(init?.headers).get('Authorization') === 'Bearer stale-token') {
+        return new Response(null, { status: 401 });
+      }
+      return new Response('a,b\r\n', { status: 200, headers: { 'Content-Disposition': 'attachment; filename="x.csv"' } });
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const { blob, headers } = await apiFetchBlob('/history/export.csv?status=failed');
+    expect(await blob.text()).toBe('a,b\r\n');
+    expect(headers.get('Content-Disposition')).toContain('x.csv');
+  });
+
+  it('throws ApiError on non-2xx; apiFetchImageBlob still returns a plain Blob', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (url: string) =>
+        url.includes('/bad')
+          ? new Response(JSON.stringify({ error: { code: 'FORBIDDEN', message: 'no', requestId: 'r' } }), { status: 403 })
+          : new Response('img', { status: 200 }),
+      ),
+    );
+    await expect(apiFetchBlob('/bad')).rejects.toBeInstanceOf(ApiError);
+    const blob = await apiFetchImageBlob('/query/X/image/1');
+    expect(await blob.text()).toBe('img');
   });
 });

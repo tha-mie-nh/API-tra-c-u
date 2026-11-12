@@ -5,6 +5,9 @@ import { FEATURE_PERMISSION_CODES } from '@shared/index';
 import { useAuthStore } from '@/lib/auth-store';
 import { HistoryFilters } from './history-filters';
 
+// Radix Checkbox measures itself with ResizeObserver, which jsdom lacks.
+globalThis.ResizeObserver ??= class { observe() {} unobserve() {} disconnect() {} };
+
 vi.mock('./history-api', async () => {
   const actual = await vi.importActual<typeof import('./history-api')>('./history-api');
   return { ...actual, fetchHistoryDatasourceOptions: vi.fn(() => Promise.resolve([])) };
@@ -14,7 +17,7 @@ function renderFilters() {
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   return render(
     <QueryClientProvider client={queryClient}>
-      <HistoryFilters filters={{ page: 1, pageSize: 20 }} onApply={vi.fn()} />
+      <HistoryFilters filters={{}} onApply={vi.fn()} />
     </QueryClientProvider>,
   );
 }

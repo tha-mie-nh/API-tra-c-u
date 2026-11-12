@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router';
-import { Home, History, Users, KeyRound, ScrollText, Database } from 'lucide-react';
+import { Home, History, Users, KeyRound, ScrollText, Database, BarChart3, SearchCheck } from 'lucide-react';
 import { FEATURE_PERMISSION_CODES } from '@shared/index';
 import { cn } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -36,7 +36,9 @@ export function SidebarNav() {
   const canViewRoles = hasAnyPermission([FEATURE_PERMISSION_CODES.ADMIN_ROLES]);
   const canViewAudit = hasAnyPermission([FEATURE_PERMISSION_CODES.ADMIN_AUDIT]);
   const canViewDatasources = hasAnyPermission([FEATURE_PERMISSION_CODES.ADMIN_DATASOURCES]);
-  const showAdminSection = canViewUsers || canViewRoles || canViewAudit || canViewDatasources;
+  const canViewQueryStats = hasAnyPermission([FEATURE_PERMISSION_CODES.ADMIN_QUERY_STATS]);
+  const canViewQueryInsights = hasAnyPermission([FEATURE_PERMISSION_CODES.HISTORY_VIEW_ALL]);
+  const showAdminSection = canViewQueryInsights || canViewUsers || canViewRoles || canViewAudit || canViewDatasources || canViewQueryStats;
 
   return (
     <nav className="flex flex-col gap-0.5 p-2">
@@ -99,6 +101,18 @@ export function SidebarNav() {
             <NavLink to="/quan-tri/nguon-du-lieu" className={linkClass}>
               <Database className="size-4" />
               {vi.nav.adminDatasources}
+            </NavLink>
+          )}
+          {canViewQueryStats && (
+            <NavLink to="/quan-tri/thong-ke" className={linkClass}>
+              <BarChart3 className="size-4" />
+              {vi.nav.adminQueryStats}
+            </NavLink>
+          )}
+          {canViewQueryInsights && (
+            <NavLink to="/quan-tri/phan-tich-tra-cuu" className={linkClass}>
+              <SearchCheck className="size-4" />
+              {vi.nav.adminQueryInsights}
             </NavLink>
           )}
         </>

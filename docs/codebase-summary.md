@@ -36,8 +36,13 @@ apps/api/src/
                        rename) rồi reload registry trong tiến trình (zero-downtime, zero
                        restart); `POST /admin/datasources/reload` nạp lại từ đĩa (hand-edit)
   query/         POST /query/:code — chạy 1 lượt tra cứu qua datasource
-  history/       Lịch sử tra cứu (query_logs)
-  audit/         Audit log admin actions (@AuditAction decorator + interceptor)
+  history/       Lịch sử tra cứu (query_logs): list/summary/detail/export.csv + ghi log (QueryLogService, writer duy nhất)
+    query-log-filter/  Bộ lọc dùng chung: zod schema, resolveQueryLogScope (scope), buildQueryLogWhereSql (where-builder duy nhất), COUNTERS/GAP_SQL
+  query-stats/   Thống kê tra cứu, read-only trên query_logs (`admin:query_stats`, preset/granularity/previous; xem docs/query-stats-dashboard.md)
+  query-insights/  Phân tích cho admin (`history:view_all`): top user/lỗi/độ trễ, hoạt động user/IP, bất thường, CSV
+                       (xem docs/query-log-drilldown-and-insights.md)
+  audit/         Audit log admin actions (@AuditAction decorator + interceptor; capture 'request' cho dữ liệu nhạy cảm)
+  common/csv/    toCsvRow/toCsvCell chống CSV injection (dùng cho mọi file CSV xuất ra)
   prisma/        PrismaService wrapper
   health/        /health, /health/ready
 
@@ -46,14 +51,19 @@ apps/web/src/
     auth/            Login, forgot-password, change-password
     query/            Form động + hiển thị kết quả (dynamic-form/, results/)
     datasources/      Menu tra cứu (list theo quyền)
-    history/          Trang lịch sử tra cứu
+    history/          Lịch sử tra cứu: bộ lọc trên URL (use-history-search-params), bảng, summary, dialog chi tiết, xuất CSV
     admin/            users/, roles/, audit/
+      query-stats/    Thống kê: thẻ, biểu đồ, bảng, range picker, drill-down href (build-stats-drilldown-href.ts)
+      query-insights/ Phân tích: tab Tổng quan / Bất thường, trang user và IP, xuất CSV
   components/ui/      shadcn/ui components
   routes/              react-router, RequireAuth/RequirePermission
 
 packages/shared/src/    Type dùng chung FE+BE: datasource-config.types.ts (DSL config.json),
                         query-envelope.types.ts (response chuẩn), admin-types.ts, auth-types.ts,
-                        permission-codes.ts (hằng số quyền feature)
+                        permission-codes.ts (hằng số quyền feature), query-stats-types.ts (contract thống kê),
+                        history-types.ts (Lịch sử + HISTORY_EXPORT_MAX_ROWS), query-log-filter-types.ts (từ vựng bộ lọc,
+                        `__null__`, STATS_COUNTER_HISTORY_FILTER), query-log-time-range.ts (múi giờ VN, bucket → khoảng),
+                        query-insights-types.ts (QUERY_INSIGHTS_RULES: ngưỡng bất thường)
 
 config/
   config.json           Định nghĩa MỌI datasource (xem mục 4) — sửa file này KHÔNG cần rebuild
@@ -114,7 +124,8 @@ diện quản trị".
   yêu cầu. Route `/query/:code` và `/datasources/:code` suy ra quyền cần từ chính `:code`
   (`api:<code>`), nên thêm datasource mới **tự động được bảo vệ**, không phải sửa route nào.
 - Role mặc định: `ADMIN` (mọi quyền, không xóa được), `OPERATOR` (quyền API + xem lịch sử của mình),
-  `AUDITOR` (xem toàn bộ lịch sử, không có quyền API nào).
+  `AUDITOR` (`history:view_all`: xem toàn bộ lịch sử và Phân tích, không có quyền API nào, không có `history:export`).
+  Quyền xem lịch sử/CSV: `history:view_own`, `history:view_all`, `history:export`; chi tiết ở [`system-architecture.md`](./system-architecture.md#5-phân-quyền).
 - Quyền loại `api:*` **tự động đồng bộ** từ `config.json` lúc boot (`PermissionSyncService`) — thêm
   datasource không cần insert tay vào DB.
 - **Quên mật khẩu** (không qua email — app nội bộ, admin toàn quyền quyết định): user tự gửi yêu cầu
@@ -129,7 +140,7 @@ Danh sách endpoint đầy đủ: [`plans/260920-2200-app-tra-cuu-du-lieu/refere
 |---|---|
 | `users`, `roles`, `permissions`, `user_roles`, `role_permissions` | RBAC |
 | `refresh_tokens` | Thu hồi phiên đăng nhập nhanh khi admin khóa user |
-| `query_logs` | Lịch sử mỗi lượt tra cứu — lưu tham số **thật** (không che), che chỉ áp dụng lúc đọc tùy quyền `history:view_sensitive` của người xem |
+| `query_logs` | Lịch sử mỗi lượt tra cứu — lưu tham số **thật** (không che), che chỉ áp dụng lúc đọc tùy quyền `history:view_sensitive` của người xem. Module `query-stats` và `query-insights` chỉ đọc bảng này. Có 2 index thêm (`ip`, `upstream_request_id`) ở migration `20261111180000_...` |
 | `audit_logs` | Nhật ký thao tác admin (before/after diff) |
 | `password_reset_requests` | Yêu cầu quên mật khẩu chờ duyệt |
 
@@ -143,6 +154,9 @@ Sơ đồ ERD đầy đủ: [`plans/260920-2200-app-tra-cuu-du-lieu/reference-da
 |---|---|
 | Port cố định, cách start dev/prod | [`docs/running-the-project.md`](./running-the-project.md) |
 | Kịch bản demo từng feature | [`docs/demo-guide.md`](./demo-guide.md) |
+| API + công thức dashboard thống kê tra cứu | [`docs/query-stats-dashboard.md`](./query-stats-dashboard.md) |
+| Drill-down Thống kê → Lịch sử, bộ lọc, Phân tích, bất thường, CSV | [`docs/query-log-drilldown-and-insights.md`](./query-log-drilldown-and-insights.md) |
+| Kiến trúc: luồng ghi/đọc query_logs, where-builder, phân quyền, audit | [`docs/system-architecture.md`](./system-architecture.md) |
 | Deploy, backup/restore, rollback | [`docs/deployment-guide.md`](./deployment-guide.md) |
 | Checklist bảo mật | [`docs/security-checklist.md`](./security-checklist.md) |
 | Toàn bộ thiết kế gốc + quyết định kiến trúc | [`plans/260920-2200-app-tra-cuu-du-lieu/`](../plans/260920-2200-app-tra-cuu-du-lieu/) |

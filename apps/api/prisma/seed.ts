@@ -21,10 +21,13 @@ const FEATURE_PERMISSIONS = [
   // OPERATOR/AUDITOR below — only ADMIN gets every feature permission
   // automatically (see seedRoles).
   { code: 'history:view_sensitive', name: 'View unmasked sensitive values in query history' },
+  // Bulk CSV export of query history — ADMIN only (auto-granted below); not given to OPERATOR/AUDITOR.
+  { code: 'history:export', name: 'Export query history (CSV)' },
   { code: 'admin:users', name: 'Manage users' },
   { code: 'admin:roles', name: 'Manage roles' },
   { code: 'admin:audit', name: 'View audit log' },
   { code: 'admin:datasources', name: 'Manage datasources' },
+  { code: 'admin:query_stats', name: 'View query statistics dashboard' },
 ] as const;
 
 const BOOTSTRAP_ADMIN_USERNAME = 'admin';
