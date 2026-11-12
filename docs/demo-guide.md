@@ -6,7 +6,7 @@ Tài liệu để tự thử toàn bộ chức năng hệ thống. Không cần 
 
 Hai bản đang chạy song song để so sánh:
 
-| | Dev (hot-reload, dùng để test/sửa) | Production (image thật `api-v8`/`web-v12`, build sẵn) |
+| | Dev (hot-reload, dùng để test/sửa) | Production (image thật `api-v11`/`web-v14`, build sẵn) |
 |---|---|---|
 | Web | http://localhost:5173 | http://localhost:80 |
 | API | http://localhost:3000/api/v1/health | qua nginx, không lộ port riêng |
