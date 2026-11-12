@@ -3,6 +3,7 @@ import type { QueryEnvelope } from '@app/shared';
 import { DatasourceRegistryService } from '../datasources/datasource-registry.service';
 import { ResponseMapperService } from '../datasources/response-mapper.service';
 import { UpstreamError, UpstreamTimeoutError } from '../datasources/adapters/adapter-errors';
+import type { UpstreamExchange } from '../datasources/adapters/datasource-adapter.interface';
 import type { JwtUser } from '../rbac/jwt-user.interface';
 import { QueryLogService } from '../history/query-log.service';
 
@@ -45,6 +46,14 @@ export class QueryService {
 
     const parsed = inputSchema.safeParse(input.params);
     if (!parsed.success) {
+      const validationError = {
+        error: {
+          code: 'VALIDATION_ERROR',
+          message: 'Request validation failed',
+          details: parsed.error.issues.map((issue) => ({ path: issue.path.join('.'), message: issue.message })),
+          requestId: input.requestId, // HttpExceptionFilter appends the same id to the real response
+        },
+      };
       await this.queryLogService.record({
         userId: input.user.id,
         username: input.user.username,
@@ -57,17 +66,9 @@ export class QueryService {
         requestId: input.requestId,
         ip: input.ip,
         userAgent: input.userAgent,
+        clientResponse: validationError,
       });
-      throw new HttpException(
-        {
-          error: {
-            code: 'VALIDATION_ERROR',
-            message: 'Request validation failed',
-            details: parsed.error.issues.map((issue) => ({ path: issue.path.join('.'), message: issue.message })),
-          },
-        },
-        HttpStatus.UNPROCESSABLE_ENTITY,
-      );
+      throw new HttpException(validationError, HttpStatus.UNPROCESSABLE_ENTITY);
     }
     const validatedParams = parsed.data as Record<string, unknown>;
 
@@ -96,11 +97,14 @@ export class QueryService {
         requestId: input.requestId,
         ip: input.ip,
         userAgent: input.userAgent,
+        exchange: result.exchange,
+        clientResponse: clientEnvelope,
       });
       return clientEnvelope;
     } catch (err) {
       const tookMs = Date.now() - startedAt;
       const translated = this.translateError(err);
+      const clientError = { error: { code: translated.code, message: translated.message, requestId: input.requestId } };
 
       await this.queryLogService.record({
         userId: input.user.id,
@@ -115,9 +119,11 @@ export class QueryService {
         requestId: input.requestId,
         ip: input.ip,
         userAgent: input.userAgent,
+        exchange: (err as { exchange?: UpstreamExchange } | null)?.exchange,
+        clientResponse: clientError,
       });
       // Never leak internal detail (upstream body, stack trace, credentials) — only the mapped code/message.
-      throw new HttpException({ error: { code: translated.code, message: translated.message } }, translated.status);
+      throw new HttpException(clientError, translated.status);
     }
   }
 

@@ -226,7 +226,8 @@ model QueryLog {
   userAgent          String?     @map("user_agent")
   createdAt          DateTime    @default(now()) @map("created_at") @db.Timestamptz
 
-  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+  user    User?            @relation(fields: [userId], references: [id], onDelete: SetNull)
+  payload QueryLogPayload?
 
   @@index([userId, createdAt(sort: Desc)])
   @@index([datasourceCode, createdAt(sort: Desc)])
@@ -234,6 +235,22 @@ model QueryLog {
   @@index([ip, createdAt(sort: Desc)])
   @@index([upstreamRequestId])
   @@map("query_logs")
+  @@schema("app")
+}
+
+/// Exact I/O snapshot of one query (request sent upstream, upstream answer, answer returned to the client).
+/// Separate table so list/stats never read the heavy jsonb; rows cascade with query_logs.
+/// Secrets are never stored (header values redacted, base64 images replaced) — see query-log-payload-sanitizer.util.ts.
+model QueryLogPayload {
+  queryLogId       String   @id @map("query_log_id") @db.Uuid
+  upstreamRequest  Json?    @map("upstream_request")
+  upstreamResponse Json?    @map("upstream_response")
+  clientResponse   Json?    @map("client_response")
+  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  queryLog QueryLog @relation(fields: [queryLogId], references: [id], onDelete: Cascade)
+
+  @@map("query_log_payloads")
   @@schema("app")
 }
 

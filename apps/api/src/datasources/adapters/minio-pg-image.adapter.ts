@@ -4,6 +4,7 @@ import type { DatasourceEntry, TransportMinioPg } from '@app/shared';
 import type { ResolvedMinioPgSecrets } from '../datasource-config.loader';
 import type { AdapterExecuteInput, AdapterExecuteResult, DatasourceAdapter, RawRecord } from './datasource-adapter.interface';
 import { UpstreamError } from './adapter-errors';
+import { localExchange } from './upstream-exchange.util';
 import { withTimeout } from './with-timeout.util';
 
 /**
@@ -43,13 +44,21 @@ export class MinioPgImageAdapter implements DatasourceAdapter {
     const identityValue = input.params[identityField.name];
     const limit = Math.min(input.pageSize ?? this.datasource.limits?.pageSize ?? 20, this.datasource.limits?.maxResults ?? 100);
 
+    const started = Date.now();
+    const sent = { [identityField.name]: identityValue, limit };
     try {
       const pool = this.getPool();
       const result = await pool.query(this.transport.query, [identityValue, limit]);
-      return { records: result.rows as RawRecord[], total: result.rowCount ?? result.rows.length };
+      const rows = result.rows as RawRecord[];
+      return {
+        records: rows,
+        total: result.rowCount ?? rows.length,
+        exchange: localExchange('minio-pg', sent, { durationMs: Date.now() - started, body: { rows } }),
+      };
     } catch (err) {
       if (err instanceof UpstreamError) throw err;
-      throw new UpstreamError(`${this.datasource.code}: image DB query failed`, this.datasource.code, err);
+      throw new UpstreamError(`${this.datasource.code}: image DB query failed`, this.datasource.code, err,
+        localExchange('minio-pg', sent, { durationMs: Date.now() - started, error: (err as Error).message }));
     }
   }
 

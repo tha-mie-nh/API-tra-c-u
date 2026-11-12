@@ -5,6 +5,7 @@ import { join } from 'node:path';
 import type { DatasourceEntry, TransportMock } from '@app/shared';
 import type { AdapterExecuteInput, AdapterExecuteResult, DatasourceAdapter, RawRecord } from './datasource-adapter.interface';
 import { UpstreamError } from './adapter-errors';
+import { localExchange } from './upstream-exchange.util';
 import { withTimeout } from './with-timeout.util';
 
 /** Magic input values (any string field) that exercise error/timeout UI paths without a real upstream. */
@@ -38,13 +39,24 @@ export class MockInfoAdapter implements DatasourceAdapter {
   }
 
   private async run(input: AdapterExecuteInput): Promise<AdapterExecuteResult> {
-    await this.applyMagicValues(input.params);
+    const started = Date.now();
+    try {
+      await this.applyMagicValues(input.params);
+    } catch (err) {
+      if (err instanceof UpstreamError) err.exchange = localExchange('mock', input.params, { durationMs: Date.now() - started, error: err.message });
+      throw err;
+    }
 
     const records = this.loadRecords();
     const matched = records.filter((record) => this.matches(record, input.params));
 
     this.logger.debug(`${this.datasource.code}: matched ${matched.length}/${records.length} mock record(s)`);
-    return { records: matched, total: matched.length, requestId: `mock_${randomUUID()}` };
+    return {
+      records: matched,
+      total: matched.length,
+      requestId: `mock_${randomUUID()}`,
+      exchange: localExchange('mock', input.params, { durationMs: Date.now() - started, body: { records: matched } }),
+    };
   }
 
   /**

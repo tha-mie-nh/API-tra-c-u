@@ -2,6 +2,20 @@
 
 Ghi lại các thay đổi đáng chú ý theo ngày. Mới nhất ở trên cùng.
 
+## 2026-11-12
+
+### Tính năng: monitor đầu vào/đầu ra của mọi request (admin)
+- Mỗi lần tra cứu lưu thêm 3 phần vào bảng riêng `app.query_log_payloads`: request gửi upstream (method, url, header, body, lần thử),
+  phản hồi upstream (mã HTTP, thời gian, body, kể cả body lỗi 4xx/5xx/timeout) và phản hồi trả client (kể cả lỗi/từ chối quyền/validate).
+- API `GET /history/:id/payload` (quyền mới `history:view_payload`, chỉ ADMIN qua seed; mỗi lần xem ghi audit `query_log.view_payload`).
+  Giá trị lưu và hiển thị **nguyên văn**, không che. User thường không có quyền này.
+- Giao diện: dialog chi tiết ở Lịch sử có tab **Đầu vào / Đầu ra** (xem JSON, copy, tải .json).
+- Không bao giờ lưu giá trị header xác thực/API key (`[redacted]`); ảnh base64 không lưu, thay bằng kích thước + sha256 + mime.
+- Mỗi phần tối đa `QUERY_LOG_PAYLOAD_MAX_BYTES` (mặc định 2 MB), vượt thì cắt và đánh dấu. Tắt toàn bộ bằng `QUERY_LOG_PAYLOAD_ENABLED=false`.
+- **Không tự xóa theo thời gian** (theo yêu cầu): cần theo dõi dung lượng bảng `query_log_payloads` ở môi trường chạy lâu.
+- Migration `20261112150000_add_query_log_payloads`. Sau khi nâng cấp phải chạy lại `db:seed` để ADMIN nhận quyền mới.
+- Bản ghi tạo trước bản này không có nội dung (tab báo "chưa lưu").
+
 ## 2026-11-11
 
 ### Thay đổi hành vi (cần biết khi nâng cấp)

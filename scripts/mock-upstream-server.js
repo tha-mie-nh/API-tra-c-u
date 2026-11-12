@@ -15,6 +15,7 @@
 // CCCD ("001099001234") returns a result on every datasource in a live demo.
 const http = require('node:http');
 const { URL } = require('node:url');
+const { setTimeout } = require('node:timers');
 
 const PORT = process.env.MOCK_UPSTREAM_PORT || 4100;
 const API_KEY = process.env.MOCK_UPSTREAM_API_KEY || 'demo-mst-secret-123';
@@ -228,6 +229,22 @@ function checkAuth(req, res, { requireReqType = false, headerName = 'x-access' }
   return true;
 }
 
+// Demo fault injection — magic CCCDs make the mock answer like a broken upstream, so the admin request I/O
+// monitor has error payloads to show: 500 -> retried by the adapter, ends as 502; 404 -> 502 at once;
+// "hang" -> never answers in time -> the API gives up at its timeout (504).
+const FAULT_CCCD = { '001099000500': 500, '001099000404': 404, '001099000504': 'hang' };
+function injectFault(body, res) {
+  const fault = FAULT_CCCD[body.soCCCD ?? body.cccd ?? body.so_cccd];
+  if (!fault) return false;
+  if (fault === 'hang') {
+    setTimeout(() => { if (!res.writableEnded) { res.writeHead(504, { 'Content-Type': 'application/json' }); res.end('{"error":"gateway timeout"}'); } }, 15000);
+    return true;
+  }
+  res.writeHead(fault, { 'Content-Type': 'application/json' });
+  res.end(JSON.stringify({ error: fault === 500 ? 'internal upstream error' : 'record not found', code: fault }));
+  return true;
+}
+
 function readJsonBody(req) {
   return new Promise((resolve, reject) => {
     let raw = '';
@@ -267,6 +284,7 @@ const server = http.createServer(async (req, res) => {
   if (simpleRoute && req.method === 'POST') {
     if (!checkAuth(req, res, { requireReqType: true, headerName: simpleRoute.headerName })) return;
     const body = await readJsonBody(req).catch(() => ({}));
+    if (injectFault(body, res)) return;
     const filterValue = body[simpleRoute.idField];
     const data = simpleRoute.records.filter((r) => !filterValue || r[simpleRoute.idField] === filterValue);
     res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -282,6 +300,8 @@ const server = http.createServer(async (req, res) => {
   if (url.pathname === '/find' && req.method === 'POST') {
     if (!checkAuth(req, res, { headerName: 'x-access-key' })) return;
     const reqType = req.headers['x-request-type'];
+    const findBody = await readJsonBody(req).catch(() => ({}));
+    if (injectFault(findBody, res)) return;
 
     if (reqType === 'find-face') {
       res.writeHead(200, { 'Content-Type': 'application/json' });

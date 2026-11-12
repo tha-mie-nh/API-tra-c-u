@@ -1,10 +1,14 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { QueryStatus, type Prisma } from '@prisma/client';
 import type { QueryLogStatus } from '@app/shared';
 import { PrismaService } from '../prisma/prisma.service';
 import { DatasourceRegistryService } from '../datasources/datasource-registry.service';
 import { normalizeClientIp } from '../common/utils/client-ip.util';
+import type { UpstreamExchange } from '../datasources/adapters/datasource-adapter.interface';
 import { summarizeQueryParams } from './sensitive-value-mask.util';
+import { collectImageKeys, sanitizePayloadParts } from './query-log-payload-sanitizer.util';
+import { readPayloadConfig } from './query-log-payload.config';
 
 export interface RecordQueryLogInput {
   userId: string | null;
@@ -30,6 +34,10 @@ export interface RecordQueryLogInput {
   requestId?: string;
   ip?: string | null;
   userAgent?: string | null;
+  /** Upstream I/O snapshot (admin payload monitor). */
+  exchange?: UpstreamExchange | null;
+  /** Exact JSON returned to the client (envelope, or `{error:{...}}`). */
+  clientResponse?: unknown;
 }
 
 const STATUS_MAP: Record<QueryLogStatus, QueryStatus> = {
@@ -51,6 +59,7 @@ export class QueryLogService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly registry: DatasourceRegistryService,
+    private readonly config: ConfigService,
   ) {}
 
   async record(input: RecordQueryLogInput): Promise<void> {
@@ -62,26 +71,64 @@ export class QueryLogService {
         entry = undefined; // unknown code — fall back to an empty summary rather than throwing from a log writer
       }
       const { summary, params } = summarizeQueryParams(entry?.config, input.params ?? {}, { mask: false });
-      await this.prisma.queryLog.create({
-        data: {
-          userId: input.userId,
-          usernameSnapshot: input.username,
-          datasourceCode: input.datasourceCode,
-          queryParams: params as Prisma.InputJsonValue,
-          querySummary: summary,
-          status: STATUS_MAP[input.status],
-          statusCode: input.statusCode,
-          errorCode: input.errorCode ?? null,
-          errorMessage: input.errorMessage ?? null,
-          recordCount: input.recordCount ?? null,
-          upstreamRequestId: input.upstreamRequestId ?? null,
-          durationMs: input.durationMs ?? null,
-          ip: normalizeClientIp(input.ip),
-          userAgent: input.userAgent ?? null,
-        },
-      });
+      const data: Prisma.QueryLogCreateInput = {
+        user: input.userId ? { connect: { id: input.userId } } : undefined,
+        usernameSnapshot: input.username,
+        datasourceCode: input.datasourceCode,
+        queryParams: params as Prisma.InputJsonValue,
+        querySummary: summary,
+        status: STATUS_MAP[input.status],
+        statusCode: input.statusCode,
+        errorCode: input.errorCode ?? null,
+        errorMessage: input.errorMessage ?? null,
+        recordCount: input.recordCount ?? null,
+        upstreamRequestId: input.upstreamRequestId ?? null,
+        durationMs: input.durationMs ?? null,
+        ip: normalizeClientIp(input.ip),
+        userAgent: input.userAgent ?? null,
+      };
+      const payload = this.buildPayload(input, entry?.config);
+      if (payload) {
+        try {
+          await this.prisma.queryLog.create({ data: { ...data, payload: { create: payload } } });
+          return;
+        } catch (err) {
+          // A bad payload must not lose the query_logs row: log and fall through to the payload-less insert.
+          this.logger.error(`Failed to write query_log_payloads for "${input.datasourceCode}"; retrying without payload`, err as Error);
+        }
+      }
+      await this.prisma.queryLog.create({ data });
     } catch (err) {
       this.logger.error(`Failed to write query_logs row for "${input.datasourceCode}" (status=${input.status})`, err as Error);
+    }
+  }
+
+  /** Sanitized payload columns, or null when capture is disabled / nothing to store. Never throws. */
+  private buildPayload(
+    input: RecordQueryLogInput,
+    datasource: ReturnType<DatasourceRegistryService['get']>['config'] | undefined,
+  ): Prisma.QueryLogPayloadCreateWithoutQueryLogInput | null {
+    try {
+      const cfg = readPayloadConfig((k) => this.config.get<string>(k));
+      if (!cfg.enabled) return null;
+      const parts = sanitizePayloadParts(
+        {
+          upstreamRequest: input.exchange?.request ?? null,
+          upstreamResponse: input.exchange?.response ?? null,
+          clientResponse: input.clientResponse ?? null,
+        },
+        { maxBytes: cfg.maxBytes, imageKeys: collectImageKeys(datasource) },
+      );
+      if (!parts.upstreamRequest && !parts.upstreamResponse && parts.clientResponse === null) return null;
+      const json = (v: unknown) => (v === null || v === undefined ? undefined : (v as Prisma.InputJsonValue));
+      return {
+        upstreamRequest: json(parts.upstreamRequest),
+        upstreamResponse: json(parts.upstreamResponse),
+        clientResponse: json(parts.clientResponse),
+      };
+    } catch (err) {
+      this.logger.error(`Failed to build payload snapshot for "${input.datasourceCode}"`, err as Error);
+      return null;
     }
   }
 

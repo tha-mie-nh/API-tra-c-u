@@ -5,6 +5,7 @@ import {
   type HistorySummaryResponse,
   type QueryLogDetail,
   type QueryLogFilterParams,
+  type QueryLogPayloadResponse,
 } from '@shared/index';
 import { ApiError, apiFetch, apiFetchBlob } from '@/lib/api-client';
 import { isHistoryRecordId } from './history-record-id';
@@ -40,6 +41,12 @@ export function fetchHistorySummary(filter: QueryLogFilterParams): Promise<Histo
 export function fetchHistoryDetail(id: string): Promise<QueryLogDetail> {
   if (!isHistoryRecordId(id)) return Promise.reject(new ApiError(404, 'NOT_FOUND', 'Invalid history id', ''));
   return apiFetch<QueryLogDetail>(`/history/${encodeURIComponent(id)}`);
+}
+
+/** `GET /history/:id/payload` — needs `history:view_payload` (403 otherwise); `captured:false` when nothing stored. */
+export function fetchHistoryPayload(id: string): Promise<QueryLogPayloadResponse> {
+  if (!isHistoryRecordId(id)) return Promise.reject(new ApiError(404, 'NOT_FOUND', 'Invalid history id', ''));
+  return apiFetch<QueryLogPayloadResponse>(`/history/${encodeURIComponent(id)}/payload`);
 }
 
 export interface HistoryCsvDownload {

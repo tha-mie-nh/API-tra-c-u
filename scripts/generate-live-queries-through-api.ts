@@ -18,13 +18,18 @@ const perUser = Number(opt('per-user', '20'));
 const GAP_MS = 2500;
 
 interface Call { code: string; params: Record<string, string>; kind: 'valid' | 'invalid' }
-const CCCDS = ['001099001234', '001099009999', '001099010137'];
+const CCCDS = ['001099001234', '001099009999', '001099010137', '001099005678', '001099012877', '001099020345', '001099031122', '001099044556'];
+// Magic CCCDs of scripts/mock-upstream-server.js that make the mock fail like a broken upstream (500->502, 404->502, hang->504).
+const FAULT = { err500: '001099000500', err404: '001099000404', timeout: '001099000504' };
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 function buildCall(i: number): Call {
   const cccd = CCCDS[i % CCCDS.length];
   const m = i % 10;
-  if (m === 8) return { code: 'CITIZEN_EXTENDED', params: { citizenId: '123' }, kind: 'invalid' }; // 422
+  if (m === 8) return { code: 'PASSPORT_INFO', params: { fullName: 'Nguyen Van A' }, kind: 'invalid' }; // 422: requireGroups not satisfied
+  if (i % 15 === 14) return { code: 'BHXH_LOOKUP', params: { cccd: FAULT.err500 }, kind: 'invalid' }; // upstream 500 -> 502
+  if (i % 25 === 24) return { code: 'FACE_PHOTO', params: { citizenId: FAULT.err404 }, kind: 'invalid' }; // upstream 404 -> 502
+  if (i % 40 === 39) return { code: 'PASSPORT_INFO', params: { citizenId: FAULT.timeout }, kind: 'invalid' }; // upstream hangs -> 504
   const valid: Call[] = [
     { code: 'IMMIGRATION_HISTORY', params: { passportNumber: 'B1234567' }, kind: 'valid' },
     { code: 'PASSPORT_INFO', params: { citizenId: cccd }, kind: 'valid' },

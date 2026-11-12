@@ -19,6 +19,8 @@ export const FEATURE_PERMISSION_CODES = {
   /** Bulk CSV export of history/insights (ADMIN only via seed). */
   HISTORY_EXPORT: 'history:export',
   HISTORY_VIEW_SENSITIVE: 'history:view_sensitive',
+  /** See the exact request input/output (upstream request/response + client response) of any query (ADMIN only via seed). */
+  HISTORY_VIEW_PAYLOAD: 'history:view_payload',
   ADMIN_USERS: 'admin:users',
   ADMIN_ROLES: 'admin:roles',
   ADMIN_AUDIT: 'admin:audit',

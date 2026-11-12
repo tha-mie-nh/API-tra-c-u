@@ -1,4 +1,5 @@
 import { viHistoryFilters } from './vi-history-filters';
+import { viHistoryPayload } from './vi-history-payload';
 
 /**
  * Vietnamese chrome strings for "Lịch sử tra cứu" (Phase 08,
@@ -38,4 +39,5 @@ export const viHistory = {
   detailNoError: 'Không có lỗi',
   detailRecordCount: 'Số bản ghi trả về',
   ...viHistoryFilters,
+  ...viHistoryPayload,
 } as const;

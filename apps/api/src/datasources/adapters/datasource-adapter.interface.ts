@@ -1,3 +1,11 @@
+import type { UpstreamRequestSnapshot, UpstreamResponseSnapshot } from '@app/shared';
+
+/** What was sent to / received from the upstream (secrets already redacted by the adapter). */
+export interface UpstreamExchange {
+  request: UpstreamRequestSnapshot;
+  response: UpstreamResponseSnapshot;
+}
+
 /**
  * Thin, boring adapter contract (phase-04 Key Insight: `type` decides the
  * response shape/UI renderer, `transport.kind` decides how bytes are
@@ -18,6 +26,8 @@ export interface AdapterExecuteResult {
   records: RawRecord[];
   total?: number;
   requestId?: string;
+  /** I/O snapshot for the admin payload monitor. */
+  exchange?: UpstreamExchange;
 }
 
 export interface DatasourceAdapter {

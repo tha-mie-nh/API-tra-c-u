@@ -6,6 +6,7 @@ import { HistoryController } from './history.controller';
 import { HistoryListSqlRepository } from './history-list-sql.repository';
 import { HistoryExportCsvService } from './history-export-csv.service';
 import { QueryLogRowMapper } from './query-log-row-mapper';
+import { HistoryPayloadService } from './history-payload.service';
 
 /**
  * Owns `query_logs` reads (`HistoryService`, `GET /history[/:id]`) and the
@@ -16,7 +17,7 @@ import { QueryLogRowMapper } from './query-log-row-mapper';
 @Module({
   imports: [DatasourcesModule],
   controllers: [HistoryController],
-  providers: [QueryLogService, HistoryService, HistoryListSqlRepository, HistoryExportCsvService, QueryLogRowMapper],
+  providers: [QueryLogService, HistoryService, HistoryListSqlRepository, HistoryExportCsvService, QueryLogRowMapper, HistoryPayloadService],
   exports: [QueryLogService],
 })
 export class HistoryModule {}

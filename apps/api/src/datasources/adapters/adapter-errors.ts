@@ -1,3 +1,5 @@
+import type { UpstreamExchange } from './datasource-adapter.interface';
+
 /**
  * Upstream failures must never leak a raw stack trace / upstream body to the
  * client (phase-04 Non-functional requirement + Security Considerations).
@@ -10,6 +12,8 @@ export class UpstreamError extends Error {
     message: string,
     readonly datasourceCode: string,
     override readonly cause?: unknown,
+    /** What was sent/received before failing (kept server-side only; never sent to the client). */
+    public exchange?: UpstreamExchange,
   ) {
     super(message);
     this.name = 'UpstreamError';
@@ -21,6 +25,7 @@ export class UpstreamTimeoutError extends Error {
   constructor(
     message: string,
     readonly datasourceCode: string,
+    public exchange?: UpstreamExchange,
   ) {
     super(message);
     this.name = 'UpstreamTimeoutError';

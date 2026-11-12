@@ -55,6 +55,8 @@ export class DatasourcePermissionGuard implements CanActivate {
         requestId: request.requestId,
         ip: request.ip,
         userAgent: request.get('user-agent') ?? undefined,
+        // Exactly what the HttpExceptionFilter returns for this ForbiddenException body.
+        clientResponse: { error: { code: 'FORBIDDEN_API', message: 'Access denied', requestId: request.requestId } },
       });
       throw new ForbiddenException({ code: 'FORBIDDEN_API', message: 'Access denied' });
     }

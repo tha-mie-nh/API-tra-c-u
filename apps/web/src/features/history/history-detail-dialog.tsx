@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { FEATURE_PERMISSION_CODES, type QueryLogDetail } from '@shared/index';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -10,6 +10,8 @@ import { vi } from '@/i18n/vi';
 import { fetchHistoryDetail } from './history-api';
 import { CopyToClipboardButton } from './copy-to-clipboard-button';
 import { HistoryDetailRelatedLinks } from './history-detail-related-links';
+import { HistoryDetailTabs, type HistoryDetailTab } from './history-detail-tabs';
+import { HistoryPayloadPanel } from './history-payload-panel';
 import { describeUserAgent } from './parse-user-agent';
 import { isHistoryRecordId } from './history-record-id';
 import { HistoryStatusBadge } from './history-status-badge';
@@ -38,7 +40,7 @@ export function HistoryDetailDialog({ id, canViewAll, onOpenChange }: HistoryDet
 
   return (
     <Dialog open={!!id} onOpenChange={(open) => !open && onOpenChange(false)}>
-      <DialogContent className="max-h-[90vh] max-w-lg overflow-y-auto">
+      <DialogContent className="max-h-[90vh] max-w-lg sm:max-w-2xl overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{vi.history.detailTitle}</DialogTitle>
         </DialogHeader>
@@ -66,6 +68,22 @@ export function HistoryDetailDialog({ id, canViewAll, onOpenChange }: HistoryDet
 }
 
 function HistoryDetailBody({ detail, canViewAll }: { detail: QueryLogDetail; canViewAll: boolean }) {
+  const canViewPayload = useAuthStore((state) => state.hasPermission(FEATURE_PERMISSION_CODES.HISTORY_VIEW_PAYLOAD));
+  const [tab, setTab] = useState<HistoryDetailTab>('overview');
+  const activeTab = canViewPayload ? tab : 'overview';
+  return (
+    <div className="flex flex-col gap-3">
+      <HistoryDetailTabs value={activeTab} onChange={setTab} showPayloadTabs={canViewPayload} />
+      {activeTab === 'overview' ? (
+        <HistoryOverview detail={detail} canViewAll={canViewAll} />
+      ) : (
+        <HistoryPayloadPanel id={detail.id} tab={activeTab} />
+      )}
+    </div>
+  );
+}
+
+function HistoryOverview({ detail, canViewAll }: { detail: QueryLogDetail; canViewAll: boolean }) {
   const canViewSensitive = useAuthStore((state) => state.hasPermission(FEATURE_PERMISSION_CODES.HISTORY_VIEW_SENSITIVE));
   return (
     <dl className="flex flex-col gap-3 text-sm">

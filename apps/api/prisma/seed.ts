@@ -23,6 +23,8 @@ const FEATURE_PERMISSIONS = [
   { code: 'history:view_sensitive', name: 'View unmasked sensitive values in query history' },
   // Bulk CSV export of query history — ADMIN only (auto-granted below); not given to OPERATOR/AUDITOR.
   { code: 'history:export', name: 'Export query history (CSV)' },
+  // Raw upstream request/response + client response of each query (admin I/O monitor) — ADMIN only (auto-granted below).
+  { code: 'history:view_payload', name: 'View raw request/response payload of query history' },
   { code: 'admin:users', name: 'Manage users' },
   { code: 'admin:roles', name: 'Manage roles' },
   { code: 'admin:audit', name: 'View audit log' },

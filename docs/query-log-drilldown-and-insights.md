@@ -336,3 +336,11 @@ Số đo trên WSL, dữ liệu giả, một lần chạy; chỉ dùng để so 
 
 Các mục khác đã sửa trong đợt này (không còn là giới hạn): khoảng `to` có giờ:phút gồm cả phút đã chọn; `outcome=gap`
 và top-users dùng cùng công thức (NULL `record_count` tính là gap); IP rác không còn làm mất dòng log (lưu NULL).
+
+## 13. Monitor đầu vào/đầu ra (payload)
+
+Xem `docs/project-changelog.md` (2026-11-12) và `plans/261112-1446-request-io-monitoring/plan.md`.
+- Bảng `app.query_log_payloads` (PK = `query_log_id`, ON DELETE CASCADE): `upstream_request`, `upstream_response`, `client_response` (jsonb).
+- Ghi cùng lúc với `query_logs` (nested create); lỗi ghi payload không làm hỏng query của user.
+- `GET /history/:id/payload`: cần `history:view_payload` + `history:view_all`; `captured:false` khi chưa có nội dung; giá trị không che (`masked` luôn false); audit mọi lần xem.
+- Ảnh base64 -> placeholder; phần > `QUERY_LOG_PAYLOAD_MAX_BYTES` -> marker cắt bớt; không tự xóa theo thời gian.
