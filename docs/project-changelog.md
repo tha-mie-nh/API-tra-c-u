@@ -2,6 +2,17 @@
 
 Ghi lại các thay đổi đáng chú ý theo ngày. Mới nhất ở trên cùng.
 
+## 2026-11-13
+
+### Bảo mật: vá libxslt trong image web (giữ nguyên tag `web-v15`)
+- `libxslt` trong image web (`nginx:1.27-alpine`, Alpine 3.21) là `1.1.42-r2`, dính 4 CVE được vá ở `1.1.42-r3`
+  (CVE-2025-10911, CVE-2026-9947, CVE-2026-87636, CVE-2026-125350 — theo secdb Alpine). Image api chạy Debian và không cài libxslt nên không ảnh hưởng.
+- Nguyên nhân bản cũ còn `r2`: `web.Dockerfile` đã có `apk upgrade` nhưng lớp runtime bị Docker cache giữ kết quả cũ.
+  Không đổi mã nguồn/Dockerfile; build lại lớp runtime không cache: `docker build --no-cache-filter runtime -f docker/web.Dockerfile -t gthanh/app_tra_cuu:web-v15 .`
+- Kiểm tra sau build: libxslt `r2 → r3`, nginx `1.27.5` và nội dung `/usr/share/nginx/html` không đổi (cùng mã băm), `nginx -t` ok, `GET /` 200.
+- **Đã ghi đè tag `web-v15` trên Docker Hub** (digest `sha256:8841c17c3743379fa2074ccd2cf66e17612cbbc6e20a22ae0a265a7b99628ac1`).
+  Máy nào đã pull `web-v15` trước đó phải `docker pull gthanh/app_tra_cuu:web-v15` rồi `up -d` lại để nhận bản vá.
+
 ## 2026-11-12
 
 ### Tính năng: monitor đầu vào/đầu ra của mọi request (admin)
