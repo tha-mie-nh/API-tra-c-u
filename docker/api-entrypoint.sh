@@ -23,6 +23,10 @@ if [ "$(id -u)" = "0" ]; then
     chown -R node:node "$CONFIG_DIR" 2>/dev/null \
       || echo "[entrypoint] warning: could not chown $CONFIG_DIR — admin-UI config saves may fail with EACCES" >&2
   fi
+  # Same for the optional log directory (LOG_FILE=/var/log/app/api.log, bind-mounted from ./logs).
+  if [ -d "${LOG_DIR:-/var/log/app}" ]; then
+    chown -R node:node "${LOG_DIR:-/var/log/app}" 2>/dev/null || echo "[entrypoint] warning: could not chown log dir" >&2
+  fi
   exec setpriv --reuid=node --regid=node --init-groups "$@"
 fi
 

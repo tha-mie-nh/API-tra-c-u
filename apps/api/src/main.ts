@@ -5,19 +5,18 @@ import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
-import { PinoLoggerService } from './common/logging/pino-logger.service';
+import { AppTextLogger } from './common/logging/app-text-logger.service';
 import { parseTrustProxy } from './query-insights/trust-proxy.util';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { bufferLogs: true });
   // tạo ứng dụng nestjs cài các thiết lập http, cookie, cors, logger, global prefix và filter
   // khởi tạo từ các module và service đã được định nghĩa trong AppModule
-  // Phase 09 hardening: structured JSON logs to stdout instead of Nest's
-  // default text logger (see PinoLoggerService for why this is a drop-in
-  // swap — every existing `new Logger(ctx)` call elsewhere is unaffected).
+  // Text logs `asctime - LEVEL - context - message` to stdout (+ optional LOG_FILE); a drop-in
+  // LoggerService, so every existing `new Logger(ctx)` call elsewhere is unaffected.
   // Instantiated directly (no constructor deps) — no need to register it in
   // AppModule's providers just to satisfy DI for this one bootstrap call.
-  app.useLogger(new PinoLoggerService());
+  app.useLogger(new AppTextLogger());
   // TRUST_PROXY (default off): behind nginx/docker request.ip would be the proxy's IP; set e.g. 'loopback, uniquelocal' or a hop count ('true' trusts every hop => spoofable).
   app.getHttpAdapter().getInstance().set('trust proxy', parseTrustProxy(process.env.TRUST_PROXY, (v) =>
     new Logger('Bootstrap').warn(`Invalid TRUST_PROXY="${v}" ignored (use true | hop count | loopback/uniquelocal | CIDR list) — trust proxy is OFF`)));

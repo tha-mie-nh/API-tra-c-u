@@ -50,3 +50,6 @@ iamge_demo/
 Review frontend v1.docx
 .claude/agent-memory/
 *:Zone.Identifier
+
+# API log files (LOG_FILE bind mount)
+/logs/

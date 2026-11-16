@@ -20,6 +20,7 @@ import { JwtAuthGuard } from './rbac/jwt-auth.guard';
 import { PermissionGuard } from './rbac/permission.guard';
 import { AuditInterceptor } from './audit/audit.interceptor';
 import { RequestIdMiddleware } from './common/middleware/request-id.middleware';
+import { HttpAccessLogMiddleware } from './common/middleware/http-access-log.middleware';
 
 @Module({
   imports: [
@@ -80,6 +81,6 @@ export class AppModule implements NestModule {
     // actually running the built image and curling it — no test exercised
     // the real HTTP route, only the controller method directly). Using the
     // modern named-wildcard syntax directly sidesteps the broken conversion.
-    consumer.apply(RequestIdMiddleware).forRoutes('{*path}');
+    consumer.apply(RequestIdMiddleware, HttpAccessLogMiddleware).forRoutes('{*path}');
   }
 }

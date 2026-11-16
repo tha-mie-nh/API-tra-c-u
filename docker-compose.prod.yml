@@ -166,7 +166,10 @@ services:
     environment:
       NODE_ENV: production
       PORT: 3000
+      LOG_FILE: /var/log/app/api.log
     volumes:
+      # Log file (`asctime - LEVEL - context - message`); host ./logs, chowned to `node` by the entrypoint.
+      - ./logs:/var/log/app
       # Writable (NOT :ro) — the admin-UI datasource API needs to atomically
       # write config.json (tmp file + .bak + rename, all inside this dir).
       # Host ./config must be owned/writable by uid 1000 (container's `node`

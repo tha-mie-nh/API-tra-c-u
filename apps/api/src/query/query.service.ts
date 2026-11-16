@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import type { QueryEnvelope } from '@app/shared';
 import { DatasourceRegistryService } from '../datasources/datasource-registry.service';
 import { ResponseMapperService } from '../datasources/response-mapper.service';
@@ -35,6 +35,8 @@ interface TranslatedError {
 // các cách sử lí query từ client
 @Injectable()
 export class QueryService {
+  private readonly logger = new Logger(QueryService.name);
+
   constructor(
     private readonly registry: DatasourceRegistryService,
     private readonly mapper: ResponseMapperService,
@@ -77,6 +79,7 @@ export class QueryService {
     const page = Math.max(input.page ?? 1, 1);
 
     const startedAt = Date.now();
+    this.logger.log(`query start datasource=${input.code} user=${input.user.username} requestId=${input.requestId} page=${page}`);
     try {
       const result = await adapter.execute({ params: validatedParams, page, pageSize });
       const tookMs = Date.now() - startedAt;
@@ -100,10 +103,15 @@ export class QueryService {
         exchange: result.exchange,
         clientResponse: clientEnvelope,
       });
+      this.logger.log(`query ok datasource=${input.code} requestId=${input.requestId} records=${envelope.page.returned} tookMs=${tookMs}`);
       return clientEnvelope;
     } catch (err) {
       const tookMs = Date.now() - startedAt;
       const translated = this.translateError(err);
+      this.logger.error(
+        `query failed datasource=${input.code} requestId=${input.requestId} code=${translated.code} tookMs=${tookMs} cause=${(err as Error)?.message ?? err}`,
+        err instanceof Error ? err.stack : undefined,
+      );
       const clientError = { error: { code: translated.code, message: translated.message, requestId: input.requestId } };
 
       await this.queryLogService.record({

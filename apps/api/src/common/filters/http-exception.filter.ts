@@ -49,7 +49,9 @@ export class HttpExceptionFilter implements ExceptionFilter {
     }
 
     if (status >= 500) {
-      this.logger.error(message, exception instanceof Error ? exception.stack : undefined);
+      this.logger.error(`${code} ${message} requestId=${request?.requestId ?? '-'}`, exception instanceof Error ? exception.stack : undefined);
+    } else if (status >= 400) {
+      this.logger.warn(`${code} ${message} requestId=${request?.requestId ?? '-'}`);
     }
 
     response
