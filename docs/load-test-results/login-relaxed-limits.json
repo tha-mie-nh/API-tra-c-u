@@ -1,0 +1,49 @@
+{
+  "startedAt": "2026-11-16T07:56:35.435Z",
+  "base": "http://localhost:8081",
+  "users": 60,
+  "scenarios": [
+    {
+      "name": "login: rush of simultaneous logins",
+      "requests": 60,
+      "ok": 60,
+      "okPct": 100,
+      "byStatus": {
+        "200": 60
+      },
+      "byCode": {},
+      "wallSeconds": 5.2,
+      "rps": 11.5,
+      "latencyMs": {
+        "p50": 2963,
+        "p90": 4976,
+        "p95": 5133,
+        "p99": 5218,
+        "max": 5218
+      },
+      "okLatencyMs": {
+        "p50": 2963,
+        "p95": 5133,
+        "p99": 5218
+      },
+      "health": {
+        "probes": 10,
+        "failed": 0,
+        "p50": 19,
+        "p95": 315,
+        "max": 315
+      }
+    }
+  ],
+  "dockerStatsBefore": {
+    "app-tra-cuu-du-lieu-test-api-1": "0.02% / 102.5MiB / 9.714GiB",
+    "app-tra-cuu-du-lieu-test-web-1": "0.00% / 5.938MiB / 9.714GiB",
+    "app-tra-cuu-du-lieu-test-postgres-1": "0.00% / 30.41MiB / 9.714GiB",
+    "app-tra-cuu-du-lieu-test-lt-flaky-1": "0.00% / 14.24MiB / 9.714GiB",
+    "app-tra-cuu-du-lieu-test-lt-timeout-1": "0.00% / 14.62MiB / 9.714GiB",
+    "app-tra-cuu-du-lieu-test-lt-fast-1": "0.00% / 22.63MiB / 9.714GiB",
+    "app-tra-cuu-du-lieu-test-lt-slow-1": "0.00% / 14.34MiB / 9.714GiB",
+    "app-tra-cuu-du-lieu-postgres-1": "2.69% / 46.33MiB / 9.714GiB"
+  },
+  "loggedInUsers": 72
+}

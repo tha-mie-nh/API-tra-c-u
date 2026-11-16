@@ -1,0 +1,57 @@
+{
+  "startedAt": "2026-11-16T08:04:03.010Z",
+  "base": "http://localhost:8081",
+  "users": 60,
+  "scenarios": [
+    {
+      "name": "I: saturation, 180 concurrent lanes (3 per user), no think time, fast upstream, 30 s",
+      "requests": 7198,
+      "ok": 7198,
+      "okPct": 100,
+      "byStatus": {
+        "200": 7198
+      },
+      "byCode": {},
+      "wallSeconds": 30.7,
+      "rps": 234.1,
+      "latencyMs": {
+        "p50": 735,
+        "p90": 875,
+        "p95": 959,
+        "p99": 1035,
+        "max": 1079
+      },
+      "okLatencyMs": {
+        "p50": 735,
+        "p95": 959,
+        "p99": 1035
+      },
+      "health": {
+        "probes": 27,
+        "failed": 0,
+        "p50": 655,
+        "p95": 825,
+        "max": 884
+      }
+    }
+  ],
+  "dockerStatsBefore": {
+    "app-tra-cuu-du-lieu-test-api-1": "0.23% / 120.1MiB / 9.714GiB",
+    "app-tra-cuu-du-lieu-test-postgres-1": "2.57% / 53.37MiB / 9.714GiB"
+  },
+  "loggedInUsers": 72,
+  "dockerStatsBeforeSoak": {
+    "app-tra-cuu-du-lieu-test-api-1": "0.03% / 253.6MiB / 9.714GiB",
+    "app-tra-cuu-du-lieu-test-postgres-1": "0.02% / 72.63MiB / 9.714GiB"
+  },
+  "dockerStatsAfter": {
+    "app-tra-cuu-du-lieu-test-api-1": "0.00% / 253.5MiB / 9.714GiB",
+    "app-tra-cuu-du-lieu-test-postgres-1": "0.02% / 72.63MiB / 9.714GiB"
+  },
+  "db": {
+    "queryLogs": 13983,
+    "payloads": 13983,
+    "payloadTableSize": "28 MB",
+    "queryLogsTableSize": "6760 kB"
+  }
+}

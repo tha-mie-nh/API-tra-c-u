@@ -1,0 +1,102 @@
+{
+  "startedAt": "2026-11-16T07:57:09.997Z",
+  "base": "http://localhost:8081",
+  "users": 60,
+  "scenarios": [
+    {
+      "name": "B: office day, 60 users, think 2-6 s, mix 70% fast / 20% slow / 10% flaky (90 s)",
+      "requests": 1204,
+      "ok": 1195,
+      "okPct": 99.3,
+      "byStatus": {
+        "200": 1195,
+        "502": 9
+      },
+      "byCode": {
+        "UPSTREAM_ERROR": 9
+      },
+      "wallSeconds": 96.5,
+      "rps": 12.5,
+      "latencyMs": {
+        "p50": 78,
+        "p90": 2299,
+        "p95": 2652,
+        "p99": 2930,
+        "max": 3016
+      },
+      "okLatencyMs": {
+        "p50": 77,
+        "p95": 2652,
+        "p99": 2934
+      },
+      "health": {
+        "probes": 192,
+        "failed": 0,
+        "p50": 3,
+        "p95": 6,
+        "max": 41
+      }
+    },
+    {
+      "name": "F: one user spams 200 requests at once while 10 others work normally",
+      "requests": 333,
+      "ok": 163,
+      "okPct": 48.9,
+      "byStatus": {
+        "200": 163,
+        "429": 170
+      },
+      "byCode": {
+        "RATE_LIMITED": 170
+      },
+      "wallSeconds": 32.7,
+      "rps": 10.2,
+      "latencyMs": {
+        "p50": 60,
+        "p90": 92,
+        "p95": 107,
+        "p99": 142,
+        "max": 160
+      },
+      "okLatencyMs": {
+        "p50": 74,
+        "p95": 126,
+        "p99": 155
+      },
+      "health": {
+        "probes": 65,
+        "failed": 0,
+        "p50": 3,
+        "p95": 5,
+        "max": 59
+      }
+    }
+  ],
+  "dockerStatsBefore": {
+    "app-tra-cuu-du-lieu-test-api-1": "0.00% / 99.74MiB / 9.714GiB",
+    "app-tra-cuu-du-lieu-test-postgres-1": "0.10% / 30.59MiB / 9.714GiB"
+  },
+  "loggedInUsers": 72,
+  "F_detail": {
+    "spamRequests": 200,
+    "spamOk": 30,
+    "spamThrottled": 170,
+    "normalRequests": 133,
+    "normalOk": 133,
+    "normalFailed": 0
+  },
+  "dockerStatsBeforeSoak": {
+    "app-tra-cuu-du-lieu-test-api-1": "0.30% / 119.3MiB / 9.714GiB",
+    "app-tra-cuu-du-lieu-test-postgres-1": "2.76% / 44.32MiB / 9.714GiB"
+  },
+  "dockerStatsAfter": {
+    "app-tra-cuu-du-lieu-test-api-1": "0.35% / 119.3MiB / 9.714GiB",
+    "app-tra-cuu-du-lieu-test-postgres-1": "0.00% / 44.2MiB / 9.714GiB"
+  },
+  "db": {
+    "queryLogs": 3581,
+    "payloads": 3581,
+    "payloadTableSize": "7296 kB",
+    "queryLogsTableSize": "2224 kB"
+  }
+}

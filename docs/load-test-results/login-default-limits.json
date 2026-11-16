@@ -1,0 +1,78 @@
+{
+  "startedAt": "2026-11-16T07:47:11.696Z",
+  "base": "http://localhost:8081",
+  "users": 60,
+  "scenarios": [
+    {
+      "name": "login: rush of simultaneous logins",
+      "requests": 60,
+      "ok": 8,
+      "okPct": 13.3,
+      "byStatus": {
+        "200": 8,
+        "429": 52
+      },
+      "byCode": {
+        "RATE_LIMITED": 52
+      },
+      "wallSeconds": 1.2,
+      "rps": 49.5,
+      "latencyMs": {
+        "p50": 290,
+        "p90": 675,
+        "p95": 1172,
+        "p99": 1212,
+        "max": 1212
+      },
+      "okLatencyMs": {
+        "p50": 983,
+        "p95": 1212,
+        "p99": 1212
+      },
+      "health": {
+        "probes": 3,
+        "failed": 0,
+        "p50": 24,
+        "p95": 36,
+        "max": 36
+      }
+    }
+  ],
+  "dockerStatsBefore": {
+    "app-tra-cuu-du-lieu-test-api-1": "5.13% / 80.36MiB / 9.714GiB",
+    "app-tra-cuu-du-lieu-test-web-1": "0.00% / 5.883MiB / 9.714GiB",
+    "app-tra-cuu-du-lieu-test-postgres-1": "2.75% / 23.33MiB / 9.714GiB",
+    "app-tra-cuu-du-lieu-test-lt-flaky-1": "0.03% / 10.96MiB / 9.714GiB",
+    "app-tra-cuu-du-lieu-test-lt-timeout-1": "0.05% / 11.18MiB / 9.714GiB",
+    "app-tra-cuu-du-lieu-test-lt-fast-1": "0.04% / 11.79MiB / 9.714GiB",
+    "app-tra-cuu-du-lieu-test-lt-slow-1": "0.05% / 10.91MiB / 9.714GiB",
+    "app-tra-cuu-du-lieu-postgres-1": "0.00% / 46.37MiB / 9.714GiB"
+  },
+  "loggedInUsers": 8,
+  "dockerStatsBeforeSoak": {
+    "app-tra-cuu-du-lieu-test-api-1": "0.00% / 97.92MiB / 9.714GiB",
+    "app-tra-cuu-du-lieu-test-web-1": "0.00% / 5.961MiB / 9.714GiB",
+    "app-tra-cuu-du-lieu-test-postgres-1": "3.11% / 31.62MiB / 9.714GiB",
+    "app-tra-cuu-du-lieu-test-lt-flaky-1": "0.00% / 10.96MiB / 9.714GiB",
+    "app-tra-cuu-du-lieu-test-lt-timeout-1": "0.00% / 11.18MiB / 9.714GiB",
+    "app-tra-cuu-du-lieu-test-lt-fast-1": "0.00% / 11.79MiB / 9.714GiB",
+    "app-tra-cuu-du-lieu-test-lt-slow-1": "0.00% / 10.91MiB / 9.714GiB",
+    "app-tra-cuu-du-lieu-postgres-1": "0.01% / 46.39MiB / 9.714GiB"
+  },
+  "dockerStatsAfter": {
+    "app-tra-cuu-du-lieu-test-api-1": "0.01% / 97.92MiB / 9.714GiB",
+    "app-tra-cuu-du-lieu-test-web-1": "0.00% / 5.961MiB / 9.714GiB",
+    "app-tra-cuu-du-lieu-test-postgres-1": "0.04% / 31.61MiB / 9.714GiB",
+    "app-tra-cuu-du-lieu-test-lt-flaky-1": "0.00% / 10.96MiB / 9.714GiB",
+    "app-tra-cuu-du-lieu-test-lt-timeout-1": "0.00% / 11.18MiB / 9.714GiB",
+    "app-tra-cuu-du-lieu-test-lt-fast-1": "0.00% / 11.79MiB / 9.714GiB",
+    "app-tra-cuu-du-lieu-test-lt-slow-1": "0.00% / 10.91MiB / 9.714GiB",
+    "app-tra-cuu-du-lieu-postgres-1": "3.58% / 46.66MiB / 9.714GiB"
+  },
+  "db": {
+    "queryLogs": 0,
+    "payloads": 0,
+    "payloadTableSize": "32 kB",
+    "queryLogsTableSize": "1288 kB"
+  }
+}

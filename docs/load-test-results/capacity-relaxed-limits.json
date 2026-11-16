@@ -1,0 +1,220 @@
+{
+  "startedAt": "2026-11-16T07:59:41.892Z",
+  "base": "http://localhost:8081",
+  "users": 60,
+  "scenarios": [
+    {
+      "name": "A: baseline, 1 user, 50 sequential fast queries",
+      "requests": 50,
+      "ok": 50,
+      "okPct": 100,
+      "byStatus": {
+        "200": 50
+      },
+      "byCode": {},
+      "wallSeconds": 4,
+      "rps": 12.5,
+      "latencyMs": {
+        "p50": 61,
+        "p90": 90,
+        "p95": 91,
+        "p99": 133,
+        "max": 133
+      },
+      "okLatencyMs": {
+        "p50": 61,
+        "p95": 91,
+        "p99": 133
+      },
+      "health": {
+        "probes": 8,
+        "failed": 0,
+        "p50": 3,
+        "p95": 4,
+        "max": 4
+      }
+    },
+    {
+      "name": "C: slow upstream (about 2-3 s), 20 users back to back (40 s)",
+      "requests": 360,
+      "ok": 360,
+      "okPct": 100,
+      "byStatus": {
+        "200": 360
+      },
+      "byCode": {},
+      "wallSeconds": 43,
+      "rps": 8.4,
+      "latencyMs": {
+        "p50": 2240,
+        "p90": 2855,
+        "p95": 2947,
+        "p99": 3005,
+        "max": 3013
+      },
+      "okLatencyMs": {
+        "p50": 2240,
+        "p95": 2947,
+        "p99": 3005
+      },
+      "health": {
+        "probes": 86,
+        "failed": 0,
+        "p50": 3,
+        "p95": 6,
+        "max": 10
+      }
+    },
+    {
+      "name": "D: upstream never answers (timeout 3 s), 10 users x 3 requests",
+      "requests": 30,
+      "ok": 0,
+      "okPct": 0,
+      "byStatus": {
+        "504": 30
+      },
+      "byCode": {
+        "UPSTREAM_TIMEOUT": 30
+      },
+      "wallSeconds": 11.5,
+      "rps": 2.6,
+      "latencyMs": {
+        "p50": 3015,
+        "p90": 3030,
+        "p95": 3031,
+        "p99": 3032,
+        "max": 3032
+      },
+      "okLatencyMs": {
+        "p50": 0,
+        "p95": 0,
+        "p99": 0
+      },
+      "health": {
+        "probes": 23,
+        "failed": 0,
+        "p50": 3,
+        "p95": 7,
+        "max": 11
+      }
+    },
+    {
+      "name": "E: flaky upstream (30% of calls fail), 20 users x 20 requests",
+      "requests": 400,
+      "ok": 390,
+      "okPct": 97.5,
+      "byStatus": {
+        "200": 390,
+        "502": 10
+      },
+      "byCode": {
+        "UPSTREAM_ERROR": 10
+      },
+      "wallSeconds": 18.1,
+      "rps": 22.1,
+      "latencyMs": {
+        "p50": 133,
+        "p90": 916,
+        "p95": 1011,
+        "p99": 1060,
+        "max": 1084
+      },
+      "okLatencyMs": {
+        "p50": 132,
+        "p95": 1011,
+        "p99": 1060
+      },
+      "health": {
+        "probes": 36,
+        "failed": 0,
+        "p50": 3,
+        "p95": 4,
+        "max": 5
+      }
+    },
+    {
+      "name": "G: burst, 60 users each send 1 query at the same instant",
+      "requests": 60,
+      "ok": 60,
+      "okPct": 100,
+      "byStatus": {
+        "200": 60
+      },
+      "byCode": {},
+      "wallSeconds": 0.5,
+      "rps": 127.4,
+      "latencyMs": {
+        "p50": 353,
+        "p90": 418,
+        "p95": 427,
+        "p99": 462,
+        "max": 462
+      },
+      "okLatencyMs": {
+        "p50": 353,
+        "p95": 427,
+        "p99": 462
+      },
+      "health": {
+        "probes": 1,
+        "failed": 0,
+        "p50": 78,
+        "p95": 78,
+        "max": 78
+      }
+    },
+    {
+      "name": "H: soak, 60 users, think 1.5-4 s, 120 s",
+      "requests": 2304,
+      "ok": 2304,
+      "okPct": 100,
+      "byStatus": {
+        "200": 2304
+      },
+      "byCode": {},
+      "wallSeconds": 125.1,
+      "rps": 18.4,
+      "latencyMs": {
+        "p50": 69,
+        "p90": 2060,
+        "p95": 2533,
+        "p99": 2922,
+        "max": 3012
+      },
+      "okLatencyMs": {
+        "p50": 69,
+        "p95": 2533,
+        "p99": 2922
+      },
+      "health": {
+        "probes": 249,
+        "failed": 0,
+        "p50": 2,
+        "p95": 4,
+        "max": 10
+      }
+    }
+  ],
+  "dockerStatsBefore": {
+    "app-tra-cuu-du-lieu-test-api-1": "0.02% / 101.1MiB / 9.714GiB",
+    "app-tra-cuu-du-lieu-test-postgres-1": "0.02% / 34.36MiB / 9.714GiB",
+    "app-tra-cuu-du-lieu-test-web-1": "0.00% / 5.984MiB / 9.714GiB"
+  },
+  "loggedInUsers": 72,
+  "dockerStatsBeforeSoak": {
+    "app-tra-cuu-du-lieu-test-api-1": "0.11% / 118.7MiB / 9.714GiB",
+    "app-tra-cuu-du-lieu-test-postgres-1": "0.00% / 47.41MiB / 9.714GiB",
+    "app-tra-cuu-du-lieu-test-web-1": "0.00% / 6.242MiB / 9.714GiB"
+  },
+  "dockerStatsAfter": {
+    "app-tra-cuu-du-lieu-test-api-1": "0.23% / 120.1MiB / 9.714GiB",
+    "app-tra-cuu-du-lieu-test-postgres-1": "0.09% / 53.73MiB / 9.714GiB",
+    "app-tra-cuu-du-lieu-test-web-1": "0.00% / 6.188MiB / 9.714GiB"
+  },
+  "db": {
+    "queryLogs": 6785,
+    "payloads": 6785,
+    "payloadTableSize": "13 MB",
+    "queryLogsTableSize": "3472 kB"
+  }
+}

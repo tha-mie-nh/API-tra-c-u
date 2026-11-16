@@ -1,0 +1,231 @@
+{
+  "version": 1,
+  "defaults": {
+    "maxResults": 100,
+    "pageSize": 20,
+    "timeoutMs": 10000,
+    "retry": {
+      "attempts": 2,
+      "backoffMs": 300
+    }
+  },
+  "datasources": [
+    {
+      "code": "LT_FAST",
+      "name": "Load test LT_FAST",
+      "type": "info",
+      "enabled": true,
+      "permissionCode": "api:lt_fast",
+      "transport": {
+        "kind": "http",
+        "baseUrl": "http://lt-fast:4200",
+        "path": "/find",
+        "method": "POST"
+      },
+      "input": {
+        "fields": [
+          {
+            "name": "soHC",
+            "label": "Số hộ chiếu",
+            "type": "string",
+            "required": true
+          }
+        ]
+      },
+      "output": {
+        "recordsPath": "data.items",
+        "totalPath": "total",
+        "requestIdPath": "requestId",
+        "timestampField": "thoi_diem",
+        "sortOrder": "desc",
+        "identityField": "cccd",
+        "labelField": "ho_ten",
+        "fields": [
+          {
+            "name": "cccd",
+            "label": "CCCD",
+            "type": "string"
+          },
+          {
+            "name": "ho_ten",
+            "label": "Họ tên",
+            "type": "string"
+          },
+          {
+            "name": "soHC",
+            "label": "Số hộ chiếu",
+            "type": "string"
+          },
+          {
+            "name": "thoi_diem",
+            "label": "Thời điểm",
+            "type": "datetime"
+          }
+        ]
+      }
+    },
+    {
+      "code": "LT_SLOW",
+      "name": "Load test LT_SLOW",
+      "type": "info",
+      "enabled": true,
+      "permissionCode": "api:lt_slow",
+      "transport": {
+        "kind": "http",
+        "baseUrl": "http://lt-slow:4200",
+        "path": "/find",
+        "method": "POST"
+      },
+      "input": {
+        "fields": [
+          {
+            "name": "soHC",
+            "label": "Số hộ chiếu",
+            "type": "string",
+            "required": true
+          }
+        ]
+      },
+      "output": {
+        "recordsPath": "data.items",
+        "totalPath": "total",
+        "requestIdPath": "requestId",
+        "timestampField": "thoi_diem",
+        "sortOrder": "desc",
+        "identityField": "cccd",
+        "labelField": "ho_ten",
+        "fields": [
+          {
+            "name": "cccd",
+            "label": "CCCD",
+            "type": "string"
+          },
+          {
+            "name": "ho_ten",
+            "label": "Họ tên",
+            "type": "string"
+          },
+          {
+            "name": "soHC",
+            "label": "Số hộ chiếu",
+            "type": "string"
+          },
+          {
+            "name": "thoi_diem",
+            "label": "Thời điểm",
+            "type": "datetime"
+          }
+        ]
+      }
+    },
+    {
+      "code": "LT_FLAKY",
+      "name": "Load test LT_FLAKY",
+      "type": "info",
+      "enabled": true,
+      "permissionCode": "api:lt_flaky",
+      "transport": {
+        "kind": "http",
+        "baseUrl": "http://lt-flaky:4200",
+        "path": "/find",
+        "method": "POST"
+      },
+      "input": {
+        "fields": [
+          {
+            "name": "soHC",
+            "label": "Số hộ chiếu",
+            "type": "string",
+            "required": true
+          }
+        ]
+      },
+      "output": {
+        "recordsPath": "data.items",
+        "totalPath": "total",
+        "requestIdPath": "requestId",
+        "timestampField": "thoi_diem",
+        "sortOrder": "desc",
+        "identityField": "cccd",
+        "labelField": "ho_ten",
+        "fields": [
+          {
+            "name": "cccd",
+            "label": "CCCD",
+            "type": "string"
+          },
+          {
+            "name": "ho_ten",
+            "label": "Họ tên",
+            "type": "string"
+          },
+          {
+            "name": "soHC",
+            "label": "Số hộ chiếu",
+            "type": "string"
+          },
+          {
+            "name": "thoi_diem",
+            "label": "Thời điểm",
+            "type": "datetime"
+          }
+        ]
+      }
+    },
+    {
+      "code": "LT_TIMEOUT",
+      "name": "Load test LT_TIMEOUT",
+      "type": "info",
+      "enabled": true,
+      "permissionCode": "api:lt_timeout",
+      "transport": {
+        "kind": "http",
+        "baseUrl": "http://lt-timeout:4200",
+        "path": "/find",
+        "method": "POST",
+        "timeoutMs": 3000
+      },
+      "input": {
+        "fields": [
+          {
+            "name": "soHC",
+            "label": "Số hộ chiếu",
+            "type": "string",
+            "required": true
+          }
+        ]
+      },
+      "output": {
+        "recordsPath": "data.items",
+        "totalPath": "total",
+        "requestIdPath": "requestId",
+        "timestampField": "thoi_diem",
+        "sortOrder": "desc",
+        "identityField": "cccd",
+        "labelField": "ho_ten",
+        "fields": [
+          {
+            "name": "cccd",
+            "label": "CCCD",
+            "type": "string"
+          },
+          {
+            "name": "ho_ten",
+            "label": "Họ tên",
+            "type": "string"
+          },
+          {
+            "name": "soHC",
+            "label": "Số hộ chiếu",
+            "type": "string"
+          },
+          {
+            "name": "thoi_diem",
+            "label": "Thời điểm",
+            "type": "datetime"
+          }
+        ]
+      }
+    }
+  ]
+}

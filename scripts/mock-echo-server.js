@@ -16,7 +16,9 @@
  * Env: PORT (default 4200), MOCK_ECHO_RESPONSE (path to a JSON file overriding the default record),
  *      MOCK_ECHO_DELAY_MS (artificial latency), MOCK_ECHO_STATUS (force a status, e.g. 500, to test errors),
  *      MOCK_ECHO_FAIL_FIRST (number: the first N requests fail with MOCK_ECHO_FAIL_MODE=reset|503 — emulates a flaky
- *      upstream / stale keep-alive socket, to test retries; default mode reset = socket destroyed, no response).
+ *      upstream / stale keep-alive socket, to test retries; default mode reset = socket destroyed, no response),
+ *      MOCK_ECHO_JITTER_MS (random extra latency 0..N ms), MOCK_ECHO_FAIL_RATE (0..1 chance a request fails, same
+ *      MOCK_ECHO_FAIL_MODE), MOCK_ECHO_QUIET=1 (no per-request INFO lines; for load tests).
  */
 const http = require('node:http');
 const fs = require('node:fs');
@@ -30,6 +32,11 @@ const DELAY_MS = Number(process.env.MOCK_ECHO_DELAY_MS ?? 0);
 const FORCED_STATUS = process.env.MOCK_ECHO_STATUS ? Number(process.env.MOCK_ECHO_STATUS) : undefined;
 const FAIL_FIRST = Number(process.env.MOCK_ECHO_FAIL_FIRST ?? 0);
 const FAIL_MODE = process.env.MOCK_ECHO_FAIL_MODE ?? 'reset';
+// Load-test knobs: random extra latency 0..JITTER ms, random failure probability 0..1, and QUIET to skip the
+// per-request log lines (a load run would otherwise spend its time printing).
+const JITTER_MS = Number(process.env.MOCK_ECHO_JITTER_MS ?? 0);
+const FAIL_RATE = Number(process.env.MOCK_ECHO_FAIL_RATE ?? 0);
+const QUIET = process.env.MOCK_ECHO_QUIET === '1';
 let seen = 0;
 const SECRET_HEADER = /key|token|authorization|secret|cookie|access/i;
 
@@ -40,7 +47,10 @@ const DEFAULT_RECORD = process.env.MOCK_ECHO_RESPONSE
 function stamp() {
   return new Date().toISOString().replace('T', ' ').replace('Z', '').replace('.', ',');
 }
-const log = (level, message) => console.log(`${stamp()} - ${level} - mock-echo - ${message}`);
+const log = (level, message) => {
+  if (QUIET && level === 'INFO' && !message.startsWith('listening')) return;
+  console.log(`${stamp()} - ${level} - mock-echo - ${message}`);
+};
 
 function redact(headers) {
   return Object.fromEntries(Object.entries(headers).map(([k, v]) => [k, SECRET_HEADER.test(k) ? '[redacted]' : v]));
@@ -65,7 +75,7 @@ const server = http.createServer((req, res) => {
     log('INFO', `--> ${req.method} ${url.pathname}${url.search} requestId=${requestId} body=${rawBody || '-'}`);
 
     seen += 1;
-    if (seen <= FAIL_FIRST) {
+    if (seen <= FAIL_FIRST || (FAIL_RATE > 0 && Math.random() < FAIL_RATE)) {
       log('WARN', `<-- simulated failure (${FAIL_MODE}) for request #${seen}/${FAIL_FIRST} requestId=${requestId}`);
       if (FAIL_MODE === 'reset') return req.socket.destroy();
       res.writeHead(503, { 'content-type': 'application/json' });
@@ -86,7 +96,7 @@ const server = http.createServer((req, res) => {
       res.writeHead(status, { 'content-type': 'application/json; charset=utf-8', 'x-request-id': requestId });
       res.end(text);
       log(status >= 400 ? 'WARN' : 'INFO', `<-- ${status} ${req.method} ${url.pathname} ${text.length}B requestId=${requestId}`);
-    }, DELAY_MS);
+    }, DELAY_MS + Math.floor(Math.random() * (JITTER_MS + 1)));
   });
 });
 
