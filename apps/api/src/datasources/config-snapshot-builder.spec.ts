@@ -201,6 +201,22 @@ describe('buildConfigSnapshot', () => {
     });
   });
 
+  it('applies file `defaults` (retry, timeout, limits) to the runtime config but not to `source`', () => {
+    const snapshot = buildConfigSnapshot(configFile([httpEntry('DEFAULTS_DS')]), { configDir: CONFIG_DIR, nodeEnv: 'development', allowMock: false });
+    const runtime = snapshot.config.datasources[0]!;
+    expect(runtime.transport).toMatchObject({ retry: { attempts: 1, backoffMs: 100 }, timeoutMs: 5000 });
+    expect(runtime.limits).toEqual({ maxResults: 100, pageSize: 20 });
+    expect(snapshot.source.datasources[0]!.limits).toBeUndefined();
+    expect((snapshot.source.datasources[0]!.transport as { retry?: unknown }).retry).toBeUndefined();
+  });
+
+  it('keeps an explicit transport.retry/timeoutMs over the defaults', () => {
+    const entry = httpEntry('OWN_RETRY_DS');
+    Object.assign(entry.transport, { retry: { attempts: 0, backoffMs: 10 }, timeoutMs: 1234 });
+    const snapshot = buildConfigSnapshot(configFile([entry]), { configDir: CONFIG_DIR, nodeEnv: 'development', allowMock: false });
+    expect(snapshot.config.datasources[0]!.transport).toMatchObject({ retry: { attempts: 0, backoffMs: 10 }, timeoutMs: 1234 });
+  });
+
   it('accepts displayFormat, time zones and transport.queryParams (schema regression)', () => {
     const entry = httpEntry('NEW_KEYS_DS');
     (entry.transport as Record<string, unknown>).queryParams = { tab: '1' };

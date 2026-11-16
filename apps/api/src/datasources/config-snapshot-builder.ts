@@ -69,15 +69,26 @@ export function buildConfigSnapshot(raw: unknown, options: BuildSnapshotOptions)
   const resolvedSecrets = resolveSecretsForEnabledDatasources(config);
   enforceNoMockInProduction(config, options);
 
-  const resolved = resolveDictionaryRefs(config);
+  const resolved = resolveRuntimeConfig(config);
   return { config: deepFreeze(resolved), source: deepFreeze(config), resolvedSecrets, configDir: options.configDir };
 }
 
-/** Copy of `config` with every `optionsRef` / `valueMapRef` replaced by the dictionary's content. */
-function resolveDictionaryRefs(config: DatasourceConfigFile): DatasourceConfigFile {
+/**
+ * Runtime copy of `config`: every `optionsRef` / `valueMapRef` replaced by the dictionary's content, and the
+ * file's `defaults` (retry, timeoutMs, maxResults, pageSize) applied wherever a datasource/transport leaves them
+ * out. Without the latter `defaults.retry` was dead config: a datasource with no `transport.retry` got ZERO
+ * retries, so one reset socket or 503 from the upstream surfaced as an error on the user's first click.
+ */
+function resolveRuntimeConfig(config: DatasourceConfigFile): DatasourceConfigFile {
   const resolved = structuredClone(config);
   const dictionaries = resolved.dictionaries ?? {};
+  const { defaults } = resolved;
   for (const ds of resolved.datasources) {
+    ds.limits ??= { maxResults: defaults.maxResults, pageSize: defaults.pageSize };
+    if (ds.transport.kind === 'http') {
+      ds.transport.timeoutMs ??= defaults.timeoutMs;
+      ds.transport.retry ??= { ...defaults.retry };
+    }
     for (const field of ds.input.fields) {
       if (field.optionsRef) field.options = dictionaries[field.optionsRef]?.map((o) => ({ ...o })) ?? [];
     }

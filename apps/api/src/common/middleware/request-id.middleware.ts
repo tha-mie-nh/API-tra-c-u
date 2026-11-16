@@ -3,6 +3,8 @@ import type { NextFunction, Request, Response } from 'express';
 import { randomUUID } from 'node:crypto';
 
 const HEADER_NAME = 'x-request-id';
+/** Inbound ids land in every log line, so only a short, plain token is accepted (no spaces/newlines = no log injection). */
+const SAFE_REQUEST_ID = /^[A-Za-z0-9._-]{1,64}$/;
 
 /**
  * Phase 05 non-functional requirement: "X-Request-Id on every response and
@@ -15,7 +17,7 @@ const HEADER_NAME = 'x-request-id';
 export class RequestIdMiddleware implements NestMiddleware {
   use(req: Request, res: Response, next: NextFunction): void {
     const inbound = req.header(HEADER_NAME);
-    const requestId = inbound && inbound.trim().length > 0 ? inbound.trim() : randomUUID();
+    const requestId = inbound && SAFE_REQUEST_ID.test(inbound.trim()) ? inbound.trim() : randomUUID();
     req.requestId = requestId;
     res.setHeader('X-Request-Id', requestId);
     next();
