@@ -2,6 +2,8 @@
 
 Mục tiêu: xem hệ thống cư xử thế nào khi có nhiều người dùng thật dùng cùng lúc, khi upstream nhanh, chậm, treo, chập chờn, và khi có người gửi dồn dập (spam). Số liệu thô nằm ở `docs/load-test-results/`.
 
+> Ghi chú: kết quả đo trên bản build đầu tiên của `api-v13`/`web-v16` (digest `sha256:0bb9b208...` và `sha256:8168a1ee...`). Hai tag sau đó được build lại để thêm sửa lỗi kết nối nhàn rỗi bị bỏ âm thầm (thăm dò `/health`, timeout nginx, agent gọi upstream); các thay đổi đó không đụng tới đường xử lý tra cứu, giới hạn tốc độ hay ghi log, nên số liệu vẫn tham khảo được, nhưng chưa đo lại trên bản mới.
+
 ## 1. Kết luận ngắn
 
 - **Dùng bình thường: tốt.** 60 người dùng (mỗi người cách 2-6 giây một lượt) trong 90 giây: 99,3% thành công, không lượt nào bị giới hạn, `/health` luôn dưới 41 ms. Thời gian trả lời của tra cứu nhanh: trung vị khoảng 78 ms.

@@ -9,8 +9,8 @@ Tất cả nằm trong repo Docker Hub công khai `gthanh/app_tra_cuu`.
 
 | Image | Vai trò | Digest | Kích thước |
 |---|---|---|---|
-| `gthanh/app_tra_cuu:api-v13` | Backend NestJS (tra cứu, quản trị, log) | `sha256:0bb9b208e082634ef650df4fbac4fa171697adb7d36c8bea4e78c879bed558ab` | ~881 MB |
-| `gthanh/app_tra_cuu:web-v16` | Giao diện React đã build + nginx | `sha256:8168a1ee52c7fefffeec9db9800f3cf343afa1acc85cdcdd1c5691515f0572c5` | ~99 MB |
+| `gthanh/app_tra_cuu:api-v13` | Backend NestJS (tra cứu, quản trị, log) | `sha256:2804785b8e7b2653dd18f03f9beb43bc967825457f4a2b94d6ae355f0717f711` | ~881 MB |
+| `gthanh/app_tra_cuu:web-v16` | Giao diện React đã build + nginx | `sha256:a5247e274f70793a0db84e6aeb61d572d88929b8a03890a9d1afabf75ec7f1b7` | ~99 MB |
 | `gthanh/app_tra_cuu:mock-echo-v1` | API giả để kiểm thử/trace (không dùng ở production) | `sha256:87bb5c36004e854919b381186b517566eb33399ac76c3876bc16b2fae55dc0af` | ~239 MB |
 | `mock-echo-v2` (chỉ build trên máy, chưa push) | Như v1, thêm tham số cho kiểm thử tải (jitter, tỉ lệ lỗi, chế độ im lặng) | — | ~239 MB |
 

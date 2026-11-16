@@ -10,3 +10,57 @@
   - FE không hardcode danh sách datasource nào cả — mỗi lần vào trang Tra cứu, FE gọi GET /api/v1/datasources để lấy danh sách hiện tại, rồi tự sinh form nhập + bảng kết quả từ chính dữ liệu đó.
   - Nên khi admin xóa 1 datasource: lần fetch tiếp theo (vào lại trang, hoặc sau khi submit form admin thành công FE tự gọi lại API này), mục đó tự biến mất khỏi menu — không cần sửa 1 dòng code FE nào.
   - Khi admin thêm mới: y hệt — lần fetch tiếp theo, mục mới tự xuất hiện trong menu, kèm đúng form input/output đã cấu hình.
+
+
+
+
+reset pass 
+  cd /home/thanh/Project_app_API/apps/api && pnpm exec dotenv -e ../../.env -- ts-node scripts/reset-admin-password.ts admin
+root@passw0rd! 
+pm_88EGC623jKGm1iO5S
+SWpzk771@@@@
+khi build xong thì báo lại cho tôi, chúng ta đã có môi trường dev-prod rồi, nên thêm luôn môi trường test vào đây (có thể làm folder riêng hay gì đó, mục đích là để cô lập, kéo image hay gì đó từ
+  ngoài của prod để về test trước khi báo done cho leader). Ngoài ra dọn dẹp sắp xếp lại chuẩn các folder của project app api này cho tôi
+
+
+
+
+
+
+
+
+
+
+
+
+Luồng Tương Tác 
+Trình duyệt (react)--> làm 2 bước:
+1. Lấy cấu hình form 
+2. Gửi yêu cầu tra cứu
+BE (nestJS)--> sau khi nhận rq làm các việc:
+1. kiểm tra đăng nhập, quyền và dữ liệu nhập
+2. gửi rq hhtp đến upstream
+Mock stream --> nhận rq của be và làm:
+1. trả dữ liệu mẫu qua HTTP 
+--> BE chuẩn hóa dữ liệu , kết quả, audit,...
+--> hiển thị ra FE 
+
+
+
+/root/kit
+app tra cuu kit 
+v9, v12
+web: 8082
+admin, SWpzk771@@@@
+
+
+
+
+
+
+
+
+
+
+# Lệnh ssh 
+

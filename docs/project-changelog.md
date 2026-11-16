@@ -22,7 +22,7 @@ Ghi lại các thay đổi đáng chú ý theo ngày. Mới nhất ở trên cù
 - **Giới hạn**: nếu chính upstream nhận request rồi im lặng trên kết nối mới thì vẫn phải chờ hết timeout của nguồn dữ liệu (không phân biệt được với upstream chậm). Cần build lại image api và web để có hiệu lực.
 
 ### Phát hành image
-- `gthanh/app_tra_cuu:api-v13` (digest `sha256:0bb9b208e082634ef650df4fbac4fa171697adb7d36c8bea4e78c879bed558ab`) và `web-v16` (digest `sha256:8168a1ee52c7fefffeec9db9800f3cf343afa1acc85cdcdd1c5691515f0572c5`, libxslt 1.1.42-r3), gồm toàn bộ thay đổi ngày 2026-11-16 bên dưới. `docker-compose.prod.yml` trỏ tới hai tag này.
+- `gthanh/app_tra_cuu:api-v13` (digest `sha256:2804785b8e7b2653dd18f03f9beb43bc967825457f4a2b94d6ae355f0717f711`) và `web-v16` (digest `sha256:a5247e274f70793a0db84e6aeb61d572d88929b8a03890a9d1afabf75ec7f1b7`, libxslt 1.1.42-r3), gồm toàn bộ thay đổi ngày 2026-11-16 bên dưới, kể cả sửa lỗi treo do kết nối bị bỏ âm thầm. Hai tag này đã được build lại và ghi đè (bản push đầu tiên, digest cũ, không còn dùng). `docker-compose.prod.yml` trỏ tới hai tag này.
 - Thư mục config cần dùng bản mới (đã chuyển sang map một lần, schema có khóa mới): `deploy-check/config/*`. Config cũ có `mapTo`/`from` vẫn chạy nhưng schema cũ sẽ từ chối `displayFormat`, múi giờ, `dictionaries`, `queryParams`, `labelField`, nên phải cập nhật cả `config.schema.json` đi kèm.
 - Chưa tạo thư mục `./logs` thì không ghi được file log (app vẫn chạy, chỉ cảnh báo một lần).
 
