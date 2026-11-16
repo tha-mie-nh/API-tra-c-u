@@ -64,6 +64,11 @@ export class DatasourceConfigLoaderService {
     return this.snapshot.configDir;
   }
 
+  /** config.json as written (dictionary refs intact) — for the admin UI; runtime code uses `getConfig()`. */
+  getSourceConfig() {
+    return this.snapshot.source;
+  }
+
   getConfigPath(): string {
     return this.configPath;
   }

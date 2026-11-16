@@ -1,5 +1,5 @@
 import { ConflictException, HttpException, HttpStatus, Injectable, Logger, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
-import type { AdminDatasource, DatasourceConfigFile, DatasourceEntry, DatasourceEnvRefs } from '@app/shared';
+import type { AdminDatasource, AdminDictionary, DatasourceConfigFile, DatasourceEntry, DatasourceEnvRefs } from '@app/shared';
 import { DatasourceConfigLoaderService } from '../datasources/datasource-config.loader';
 import { DatasourceRegistryService } from '../datasources/datasource-registry.service';
 import { AdapterFactory } from '../datasources/adapters/adapter.factory';
@@ -52,7 +52,7 @@ export class AdminDatasourcesService {
   ) {}
 
   list(): AdminDatasource[] {
-    return this.loader.getConfig().datasources.map(toAdminDatasourceProjection);
+    return this.loader.getSourceConfig().datasources.map(toAdminDatasourceProjection);
   }
 
   envRefs(): DatasourceEnvRefs {
@@ -61,6 +61,47 @@ export class AdminDatasourcesService {
 
   get(code: string): AdminDatasource {
     return toAdminDatasourceProjection(this.findEntry(code));
+  }
+
+  /** Every dictionary in config.json with the fields that reference it. */
+  listDictionaries(): AdminDictionary[] {
+    const source = this.loader.getSourceConfig();
+    return Object.entries(source.dictionaries ?? {}).map(([name, items]) => ({
+      name,
+      items: items.map((i) => ({ ...i })),
+      usedBy: source.datasources.flatMap((ds) => [
+        ...ds.input.fields.filter((f) => f.optionsRef === name).map((f) => ({ datasource: ds.code, field: f.name, kind: 'input' as const })),
+        ...ds.output.fields.filter((f) => f.valueMapRef === name).map((f) => ({ datasource: ds.code, field: f.name, kind: 'output' as const })),
+      ]),
+    }));
+  }
+
+  /** Create or replace one dictionary (full validation + live reload via the shared write path). */
+  async putDictionary(name: string, items: unknown): Promise<AdminDictionary> {
+    if (!Array.isArray(items)) {
+      throw new UnprocessableEntityException({ code: 'DICTIONARY_INVALID', message: 'items must be an array of { value, label }' });
+    }
+    await this.withLockedReload(true, (raw) => {
+      raw.dictionaries = { ...(raw.dictionaries ?? {}), [name]: items as { value: string; label: string }[] };
+      return { candidate: raw, touchedIndex: null };
+    });
+    return this.listDictionaries().find((d) => d.name === name) as AdminDictionary;
+  }
+
+  async removeDictionary(name: string): Promise<{ name: string }> {
+    const dictionary = this.listDictionaries().find((d) => d.name === name);
+    if (!dictionary) throw new NotFoundException({ code: 'DICTIONARY_NOT_FOUND', message: `Unknown dictionary "${name}"` });
+    if (dictionary.usedBy.length > 0) {
+      const where = dictionary.usedBy.map((u) => `${u.datasource}.${u.field}`).join(', ');
+      throw new ConflictException({ code: 'DICTIONARY_IN_USE', message: `Danh mục "${name}" đang được dùng bởi: ${where}` });
+    }
+    await this.withLockedReload(true, (raw) => {
+      const rest = { ...(raw.dictionaries ?? {}) };
+      delete rest[name];
+      raw.dictionaries = rest;
+      return { candidate: raw, touchedIndex: null };
+    });
+    return { name };
   }
 
   async create(body: unknown): Promise<AdminDatasource> {
@@ -182,7 +223,7 @@ export class AdminDatasourcesService {
   }
 
   private findEntry(code: string): DatasourceEntry {
-    const entry = this.loader.getConfig().datasources.find((d) => d.code === code);
+    const entry = this.loader.getSourceConfig().datasources.find((d) => d.code === code);
     if (!entry) throw this.notFoundError(code);
     return entry;
   }

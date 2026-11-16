@@ -9,7 +9,10 @@ import { DatasourceConfigInvalidError, type DatasourceConfigIssue } from './data
 
 /** Immutable result of validating one candidate config — never mutated after `buildConfigSnapshot` returns it. */
 export interface ConfigSnapshot {
+  /** Runtime view: dictionary refs (`optionsRef`/`valueMapRef`) already inlined into `options`/`valueMap`. */
   readonly config: DatasourceConfigFile;
+  /** The validated config exactly as written in config.json (refs intact) — what the admin UI shows and edits. */
+  readonly source: DatasourceConfigFile;
   readonly resolvedSecrets: ReadonlyMap<string, ResolvedSecrets>;
   readonly configDir: string;
 }
@@ -66,7 +69,25 @@ export function buildConfigSnapshot(raw: unknown, options: BuildSnapshotOptions)
   const resolvedSecrets = resolveSecretsForEnabledDatasources(config);
   enforceNoMockInProduction(config, options);
 
-  return { config: deepFreeze(config), resolvedSecrets, configDir: options.configDir };
+  const resolved = resolveDictionaryRefs(config);
+  return { config: deepFreeze(resolved), source: deepFreeze(config), resolvedSecrets, configDir: options.configDir };
+}
+
+/** Copy of `config` with every `optionsRef` / `valueMapRef` replaced by the dictionary's content. */
+function resolveDictionaryRefs(config: DatasourceConfigFile): DatasourceConfigFile {
+  const resolved = structuredClone(config);
+  const dictionaries = resolved.dictionaries ?? {};
+  for (const ds of resolved.datasources) {
+    for (const field of ds.input.fields) {
+      if (field.optionsRef) field.options = dictionaries[field.optionsRef]?.map((o) => ({ ...o })) ?? [];
+    }
+    for (const field of ds.output.fields) {
+      if (field.valueMapRef) {
+        field.valueMap = Object.fromEntries((dictionaries[field.valueMapRef] ?? []).map((o) => [o.value, o.label]));
+      }
+    }
+  }
+  return resolved;
 }
 
 /** Resolves `${VAR}`/`*Env` references for enabled datasources only (disabled ones may lack real env vars). */

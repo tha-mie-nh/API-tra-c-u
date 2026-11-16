@@ -15,6 +15,7 @@ export interface QueryColumn {
   iconMap?: Record<string, string>;
   headerField?: boolean;
   displayFormat?: string;
+  displayTimeZone?: string;
 }
 
 /** One mapped output record — keys are output field `name`s, not upstream keys. */

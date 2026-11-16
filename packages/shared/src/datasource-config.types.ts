@@ -37,6 +37,8 @@ export interface InputFieldDef {
   max?: number;
   pattern?: string;
   options?: FieldOption[];
+  /** Name of a `dictionaries` entry; when set, `options` is filled from it (server-side, at load). */
+  optionsRef?: string;
   format?: string;
   /** Upstream request key this field is sent as (server-only concern, but harmless to share). */
   mapTo?: string;
@@ -76,6 +78,12 @@ export interface OutputFieldDef {
   /** How the client renders a `date`/`datetime` output value (default
    * `DD-MM-YYYY` / `DD-MM-YYYY HH:mm`). Same tokens as `format`, shown in Asia/Ho_Chi_Minh. */
   displayFormat?: string;
+  /** IANA zone the upstream's zone-less date/time strings are written in (default `UTC`). */
+  sourceTimeZone?: string;
+  /** IANA zone the client displays this value in (default `Asia/Ho_Chi_Minh`). */
+  displayTimeZone?: string;
+  /** Name of a `dictionaries` entry; when set, `valueMap` is filled from it (value -> label). */
+  valueMapRef?: string;
 }
 
 export type TransportAuthKind = 'apiKeyHeader' | 'bearer' | 'basic' | 'none';
@@ -105,6 +113,8 @@ export interface TransportHttp {
    * routed by this header, not by path. Secrets never belong here; use `auth`.
    */
   headers?: Record<string, string>;
+  /** Static query-string parameters appended to every call (`{ tab: "1" }` -> `?tab=1`). */
+  queryParams?: Record<string, string>;
   timeoutMs?: number;
   retry?: TransportRetry;
 }
@@ -174,6 +184,8 @@ export interface DatasourceOutput {
   sortOrder: 'asc' | 'desc';
   /** Which mapped output field name groups records into a per-identity timeline. */
   identityField: string;
+  /** Output field whose value titles each group (default: `fullName` if present, else the identity). */
+  labelField?: string;
   imageRef?: {
     bucketField: string;
     objectKeyField: string;
@@ -210,6 +222,8 @@ export interface ConfigDefaults {
 export interface DatasourceConfigFile {
   version: 1;
   defaults: ConfigDefaults;
+  /** Named code -> label lists (e.g. `GENDER`) referenced by `optionsRef` / `valueMapRef`. */
+  dictionaries?: Record<string, FieldOption[]>;
   datasources: DatasourceEntry[];
 }
 

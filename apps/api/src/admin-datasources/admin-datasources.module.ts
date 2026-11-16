@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { DatasourcesModule } from '../datasources/datasources.module';
 import { AdminDatasourcesController } from './admin-datasources.controller';
+import { AdminDictionariesController } from './admin-dictionaries.controller';
 import { AdminDatasourcesService } from './admin-datasources.service';
 
 /** Phase 02: ADMIN-only `config.json` CRUD + live reload. Depends on
@@ -9,7 +10,7 @@ import { AdminDatasourcesService } from './admin-datasources.service';
  * a validated write is visible with no restart. */
 @Module({
   imports: [DatasourcesModule],
-  controllers: [AdminDatasourcesController],
+  controllers: [AdminDatasourcesController, AdminDictionariesController],
   providers: [AdminDatasourcesService],
 })
 export class AdminDatasourcesModule {}

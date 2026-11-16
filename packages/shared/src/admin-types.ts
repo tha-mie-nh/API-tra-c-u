@@ -169,3 +169,10 @@ export interface AuditLogsListResponse {
   page: number;
   pageSize: number;
 }
+
+/** `GET /admin/dictionaries` — one named code -> label list plus where it is referenced. */
+export interface AdminDictionary {
+  name: string;
+  items: { value: string; label: string }[];
+  usedBy: { datasource: string; field: string; kind: 'input' | 'output' }[];
+}

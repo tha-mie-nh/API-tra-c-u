@@ -1,6 +1,7 @@
 import { resolve, sep } from 'node:path';
 import type { DatasourceConfigFile } from '@app/shared';
 import { apiPermissionCode } from '@app/shared';
+import { isValidTimeZone } from './date-format-parser.util';
 
 /**
  * Cross-field constraints JSON Schema cannot express (phase-04 Implementation
@@ -19,6 +20,14 @@ import { apiPermissionCode } from '@app/shared';
 export function validateCrossFieldConstraints(config: DatasourceConfigFile, configDir?: string): string[] {
   const issues: string[] = [];
   const seenCodes = new Set<string>();
+  const dictionaries = config.dictionaries ?? {};
+  for (const [name, items] of Object.entries(dictionaries)) {
+    const seen = new Set<string>();
+    for (const item of items) {
+      if (seen.has(item.value)) issues.push(`dictionaries.${name}: duplicate value "${item.value}"`);
+      seen.add(item.value);
+    }
+  }
 
   for (const ds of config.datasources) {
     if (seenCodes.has(ds.code)) {
@@ -34,6 +43,22 @@ export function validateCrossFieldConstraints(config: DatasourceConfigFile, conf
     }
 
     const outputFieldNames = new Set(ds.output.fields.map((f) => f.name));
+    if (ds.output.labelField && !outputFieldNames.has(ds.output.labelField)) {
+      issues.push(`${ds.code}: output.labelField "${ds.output.labelField}" is not in output.fields[].name`);
+    }
+    for (const f of ds.output.fields) {
+      if (f.valueMapRef && !(f.valueMapRef in dictionaries)) {
+        issues.push(`${ds.code}: output field "${f.name}" valueMapRef references unknown dictionary "${f.valueMapRef}"`);
+      }
+      for (const [key, zone] of [['sourceTimeZone', f.sourceTimeZone], ['displayTimeZone', f.displayTimeZone]] as const) {
+        if (zone && !isValidTimeZone(zone)) issues.push(`${ds.code}: output field "${f.name}" ${key} "${zone}" is not a valid IANA time zone`);
+      }
+    }
+    for (const f of ds.input.fields) {
+      if (f.optionsRef && !(f.optionsRef in dictionaries)) {
+        issues.push(`${ds.code}: input field "${f.name}" optionsRef references unknown dictionary "${f.optionsRef}"`);
+      }
+    }
     if (!outputFieldNames.has(ds.output.identityField)) {
       issues.push(`${ds.code}: output.identityField "${ds.output.identityField}" is not in output.fields[].name`);
     }

@@ -35,3 +35,20 @@ describe('parseWithFormats / parseDateValue', () => {
     expect(parseDateValue('không phải ngày', formats)).toBeUndefined();
   });
 });
+
+describe('time zones', () => {
+  it('reads zone-less wall time in the given IANA zone (Asia/Ho_Chi_Minh = UTC+7)', () => {
+    expect(parseWithFormat('15/01/2026 09:30:00', 'DD/MM/YYYY HH:mm:ss', 'Asia/Ho_Chi_Minh')).toBe('2026-01-15T02:30:00.000Z');
+    expect(parseDateValue('2026-01-15 09:30:00', undefined, 'Asia/Ho_Chi_Minh')).toBe('2026-01-15T02:30:00.000Z');
+  });
+
+  it('defaults to UTC and never shifts values that carry an explicit zone', () => {
+    expect(parseWithFormat('15/01/2026 09:30:00', 'DD/MM/YYYY HH:mm:ss')).toBe('2026-01-15T09:30:00.000Z');
+    expect(parseDateValue('2026-01-15T09:30:00+07:00', undefined, 'America/New_York')).toBe('2026-01-15T02:30:00.000Z');
+  });
+
+  it('handles zones with daylight saving', () => {
+    expect(parseWithFormat('15/07/2026 12:00:00', 'DD/MM/YYYY HH:mm:ss', 'America/New_York')).toBe('2026-07-15T16:00:00.000Z');
+    expect(parseWithFormat('15/01/2026 12:00:00', 'DD/MM/YYYY HH:mm:ss', 'America/New_York')).toBe('2026-01-15T17:00:00.000Z');
+  });
+});

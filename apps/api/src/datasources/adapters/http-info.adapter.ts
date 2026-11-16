@@ -88,6 +88,7 @@ export class HttpInfoAdapter implements DatasourceAdapter {
 
   private async callOnce(input: AdapterExecuteInput, attempt: number, tracker: ExchangeTracker): Promise<AdapterExecuteResult> {
     const url = new URL(this.transport.path, this.secrets.baseUrl);
+    for (const [key, value] of Object.entries(this.transport.queryParams ?? {})) url.searchParams.set(key, value);
     const body = this.buildUpstreamBody(input.params);
     const headers: Record<string, string> = { 'content-type': 'application/json', ...this.transport.headers };
     if (this.transport.auth?.kind === 'apiKeyHeader' && this.transport.auth.header && this.secrets.apiKeyValue) {

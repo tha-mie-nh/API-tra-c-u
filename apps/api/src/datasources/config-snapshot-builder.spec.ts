@@ -153,4 +153,59 @@ describe('buildConfigSnapshot', () => {
 
     expect(() => buildConfigSnapshot(raw, { configDir: CONFIG_DIR, nodeEnv: 'production', allowMock: true })).not.toThrow();
   });
+
+  describe('dictionaries', () => {
+    const opts = { configDir: CONFIG_DIR, nodeEnv: 'development', allowMock: false };
+    const withRefs = (): DatasourceConfigFile => ({
+      ...configFile([
+        mockEntry('DICT_DS', {
+          input: { fields: [{ name: 'gioiTinh', label: 'Giới tính', type: 'enum', optionsRef: 'GENDER' }] },
+          output: {
+            timestampField: 'ts',
+            sortOrder: 'desc',
+            identityField: 'id',
+            fields: [
+              { name: 'id', label: 'ID', type: 'string' },
+              { name: 'ts', label: 'TS', type: 'datetime' },
+              { name: 'gioiTinh', label: 'Giới tính', type: 'enum', valueMapRef: 'GENDER' },
+            ],
+          },
+        }),
+      ]),
+      dictionaries: { GENDER: [{ value: 'M', label: 'Nam' }, { value: 'F', label: 'Nữ' }] },
+    });
+
+    it('inlines optionsRef/valueMapRef into the runtime config but keeps the refs in `source`', () => {
+      const snapshot = buildConfigSnapshot(withRefs(), opts);
+      const ds = snapshot.config.datasources[0]!;
+      expect(ds.input.fields[0]!.options).toEqual([{ value: 'M', label: 'Nam' }, { value: 'F', label: 'Nữ' }]);
+      expect(ds.output.fields[2]!.valueMap).toEqual({ M: 'Nam', F: 'Nữ' });
+      expect(snapshot.source.datasources[0]!.input.fields[0]!.options).toBeUndefined();
+      expect(snapshot.source.datasources[0]!.input.fields[0]!.optionsRef).toBe('GENDER');
+    });
+
+    it('rejects a reference to an unknown dictionary', () => {
+      const raw = withRefs();
+      raw.dictionaries = {};
+      expect(() => buildConfigSnapshot(raw, opts)).toThrow(/unknown dictionary "GENDER"/);
+    });
+
+    it('rejects duplicate values inside a dictionary and invalid time zones', () => {
+      const dup = withRefs();
+      dup.dictionaries = { GENDER: [{ value: 'M', label: 'A' }, { value: 'M', label: 'B' }] };
+      expect(() => buildConfigSnapshot(dup, opts)).toThrow(/duplicate value "M"/);
+
+      const tz = configFile([mockEntry('TZ_DS')]);
+      (tz.datasources[0]!.output.fields[1] as unknown as Record<string, unknown>).displayTimeZone = 'Mars/Base';
+      expect(() => buildConfigSnapshot(tz, opts)).toThrow(/not a valid IANA time zone/);
+    });
+  });
+
+  it('accepts displayFormat, time zones and transport.queryParams (schema regression)', () => {
+    const entry = httpEntry('NEW_KEYS_DS');
+    (entry.transport as Record<string, unknown>).queryParams = { tab: '1' };
+    (entry.output.fields[1] as Record<string, unknown>).displayFormat = 'DD/MM/YYYY HH:mm';
+    (entry.output.fields[1] as Record<string, unknown>).sourceTimeZone = 'Asia/Ho_Chi_Minh';
+    expect(() => buildConfigSnapshot(configFile([entry]), { configDir: CONFIG_DIR, nodeEnv: 'development', allowMock: false })).not.toThrow();
+  });
 });

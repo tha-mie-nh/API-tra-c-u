@@ -75,7 +75,7 @@ export class ResponseMapperService {
     for (const field of datasource.output.fields) {
       let rawValue = field.from ? raw[field.from] : raw[field.name];
       if ((field.type === 'date' || field.type === 'datetime') && typeof rawValue === 'string' && rawValue !== '') {
-        rawValue = parseWithFormats(rawValue, field.format) ?? rawValue;
+        rawValue = parseWithFormats(rawValue, field.format, field.sourceTimeZone) ?? rawValue;
       }
       mapped[field.name] = field.valueMap && rawValue !== undefined ? (field.valueMap[String(rawValue)] ?? rawValue) : rawValue;
     }
@@ -90,15 +90,15 @@ export class ResponseMapperService {
     const tsField = datasource.output.fields.find((f) => f.name === timestampField);
     const keyed = rawRecords.map((raw) => {
       const rawValue = tsField ? (tsField.from ? raw[tsField.from] : raw[tsField.name]) : undefined;
-      return { record: this.mapOne(raw, datasource), key: this.toComparableTime(rawValue, tsField?.format) };
+      return { record: this.mapOne(raw, datasource), key: this.toComparableTime(rawValue, tsField?.format, tsField?.sourceTimeZone) };
     });
     keyed.sort((a, b) => (a.key - b.key) * direction);
     return keyed.map((k) => k.record);
   }
 
-  private toComparableTime(value: unknown, format?: string): number {
+  private toComparableTime(value: unknown, format?: string, timeZone?: string): number {
     if (typeof value !== 'string') return 0;
-    const iso = parseDateValue(value, format);
+    const iso = parseDateValue(value, format, timeZone);
     const time = iso ? new Date(iso).getTime() : Number.NaN;
     return Number.isNaN(time) ? 0 : time;
   }
@@ -111,7 +111,7 @@ export class ResponseMapperService {
       const identity = String(record[identityField] ?? '');
       let group = groups.get(identity);
       if (!group) {
-        group = { identity, label: this.deriveLabel(record, identity), records: [] };
+        group = { identity, label: this.deriveLabel(record, identity, datasource.output.labelField), records: [] };
         groups.set(identity, group);
       }
       group.records.push(record);
@@ -119,10 +119,10 @@ export class ResponseMapperService {
     return Array.from(groups.values());
   }
 
-  /** Best-effort display label: prefer a `fullName` field if the datasource has one, else fall back to the identity. */
-  private deriveLabel(record: QueryRecord, identity: string): string {
-    const fullName = record.fullName;
-    return typeof fullName === 'string' && fullName.length > 0 ? fullName : identity;
+  /** Group title: the configured `output.labelField`, else a `fullName` field if present, else the identity. */
+  private deriveLabel(record: QueryRecord, identity: string, labelField?: string): string {
+    const title = record[labelField ?? 'fullName'];
+    return typeof title === 'string' && title.length > 0 ? title : identity;
   }
 
   private buildColumns(datasource: DatasourceEntry): QueryColumn[] {
@@ -134,6 +134,7 @@ export class ResponseMapperService {
       ...(f.iconMap ? { iconMap: f.iconMap } : {}),
       ...(f.headerField ? { headerField: f.headerField } : {}),
       ...(f.displayFormat ? { displayFormat: f.displayFormat } : {}),
+      ...(f.displayTimeZone ? { displayTimeZone: f.displayTimeZone } : {}),
     }));
   }
 }

@@ -27,6 +27,11 @@
         }
       }
     },
+    "dictionaries": {
+      "type": "object",
+      "propertyNames": { "pattern": "^[A-Z][A-Z0-9_]*$" },
+      "additionalProperties": { "type": "array", "items": { "$ref": "#/$defs/fieldOption" } }
+    },
     "datasources": {
       "type": "array",
       "items": { "$ref": "#/$defs/datasourceEntry" }
@@ -58,6 +63,7 @@
         "max": { "type": "number" },
         "pattern": { "type": "string" },
         "options": { "type": "array", "items": { "$ref": "#/$defs/fieldOption" } },
+        "optionsRef": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]*$" },
         "format": { "type": "string" },
         "mapTo": { "type": "string" }
       }
@@ -77,7 +83,11 @@
         "emphasize": { "type": "boolean" },
         "iconMap": { "type": "object", "additionalProperties": { "type": "string" } },
         "headerField": { "type": "boolean" },
-        "format": { "type": "string" }
+        "format": { "type": "string" },
+        "displayFormat": { "type": "string" },
+        "sourceTimeZone": { "type": "string" },
+        "displayTimeZone": { "type": "string" },
+        "valueMapRef": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]*$" }
       }
     },
     "transportAuth": {
@@ -109,6 +119,7 @@
         "method": { "enum": ["GET", "POST"] },
         "auth": { "$ref": "#/$defs/transportAuth" },
         "headers": { "type": "object", "additionalProperties": { "type": "string" } },
+        "queryParams": { "type": "object", "additionalProperties": { "type": "string" } },
         "timeoutMs": { "type": "integer", "minimum": 1 },
         "retry": { "$ref": "#/$defs/transportRetry" },
         "dataFile": { "type": "string" },
@@ -155,6 +166,7 @@
         "timestampField": { "type": "string", "minLength": 1 },
         "sortOrder": { "enum": ["asc", "desc"] },
         "identityField": { "type": "string", "minLength": 1 },
+        "labelField": { "type": "string" },
         "imageRef": {
           "type": "object",
           "additionalProperties": false,
