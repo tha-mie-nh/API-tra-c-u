@@ -13,6 +13,10 @@ Các lỗi do Hưng báo, nhóm dễ và vừa đã sửa xong. Chi tiết kỹ 
 
 Đã kiểm tra: test API 226/227 pass (1 test fail do `FAMILY_EVENTS_BASE_URL` chưa đặt trong env, không liên quan), typecheck API và Web sạch. Log mới đã chạy thử trên API thật. Chưa kiểm tra giao diện trên trình duyệt.
 
+## Bổ sung theo góp ý của leader
+
+Field kiểu Ngày/Ngày giờ trong form admin hiện ngay 2 dropdown chọn mẫu: **format đọc từ API thật** (chuyển chuỗi sang ngày) và **format hiển thị đầu ra**, có mục "Tùy chỉnh…" và ví dụ xem trước.
+
 ## Chưa sửa
 
 - **Request lần đầu không gửi, phải bấm 2-3 lần**: backend gọi lần đầu đã trả 200, chưa tái hiện được. Cần tái hiện trên trình duyệt hoặc lab, log mới sẽ hỗ trợ truy vết.

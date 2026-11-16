@@ -9,6 +9,7 @@ import { vi } from '@/i18n/vi';
 import type { DatasourceFormValues } from './datasource-form-schema';
 import { FIELD_TYPE_VALUES, makeEmptyKeyValueRow } from './datasource-field-row-types';
 import { PairRowsEditor } from './datasource-pair-rows-editor';
+import { DatasourceOutputDateFormatFields } from './datasource-output-date-format-fields';
 
 interface DatasourceOutputFieldRowProps {
   index: number;
@@ -103,6 +104,10 @@ export function DatasourceOutputFieldRow({
         <p className="text-destructive text-xs">{rowErrors?.name?.message ?? rowErrors?.label?.message}</p>
       )}
 
+      {(row.type === 'date' || row.type === 'datetime') && (
+        <DatasourceOutputDateFormatFields index={index} register={register} watch={watch} setValue={setValue} />
+      )}
+
       {expanded && (
         <div className="flex flex-col gap-2 border-t pt-2 pl-8">
           <div className="flex flex-wrap gap-3">
@@ -113,20 +118,6 @@ export function DatasourceOutputFieldRow({
               </div>
             ))}
           </div>
-          {(row.type === 'date' || row.type === 'datetime') && (
-            <div className="grid grid-cols-2 gap-2">
-              <div className="flex flex-col gap-1.5">
-                <span className="text-xs font-medium">{t.outputFieldFormat}</span>
-                <Input placeholder="DD/MM/YYYY HH:mm:ss" title={t.outputFieldFormatHint} {...register(`outputFields.${index}.format`)} />
-                <span className="text-muted-foreground text-xs">{t.outputFieldFormatHint}</span>
-              </div>
-              <div className="flex flex-col gap-1.5">
-                <span className="text-xs font-medium">{t.outputFieldDisplayFormat}</span>
-                <Input placeholder="DD/MM/YYYY HH:mm" title={t.outputFieldDisplayFormatHint} {...register(`outputFields.${index}.displayFormat`)} />
-                <span className="text-muted-foreground text-xs">{t.outputFieldDisplayFormatHint}</span>
-              </div>
-            </div>
-          )}
           <div className="grid grid-cols-2 gap-2">
             <div className="flex flex-col gap-1.5">
               <span className="text-xs font-medium">{t.outputFieldValueMap}</span>

@@ -8,6 +8,7 @@ Ghi lại các thay đổi đáng chú ý theo ngày. Mới nhất ở trên cù
 - **Sort**: khóa sort lấy từ giá trị gốc của upstream + `format` của field, nên sort đúng cả khi field khai báo `string` hoặc giá trị dạng `DD/MM/YYYY HH:mm:ss` (trước đây `new Date()` ra NaN nên mọi dòng bằng nhau).
 - **`format` nhận nhiều dạng**, ngăn cách bằng `|` (vd `DD/MM/YYYY HH:mm:ss|DD/MM/YYYY HH:mm|DD/MM/YYYY`); giá trị dạng ISO vẫn đi qua như cũ. Chuỗi ISO không có múi giờ được hiểu là UTC.
 - **`displayFormat` (mới)** trên output field `date`/`datetime`: định dạng hiển thị (token `DD MM YYYY HH mm ss`, múi giờ Asia/Ho_Chi_Minh). Mặc định giữ `DD-MM-YYYY` / `DD-MM-YYYY HH:mm`.
+- **Form admin**: field `Ngày`/`Ngày giờ` hiện ngay trên dòng chính 2 ô chọn: "Đọc từ API thật theo (format)" (chuyển chuỗi sang ngày) và "Hiển thị cho người dùng (displayFormat)", mỗi ô là dropdown mẫu có sẵn + "Tùy chỉnh…", kèm ví dụ xem trước cho displayFormat.
 - **FE**: giá trị ngày không parse được hiển thị nguyên văn thay vì `—`.
 - **Form admin datasource**: output field có ô `format` và `displayFormat`. Trước đây form không có `format` nên **lưu từ giao diện làm mất `format`** đã cấu hình trong config.json (nguyên nhân khả dĩ của lỗi datetime sai định dạng sau khi sửa trong admin).
 

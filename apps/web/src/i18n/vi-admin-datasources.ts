@@ -136,10 +136,14 @@ export const viAdminDatasources = {
   addRequireGroupButton: 'Thêm nhóm',
 
   outputFieldsSectionTitle: 'Các trường đầu ra (output)',
-  outputFieldFormat: 'Định dạng nguồn (format)',
-  outputFieldFormatHint: 'Cách API thật gửi ngày/giờ, vd DD/MM/YYYY HH:mm:ss. Nhiều dạng: ngăn cách bằng |',
-  outputFieldDisplayFormat: 'Định dạng hiển thị (displayFormat)',
-  outputFieldDisplayFormatHint: 'Cách hiển thị cho người dùng, vd DD/MM/YYYY HH:mm. Mặc định DD-MM-YYYY',
+  dateFormatCustomOption: 'Tùy chỉnh…',
+  dateFormatExample: 'Ví dụ:',
+  dateFormatSourceDefault: 'Tự nhận (ISO 8601)',
+  dateFormatDisplayDefault: 'Mặc định (DD-MM-YYYY)',
+  outputFieldFormat: 'Đọc từ API thật theo (format) — chuyển chuỗi sang ngày',
+  outputFieldFormatHint: 'Dạng chuỗi API thật gửi. Chọn kiểu "Ngày"/"Ngày giờ" để chuyển chuỗi thành ngày. Nhiều dạng: ngăn cách bằng |',
+  outputFieldDisplayFormat: 'Hiển thị cho người dùng (displayFormat)',
+  outputFieldDisplayFormatHint: 'Chọn dạng hiển thị đầu ra của ngày',
   outputFieldFrom: 'Lấy từ (from)',
   outputFieldFromHint: 'Đường dẫn lấy giá trị từ response API thật, vd data.hoTen',
   outputFieldFlagLabels: {
