@@ -91,6 +91,7 @@ export class HttpInfoAdapter implements DatasourceAdapter {
     for (const [key, value] of Object.entries(this.transport.queryParams ?? {})) url.searchParams.set(key, value);
     const body = this.buildUpstreamBody(input.params);
     const headers: Record<string, string> = { 'content-type': 'application/json', ...this.transport.headers };
+    if (input.requestId) headers['x-request-id'] = input.requestId;
     if (this.transport.auth?.kind === 'apiKeyHeader' && this.transport.auth.header && this.secrets.apiKeyValue) {
       headers[this.transport.auth.header] = this.secrets.apiKeyValue;
     } else if (this.transport.auth?.kind === 'bearer' && this.secrets.apiKeyValue) {
@@ -112,6 +113,7 @@ export class HttpInfoAdapter implements DatasourceAdapter {
     // Placeholder in case the overall timeout fires while this attempt is still in flight.
     record({ error: 'no response received yet' });
 
+    this.logger.log(`upstream --> ${this.transport.method} ${safeUrl(url)} ds=${this.datasource.code} attempt=${attempt} requestId=${input.requestId ?? '-'}`);
     let response;
     try {
       response = await request(url, {
@@ -122,10 +124,12 @@ export class HttpInfoAdapter implements DatasourceAdapter {
       });
     } catch (err) {
       record({ error: `network error: ${(err as Error).message}` });
+      this.logger.warn(`upstream <-- network error ds=${this.datasource.code} attempt=${attempt} ${Date.now() - startedAt}ms cause=${(err as Error).message} requestId=${input.requestId ?? '-'}`);
       throw new RetryableError(`network error calling ${this.datasource.code}`, err);
     }
 
     const text = await response.body.text().catch(() => null);
+    this.logger.log(`upstream <-- ${response.statusCode} ds=${this.datasource.code} attempt=${attempt} ${Date.now() - startedAt}ms requestId=${input.requestId ?? '-'}`);
     const parsed = text === null ? null : parseBodyText(text);
 
     if (response.statusCode >= 500 || response.statusCode === 429) {

@@ -81,7 +81,7 @@ export class QueryService {
     const startedAt = Date.now();
     this.logger.log(`query start datasource=${input.code} user=${input.user.username} requestId=${input.requestId} page=${page}`);
     try {
-      const result = await adapter.execute({ params: validatedParams, page, pageSize });
+      const result = await adapter.execute({ params: validatedParams, page, pageSize, requestId: input.requestId });
       const tookMs = Date.now() - startedAt;
 
       const envelope = this.mapper.map(result.records, config, { page, pageSize, requestId: input.requestId, tookMs });

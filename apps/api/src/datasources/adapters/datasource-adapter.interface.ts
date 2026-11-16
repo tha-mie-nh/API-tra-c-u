@@ -17,6 +17,8 @@ export interface AdapterExecuteInput {
   params: Record<string, unknown>;
   page?: number;
   pageSize?: number;
+  /** App request id, forwarded upstream as `X-Request-Id` so both sides' logs can be joined. */
+  requestId?: string;
 }
 
 /** One raw record, keyed by the UPSTREAM's own field names (pre-`from` mapping). */
