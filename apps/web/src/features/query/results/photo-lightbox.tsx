@@ -63,7 +63,9 @@ function PhotoSlideView({ code, columns, slide }: { code: string; columns: Query
 }
 
 function formatFieldValue(value: unknown, type: QueryColumn['type']): string {
-  if (type === 'datetime') return formatDateTime(String(value));
-  if (type === 'date') return formatDate(String(value));
+  if (type === 'datetime' || type === 'date') {
+    const formatted = type === 'datetime' ? formatDateTime(String(value)) : formatDate(String(value));
+    return formatted === '—' ? String(value) : formatted; // unparseable value: show it as received
+  }
   return String(value);
 }

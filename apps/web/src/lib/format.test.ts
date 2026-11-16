@@ -14,6 +14,11 @@ describe('date formatting with time zones', () => {
     expect(formatWithPattern(iso, 'HH:mm DD/MM/YYYY', 'America/New_York')).toBe('21:30 14/01/2026');
   });
 
+  it('never guesses a non-ISO string (02/03/2026 would be read month-first by Date)', () => {
+    expect(formatWithPattern('02/03/2026 14:10:00', 'DD/MM/YYYY')).toBeNull();
+    expect(formatDateTime('02/03/2026 14:10:00')).toBe('—');
+  });
+
   it('returns null for non-dates or unknown zones so callers can fall back to the raw value', () => {
     expect(formatWithPattern('không phải ngày', 'DD/MM/YYYY')).toBeNull();
     expect(formatWithPattern(iso, 'DD/MM/YYYY', 'Mars/Base')).toBeNull();

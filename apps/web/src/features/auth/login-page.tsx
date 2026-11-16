@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Link, Navigate, useLocation } from 'react-router';
+import { Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -53,8 +54,14 @@ export function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-svh items-center justify-center p-4">
-      <Card className="w-full max-w-sm">
+    <div className="from-primary/10 via-background to-background flex min-h-svh flex-col items-center justify-center gap-6 bg-gradient-to-br p-4">
+      <div className="flex flex-col items-center gap-3">
+        <span className="bg-primary text-primary-foreground grid size-12 place-items-center rounded-2xl shadow-md">
+          <Search className="size-6" />
+        </span>
+        <span className="text-lg font-semibold tracking-tight">{vi.app.title}</span>
+      </div>
+      <Card className="w-full max-w-sm shadow-md">
         <CardHeader>
           <CardTitle>{vi.auth.loginTitle}</CardTitle>
           <CardDescription>{vi.auth.loginSubtitle}</CardDescription>

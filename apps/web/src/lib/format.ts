@@ -7,10 +7,15 @@ const DISPLAY_TIME_ZONE = 'Asia/Ho_Chi_Minh';
 
 const PATTERN_TOKEN_RE = /YYYY|MM|DD|HH|mm|ss/g;
 
+/** The API sends ISO 8601. Anything else (e.g. `02/03/2026`) must NOT go through `new Date`, which would read it
+ * US-style (month first) and show a wrong date without any warning — such values are displayed as received. */
+const ISO_8601_RE = /^\d{4}-\d{2}-\d{2}([T ]\d{2}:\d{2}(:\d{2}(\.\d+)?)?)?(Z|[+-]\d{2}:?\d{2})?$/;
+
 /** Formats an ISO timestamp with a config-driven pattern (tokens `DD` `MM` `YYYY` `HH` `mm` `ss`,
  * anything else is a literal) in `timeZone` (IANA, default Asia/Ho_Chi_Minh). Returns `null` when the
  * value is not a date or the zone is unknown. */
 export function formatWithPattern(iso: string, pattern: string, timeZone: string = DISPLAY_TIME_ZONE): string | null {
+  if (!ISO_8601_RE.test(iso)) return null;
   const date = new Date(iso);
   if (Number.isNaN(date.getTime())) return null;
   let parts: Intl.DateTimeFormatPart[];

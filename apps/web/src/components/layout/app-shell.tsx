@@ -9,11 +9,13 @@ export function AppShell() {
     <div className="flex min-h-svh flex-col">
       <HeaderBar />
       <div className="flex flex-1">
-        <aside className="w-56 shrink-0 border-r">
+        <aside className="bg-sidebar w-60 shrink-0 border-r">
           <SidebarNav />
         </aside>
-        <main className="min-w-0 flex-1 p-6">
-          <Outlet />
+        <main className="min-w-0 flex-1 p-6 lg:p-8">
+          <div className="mx-auto max-w-[1400px]">
+            <Outlet />
+          </div>
         </main>
       </div>
     </div>

@@ -10,12 +10,14 @@ import { DatasourceIcon } from './datasource-icon';
 
 const linkClass = ({ isActive }: { isActive: boolean }) =>
   cn(
-    'flex items-center gap-2 rounded-md px-2.5 py-1.5 text-sm transition-colors',
-    isActive ? 'bg-muted text-foreground font-medium' : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+    'relative flex items-center gap-2.5 rounded-md px-3 py-2 text-sm transition-colors [&>svg]:shrink-0',
+    isActive
+      ? 'bg-sidebar-accent text-sidebar-accent-foreground font-medium before:bg-primary before:absolute before:top-1.5 before:bottom-1.5 before:left-0 before:w-0.5 before:rounded-full'
+      : 'text-muted-foreground hover:bg-muted hover:text-foreground',
   );
 
 function SectionLabel({ children }: { children: string }) {
-  return <p className="text-muted-foreground px-2.5 pt-4 pb-1 text-xs font-semibold uppercase">{children}</p>;
+  return <p className="text-muted-foreground/80 px-3 pt-5 pb-1.5 text-[11px] font-semibold tracking-wider uppercase">{children}</p>;
 }
 
 /**
@@ -41,7 +43,7 @@ export function SidebarNav() {
   const showAdminSection = canViewQueryInsights || canViewUsers || canViewRoles || canViewAudit || canViewDatasources || canViewQueryStats;
 
   return (
-    <nav className="flex flex-col gap-0.5 p-2">
+    <nav className="flex flex-col gap-0.5 p-3">
       <NavLink to="/" end className={linkClass}>
         <Home className="size-4" />
         {vi.nav.home}

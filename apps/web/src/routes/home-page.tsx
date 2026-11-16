@@ -12,9 +12,9 @@ export function HomePage() {
 
   return (
     <div className="flex flex-col gap-4">
-      <div>
-        <h1 className="text-xl font-semibold">Xin chào, {user?.fullName}</h1>
-        <dl className="text-muted-foreground mt-1 flex flex-wrap gap-x-6 gap-y-0.5 text-sm">
+      <div className="from-primary/10 border-primary/15 rounded-xl border bg-gradient-to-r to-transparent p-5">
+        <h1 className="text-xl font-semibold tracking-tight">Xin chào, {user?.fullName}</h1>
+        <dl className="text-muted-foreground mt-1.5 flex flex-wrap gap-x-6 gap-y-0.5 text-sm">
           <div className="flex items-center gap-1">
             <dt className="font-medium">Tên đăng nhập:</dt>
             <dd>{user?.username}</dd>
@@ -33,10 +33,12 @@ export function HomePage() {
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {datasources.map((ds) => (
             <Link key={ds.code} to={`/tra-cuu/${ds.code}`}>
-              <Card className="hover:border-primary/50 transition-colors">
+              <Card className="hover:ring-primary/40 h-full transition-all hover:-translate-y-0.5 hover:shadow-md">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 text-base">
-                    <DatasourceIcon code={ds.code} className="text-primary size-4 shrink-0" />
+                    <span className="bg-primary/10 text-primary grid size-8 shrink-0 place-items-center rounded-lg">
+                      <DatasourceIcon code={ds.code} className="size-4" />
+                    </span>
                     {ds.name}
                   </CardTitle>
                 </CardHeader>
