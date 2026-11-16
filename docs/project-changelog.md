@@ -12,6 +12,17 @@ Ghi lại các thay đổi đáng chú ý theo ngày. Mới nhất ở trên cù
 - **FE**: giá trị ngày không parse được hiển thị nguyên văn thay vì `—`.
 - **Form admin datasource**: output field có ô `format` và `displayFormat`. Trước đây form không có `format` nên **lưu từ giao diện làm mất `format`** đã cấu hình trong config.json (nguyên nhân khả dĩ của lỗi datetime sai định dạng sau khi sửa trong admin).
 
+### Góp ý của leader (đợt 2)
+- **Sửa lỗi nghiêm trọng của bản trước**: `config.schema.json` không cho phép `displayFormat` (`additionalProperties: false`), nên chọn format hiển thị trong form admin sẽ bị từ chối khi lưu. Đã thêm vào schema (kèm test hồi quy).
+- **Map 1 lần**: `name` của trường input/output chính là key của API (`soHC`, `ngaySinh`), `label` là tên hiển thị; bỏ `mapTo`/`from` khỏi form và `config.json`. Config cũ có `mapTo`/`from` vẫn chạy. Script chuyển đổi: `node scripts/migrate-config-single-key.js <config.json> --write`. Tiêu đề nhóm kết quả lấy từ `output.labelField` (mặc định `fullName`, rồi đến định danh). `from` chỉ còn dùng cho đường dẫn lồng nhau (`data.hoTen`) trong mục nâng cao.
+- **Danh mục (enum dictionary)**: `dictionaries` ở cấp cao của config; trường input dùng `optionsRef`, trường output dùng `valueMapRef`. Trang **Quản trị → Danh mục** (`/quan-tri/danh-muc`) xem/sửa bảng key-giá trị, thấy danh mục đang được trường nào dùng; không xóa được danh mục đang dùng. Sửa danh mục có hiệu lực ngay, không cần restart. API: `GET/PUT/DELETE /admin/dictionaries[/:name]`.
+- **Múi giờ**: output field có `sourceTimeZone` (múi giờ của API thật cho giờ không kèm múi giờ, mặc định UTC) và `displayTimeZone` (hiển thị, mặc định Asia/Ho_Chi_Minh); chọn trong form admin, kiểm tra tên IANA khi lưu.
+- **Query param tĩnh**: `transport.queryParams` (`{"tab":"1"}` thành `?tab=1`), nhập ở form admin.
+- **Log transaction**: mỗi lần gọi upstream ghi `upstream -->` / `upstream <--` (trạng thái, ms, attempt); `X-Request-Id` của app được gửi sang upstream để nối log hai phía.
+- **API giả dạng echo** (`scripts/mock-echo-server.js`, `docker/mock-echo.Dockerfile`): mọi method/path trả 200 kèm bản ghi mặc định + `echo` (method, URL, query, header đã che, body), log từng request/response. Env: `PORT`, `MOCK_ECHO_RESPONSE`, `MOCK_ECHO_DELAY_MS`, `MOCK_ECHO_STATUS`.
+- **Form admin URL/API key**: chọn "Nhập tay" trước đây đặt giá trị về rỗng và ẩn luôn ô nhập (nên trường trông như biến mất); nay giữ giá trị và hiện ô nhập. Có cảnh báo khi biến môi trường chưa được đặt trên server API.
+- **Giới hạn**: `deploy-check/config` (bản phát hành) chưa chuyển sang định dạng mới, cập nhật khi build bản phát hành kế tiếp. Bản ghi lịch sử cũ giữ tên tham số cũ.
+
 ### Log backend dạng text, ghi file
 - Định dạng `YYYY-MM-DD HH:mm:ss,SSS - LEVEL - context - message` (context đóng vai threadName), thay cho JSON pino. `LOG_LEVEL`, `LOG_TIMEZONE` (mặc định Asia/Ho_Chi_Minh), `LOG_FILE` (tùy chọn, vd `/var/log/app/api.log`).
 - Mỗi request có dòng `-->` khi vào và `<--` khi trả (status, ms, requestId, user); không ghi body/query string. Lỗi 4xx ghi WARN, 5xx ghi ERROR kèm stack. `QueryService` ghi `query start/ok/failed` kèm nguyên nhân thật của lỗi upstream (trước đây bị nuốt).
