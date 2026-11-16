@@ -1,6 +1,6 @@
 # Báo cáo sửa lỗi 2026-11-16
 
-Các lỗi do Hưng báo, nhóm dễ và vừa đã sửa xong. Chi tiết kỹ thuật xem `project-changelog.md` (mục 2026-11-16).
+Các lỗi được báo trong quá trình sử dụng, nhóm dễ và vừa đã sửa xong. Chi tiết kỹ thuật xem `project-changelog.md` (mục 2026-11-16).
 
 ## Đã sửa
 
@@ -13,9 +13,9 @@ Các lỗi do Hưng báo, nhóm dễ và vừa đã sửa xong. Chi tiết kỹ 
 
 Đã kiểm tra: test API 233/234 pass (1 test fail do biến môi trường `*_BASE_URL` chưa đặt khi chạy test, không liên quan), test web 179/179 pass, typecheck sạch. Log, danh mục, query param, múi giờ đã chạy thử trên API thật. Chưa kiểm tra giao diện trên trình duyệt.
 
-Theo góp ý đợt 1 của leader: field kiểu Ngày/Ngày giờ trong form admin hiện ngay 2 dropdown chọn mẫu, **format đọc từ API thật** (chuyển chuỗi sang ngày) và **format hiển thị đầu ra**, có mục "Tùy chỉnh…" và ví dụ xem trước.
+Chọn định dạng ngày: field kiểu Ngày/Ngày giờ trong form admin hiện ngay 2 dropdown chọn mẫu, **format đọc từ API thật** (chuyển chuỗi sang ngày) và **format hiển thị đầu ra**, có mục "Tùy chỉnh…" và ví dụ xem trước.
 
-## Bổ sung theo góp ý đợt 2 của leader
+## Bổ sung đợt 2
 
 | Yêu cầu | Đã làm |
 |---|---|
@@ -32,7 +32,7 @@ Theo góp ý đợt 1 của leader: field kiểu Ngày/Ngày giờ trong form ad
 
 Đã tái hiện bằng trình duyệt thật và upstream giả chập chờn, không còn chỉ là suy đoán.
 
-| Triệu chứng của Hưng | Nguyên nhân thật | Đã sửa |
+| Triệu chứng được báo | Nguyên nhân thật | Đã sửa |
 |---|---|---|
 | Lần đầu tra cứu không gửi được, bấm lần 2-3 mới được | `defaults` trong config (retry 2 lần, timeout, giới hạn) **không được dùng ở đâu**. Nguồn dữ liệu không khai báo `retry` có 0 lần thử lại, một lần upstream reset kết nối hoặc trả 503 là báo lỗi 502 ngay | Áp dụng `defaults` vào cấu hình chạy. Tái hiện: lần 1 trả 502, lần 2-3 trả 200. Sau sửa: lần 1 tự thử lại và trả 200 |
 | Xóa cache thì mất URL và API key trong form nguồn dữ liệu | Ô chọn (Radix Select) tự bắn giá trị rỗng khi danh sách biến môi trường tải về sau. Form ghi `${}` vào URL và xóa tên biến API key | Bỏ qua giá trị rỗng. Kiểm tra lại bằng trình duyệt: hiện đúng tên biến |
@@ -44,7 +44,7 @@ Ngoài ra: lúc tải trang và đăng nhập, `/auth/me` gọi trước khi có
 ## Chưa sửa
 
 - Chưa thấy trường hợp nào khác làm "lần đầu không gửi" trên máy mình. Nếu lab vẫn còn, mở console trình duyệt (có dòng `[api] ... requestId=...`) và tìm requestId đó trong log backend: không có dòng `-->` nghĩa là request không tới được server.
-- Log phía frontend: để nguyên theo góp ý (chỉ warn/error).
+- Log phía frontend: để nguyên (frontend chỉ cần warn/error).
 
 ## Khi triển khai
 

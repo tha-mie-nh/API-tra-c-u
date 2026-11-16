@@ -1,6 +1,6 @@
 # Mô tả image phát hành: api-v13, web-v16 (và mock-echo)
 
-Tài liệu cho leader: image nào, chứa gì, khác bản trước ra sao, cách chạy và lưu ý khi nâng cấp.
+Tài liệu mô tả image phát hành: image nào, chứa gì, khác bản trước ra sao, cách chạy và lưu ý khi nâng cấp.
 Chi tiết cách đóng gói (multi-stage, bảo mật) xem `deploy-check/docker-images-explained.md`.
 
 ## 1. Danh sách image

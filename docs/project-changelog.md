@@ -25,7 +25,7 @@ Ghi lại các thay đổi đáng chú ý theo ngày. Mới nhất ở trên cù
 - **Trace**: FE gửi `X-Request-Id` cho mỗi request và ghi `console.warn/error` (401, lỗi mạng, lỗi API) kèm id đó; backend chỉ nhận id dạng token ngắn `[A-Za-z0-9._-]{1,64}` (chống chèn dòng log), nên khớp được dòng log FE với dòng `-->`/`<--`/`upstream` ở BE.
 - **API giả echo**: thêm `MOCK_ECHO_FAIL_FIRST=N` + `MOCK_ECHO_FAIL_MODE=reset|503` để giả lập upstream chập chờn. Image `gthanh/app_tra_cuu:mock-echo-v1` (đã push, chạy bằng user `node`).
 
-### Góp ý của leader (đợt 2)
+### Đợt 2: danh mục, map một lần, múi giờ, query param, API giả
 - **Sửa lỗi nghiêm trọng của bản trước**: `config.schema.json` không cho phép `displayFormat` (`additionalProperties: false`), nên chọn format hiển thị trong form admin sẽ bị từ chối khi lưu. Đã thêm vào schema (kèm test hồi quy).
 - **Map 1 lần**: `name` của trường input/output chính là key của API (`soHC`, `ngaySinh`), `label` là tên hiển thị; bỏ `mapTo`/`from` khỏi form và `config.json`. Config cũ có `mapTo`/`from` vẫn chạy. Script chuyển đổi: `node scripts/migrate-config-single-key.js <config.json> --write`. Tiêu đề nhóm kết quả lấy từ `output.labelField` (mặc định `fullName`, rồi đến định danh). `from` chỉ còn dùng cho đường dẫn lồng nhau (`data.hoTen`) trong mục nâng cao.
 - **Danh mục (enum dictionary)**: `dictionaries` ở cấp cao của config; trường input dùng `optionsRef`, trường output dùng `valueMapRef`. Trang **Quản trị → Danh mục** (`/quan-tri/danh-muc`) xem/sửa bảng key-giá trị, thấy danh mục đang được trường nào dùng; không xóa được danh mục đang dùng. Sửa danh mục có hiệu lực ngay, không cần restart. API: `GET/PUT/DELETE /admin/dictionaries[/:name]`.
@@ -101,7 +101,7 @@ Ghi lại các thay đổi đáng chú ý theo ngày. Mới nhất ở trên cù
 - `records` là số bản ghi trong các trang đã trả về, không phải tổng dữ liệu nguồn.
 - Log ghi trước khi có cột `status_code` không có mã HTTP (hiển thị "—").
 - Chưa kiểm tra giao diện trên trình duyệt thật.
-- Chưa có retention/dọn `query_logs` (cần quyết định của leader).
+- Chưa có retention/dọn `query_logs` (cần quyết định chính sách lưu giữ).
 - Ngưỡng bất thường và giờ làm việc là giá trị tạm, cần xác nhận nghiệp vụ.
 - `apps/api/test/query.e2e-spec.ts` fail 5/7 từ trước: dùng datasource `CITIZEN_BASIC` đã tắt trong `config.json`, không do tính năng này.
 

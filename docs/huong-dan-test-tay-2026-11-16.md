@@ -1,4 +1,4 @@
-# Hướng dẫn test tay các lỗi leader đã báo (2026-11-16)
+# Hướng dẫn test tay các lỗi và yêu cầu đã xử lý (2026-11-16)
 
 Mỗi mục có: **lỗi cũ**, **các bước**, **kết quả đúng**. Làm theo thứ tự hoặc chọn mục cần verify.
 
@@ -15,7 +15,7 @@ pnpm dev                                            # api :3000 + web :5173
   (in ra mật khẩu tạm, lần đăng nhập đầu phải đổi).
 - Dữ liệu thử dùng nguồn **Tra cứu dữ liệu xuất nhập cảnh** (`IMMIGRATION_HISTORY`), nhập **Số hộ chiếu = `E00123456`**. Upstream giả trả 2 bản ghi: `15/01/2026 09:30:00` (Nhập/Xuất) và `02/02/2026 14:10:00`.
 - Log backend xem ngay trên terminal chạy `pnpm dev`. Bản docker: `docker compose -f docker-compose.prod.yml logs -f api`.
-- Sau khi test xong, nhớ khôi phục các thay đổi bạn làm ở form admin (hoặc `git checkout config/config.json`).
+- Sau khi test xong, nhớ khôi phục các thay đổi đã làm ở form admin (hoặc `git checkout config/config.json`).
 
 ---
 
@@ -44,7 +44,7 @@ pnpm dev                                            # api :3000 + web :5173
 
 ## 3. Chọn format hiển thị đầu ra, convert sang date
 
-**Yêu cầu leader:** chỗ date phải cho chọn format output; chuyển chuỗi sang date.
+**Yêu cầu:** chỗ date phải cho chọn format output; chuyển chuỗi sang date.
 
 1. Sửa `IMMIGRATION_HISTORY`. Dòng field kiểu **Ngày** hoặc **Ngày giờ** hiện ngay 4 ô chọn: *Đọc từ API thật theo (format)*, *Hiển thị cho người dùng (displayFormat)*, *Múi giờ của API thật*, *Múi giờ hiển thị*.
 2. Ở `ngayXuatNhap`, ô *Hiển thị cho người dùng* chọn `HH:mm DD/MM/YYYY`. Dưới ô hiện ví dụ (`Ví dụ: 09:30 15/01/2026`). Chọn **Tùy chỉnh…** thì có ô gõ tay.
@@ -53,7 +53,7 @@ pnpm dev                                            # api :3000 + web :5173
 
 ## 4. Múi giờ
 
-**Yêu cầu leader:** UTC cũng được, hoặc cài đặt múi giờ để frontend hiển thị theo đó.
+**Yêu cầu:** UTC cũng được, hoặc cài đặt múi giờ để frontend hiển thị theo đó.
 
 1. Mặc định: upstream `15/01/2026 09:30:00` được hiểu là UTC, hiển thị giờ Việt Nam là **16:30**.
 2. Sửa `ngayXuatNhap`, *Múi giờ của API thật* chọn **Asia/Ho_Chi_Minh**, Lưu, tra cứu: hiện **09:30** (đúng giờ gốc).
@@ -62,7 +62,7 @@ pnpm dev                                            # api :3000 + web :5173
 
 ## 5. Log backend
 
-**Yêu cầu leader:** log dạng `asctime - levelname - threadName - message`, mỗi request/response có log, log lỗi hệ thống, ghi vào file.
+**Yêu cầu:** log dạng `asctime - levelname - threadName - message`, mỗi request/response có log, log lỗi hệ thống, ghi vào file.
 
 1. Bấm Tra cứu một lần. Trên terminal backend phải có chuỗi dòng dạng (giờ Việt Nam):
    ```
@@ -80,7 +80,7 @@ pnpm dev                                            # api :3000 + web :5173
 
 ## 6. API giả (docker image echo) và query param
 
-**Yêu cầu leader:** giả lập một API docker trả về mặc định kèm query/body/param để trace transaction; hỗ trợ `tab=1` thành `?tab=1`.
+**Yêu cầu:** giả lập một API docker trả về mặc định kèm query/body/param để trace transaction; hỗ trợ `tab=1` thành `?tab=1`.
 
 1. Chạy image: `docker run --rm -p 4200:4200 gthanh/app_tra_cuu:mock-echo-v1` (log của nó hiện từng `-->`/`<--`).
 2. Thử trực tiếp: `curl -s -X POST "localhost:4200/find?tab=1" -H 'X-Access-Key: bi-mat' -d '{"soHC":"B1"}'`. Kết quả có `data.items[0]` chứa `tab:"1"`, `soHC:"B1"` và khối `echo` với đúng method, URL (`/find?tab=1`), query, body; header `x-access-key` hiện `[redacted]`.
@@ -119,7 +119,7 @@ pnpm dev                                            # api :3000 + web :5173
 
 ## 9. Danh mục (enum dictionary)
 
-**Yêu cầu leader:** mục cấu hình danh mục, bảng key-value, các mục trong config lấy từ đây.
+**Yêu cầu:** mục cấu hình danh mục, bảng key-value, các mục trong config lấy từ đây.
 
 1. Menu trái **Quản trị → Danh mục** (`/quan-tri/danh-muc`). Nhập tên `GENDER` (chữ hoa) → dấu `+`. Bảng key-value: thêm `M` = `Nam`, `F` = `Nữ`. **Lưu**. Danh mục xuất hiện bên trái với số dòng.
 2. Tên sai (chữ thường/ký tự lạ) bị báo lỗi; key trùng nhau bị báo lỗi, nút Lưu bị khóa.
@@ -130,7 +130,7 @@ pnpm dev                                            # api :3000 + web :5173
 
 ## 10. Chỉ map một lần (key theo API)
 
-**Yêu cầu leader:** `ngaySinh → Ngày sinh`, không map qua key trung gian của frontend.
+**Yêu cầu:** `ngaySinh → Ngày sinh`, không map qua key trung gian của frontend.
 
 1. Sửa `IMMIGRATION_HISTORY`: ở **Đầu vào**, mỗi dòng có ô **Key theo API (name)** = `soHC`, `hoTen`, `ngaySinh`, `gioiTinh` và ô **Tên hiển thị (label)** = "Số hộ chiếu", "Họ và tên", "Ngày sinh"... Không còn ô `mapTo`/`from` ở dòng chính.
 2. Tra cứu nhập Số hộ chiếu: ở log backend của upstream giả `[mock-upstream] POST /find ...` body gửi đi có khóa `soHC` (đúng key API).
@@ -139,7 +139,7 @@ pnpm dev                                            # api :3000 + web :5173
 
 ## 11. Trace FE ↔ BE
 
-**Yêu cầu leader:** backend log kỹ để trace transaction; frontend chỉ cần warn/error.
+**Yêu cầu:** backend log kỹ để trace transaction; frontend chỉ cần warn/error.
 
 1. Mở F12 → **Console**. Bấm Tra cứu với dữ liệu hợp lệ: console **không** in log thường (frontend im lặng khi thành công).
 2. Gây lỗi: tắt backend (Ctrl+C `pnpm dev` phần api) rồi bấm Tra cứu. Console có `[api] network error POST /query/... requestId=web-xxxxxxxx...`. Bật lại backend; request ở thời điểm tắt không có dòng nào trong log backend (đúng: request không tới được server).
