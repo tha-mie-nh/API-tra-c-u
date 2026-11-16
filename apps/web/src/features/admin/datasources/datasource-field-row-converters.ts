@@ -38,6 +38,7 @@ export function inputFieldToRow(field: InputFieldDef): InputFieldRow {
     max: field.max !== undefined ? String(field.max) : '',
     pattern: field.pattern ?? '',
     format: field.format ?? '',
+    in: field.in ?? '',
     mapTo: field.mapTo ?? '',
     optionsRef: field.optionsRef ?? '',
     options: optionsToRows(field.options),
@@ -56,6 +57,7 @@ export function rowToInputField(row: InputFieldRow): InputFieldDef {
   if (row.max.trim()) field.max = Number(row.max);
   if (row.pattern.trim()) field.pattern = row.pattern.trim();
   if (row.format.trim()) field.format = row.format.trim();
+  if (row.in === 'body' || row.in === 'query') field.in = row.in;
   if (row.mapTo.trim()) field.mapTo = row.mapTo.trim();
   if (row.type === 'enum' && row.optionsRef.trim()) {
     field.optionsRef = row.optionsRef.trim();

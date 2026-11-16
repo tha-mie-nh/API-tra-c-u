@@ -39,7 +39,10 @@ export interface InputFieldDef {
   options?: FieldOption[];
   /** Name of a `dictionaries` entry; when set, `options` is filled from it (server-side, at load). */
   optionsRef?: string;
+  /** For `date`/`datetime`: the format the UPSTREAM expects (`DD/MM/YYYY`, `YYYYMMDD`, ...); default is ISO `YYYY-MM-DD`. */
   format?: string;
+  /** Where this value goes in the upstream request. Default: `body` for POST, `query` for GET. */
+  in?: 'body' | 'query';
   /** Upstream request key this field is sent as (server-only concern, but harmless to share). */
   mapTo?: string;
 }

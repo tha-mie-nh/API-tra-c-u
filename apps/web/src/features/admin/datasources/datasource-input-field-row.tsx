@@ -10,6 +10,7 @@ import type { DatasourceFormValues } from './datasource-form-schema';
 import { FIELD_TYPE_VALUES, makeEmptyFieldOptionRow } from './datasource-field-row-types';
 import { PairRowsEditor } from './datasource-pair-rows-editor';
 import { DictionaryRefSelect } from './datasource-dictionary-ref-select';
+import { DateFormatSelect, INPUT_SEND_PRESETS } from './datasource-output-date-format-fields';
 
 interface DatasourceInputFieldRowProps {
   index: number;
@@ -100,6 +101,22 @@ export function DatasourceInputFieldRow({
         <p className="text-destructive text-xs">{rowErrors?.name?.message ?? rowErrors?.label?.message}</p>
       )}
 
+      {(row.type === 'date' || row.type === 'datetime') && (
+        <div className="pl-8">
+          <DateFormatSelect
+            label={t.inputFieldFormat}
+            hint={t.inputFieldFormatHint}
+            defaultLabel={t.inputFormatDefault}
+            presets={INPUT_SEND_PRESETS}
+            value={row.format}
+            onChange={(v) => setValue(`inputFields.${index}.format`, v)}
+            register={register(`inputFields.${index}.format`)}
+            preview
+            previewTimeZone="UTC"
+          />
+        </div>
+      )}
+
       {expanded && (
         <div className="grid grid-cols-2 gap-2 border-t pt-2 pl-8">
           <Input placeholder={t.fieldRowMinLength} type="number" {...register(`inputFields.${index}.minLength`)} />
@@ -107,7 +124,20 @@ export function DatasourceInputFieldRow({
           <Input placeholder={t.fieldRowMin} type="number" {...register(`inputFields.${index}.min`)} />
           <Input placeholder={t.fieldRowMax} type="number" {...register(`inputFields.${index}.max`)} />
           <Input placeholder={t.fieldRowPattern} {...register(`inputFields.${index}.pattern`)} />
-          <Input placeholder={t.fieldRowFormat} {...register(`inputFields.${index}.format`)} />
+          <div className="col-span-2 flex flex-col gap-1.5">
+            <span className="text-xs font-medium">{t.fieldRowIn}</span>
+            <Select value={row.in || '__default__'} onValueChange={(v) => v && setValue(`inputFields.${index}.in`, v === '__default__' ? '' : v)}>
+              <SelectTrigger className="w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="__default__">{t.fieldRowInDefault}</SelectItem>
+                <SelectItem value="body">{t.fieldRowInBody}</SelectItem>
+                <SelectItem value="query">{t.fieldRowInQuery}</SelectItem>
+              </SelectContent>
+            </Select>
+            <span className="text-muted-foreground text-xs">{t.fieldRowInHint}</span>
+          </div>
           {row.mapTo && <Input placeholder={t.fieldRowMapTo} {...register(`inputFields.${index}.mapTo`)} />}
           {row.type === 'enum' && (
             <div className="col-span-2 flex flex-col gap-1.5">

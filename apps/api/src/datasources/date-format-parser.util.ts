@@ -113,3 +113,18 @@ export function parseDateValue(value: string, format?: string, timeZone?: string
   }
   return undefined;
 }
+
+const VALUE_PARTS_RE = /^(\d{4})-(\d{2})-(\d{2})(?:[T ](\d{2}):(\d{2})(?::(\d{2}))?)?/;
+const FORMAT_TOKEN_RE = /YYYY|MM|DD|HH|mm|ss/g;
+
+/**
+ * Renders a validated input date/datetime (`YYYY-MM-DD` or `YYYY-MM-DDTHH:mm[:ss]...`, as the search form produces it)
+ * in the upstream's own `format` (`DD/MM/YYYY`, `YYYYMMDD`, ...). The wall-clock digits are re-arranged as written; no
+ * time-zone conversion is applied. A value that is not in the expected shape is returned unchanged.
+ */
+export function formatDateValue(value: string, format: string): string {
+  const m = VALUE_PARTS_RE.exec(value.trim());
+  if (!m) return value;
+  const parts: Record<string, string> = { YYYY: m[1]!, MM: m[2]!, DD: m[3]!, HH: m[4] ?? '00', mm: m[5] ?? '00', ss: m[6] ?? '00' };
+  return format.replace(FORMAT_TOKEN_RE, (token) => parts[token] ?? token);
+}

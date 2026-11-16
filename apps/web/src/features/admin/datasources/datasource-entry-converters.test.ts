@@ -155,5 +155,21 @@ describe('input/output field builder round trip (follow-up to phase-03: visual b
     expect(payload.output).not.toHaveProperty('recordsPath');
     expect(payload.output).not.toHaveProperty('labelField');
   });
+
+  it('round trip keeps an input field\'s upstream date format and where it is sent (`in`)', () => {
+    const original = httpAdminDatasource();
+    original.input = {
+      fields: [
+        { name: 'ngaySinh', label: 'Ngày sinh', type: 'date', format: 'DD/MM/YYYY', in: 'query' },
+        { name: 'id', label: 'ID', type: 'string' },
+      ],
+    } as AdminDatasource['input'];
+
+    const payload = formValuesToEntryPayload(entryToFormValues(original), original);
+    const fields = payload.input.fields as unknown as Record<string, unknown>[];
+
+    expect(fields[0]).toMatchObject({ format: 'DD/MM/YYYY', in: 'query' });
+    expect(fields[1]).not.toHaveProperty('in'); // default (empty) is not written to config
+  });
 });
 

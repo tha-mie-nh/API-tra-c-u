@@ -44,11 +44,13 @@ export function DatasourceTransportFields({ register, watch, setValue, control, 
 
   const baseUrlValue = watch('httpBaseUrl') ?? '';
   const matchedEnvName = envRefs?.baseUrlEnvNames.find((name) => baseUrlValue === `\${${name}}`);
-  const baseUrlMode = matchedEnvName ?? (baseUrlValue !== '' || baseUrlCustom ? CUSTOM_BASE_URL_OPTION : undefined);
+  // The explicit "tự viết" choice wins over a value that still happens to equal an env reference (`${NAME}`): the
+  // text stays as the starting point to edit, but the manual input must be shown, otherwise it cannot be changed.
+  const baseUrlMode = baseUrlCustom ? CUSTOM_BASE_URL_OPTION : (matchedEnvName ?? (baseUrlValue !== '' ? CUSTOM_BASE_URL_OPTION : undefined));
 
   const authValueEnvValue = watch('authValueEnv') ?? '';
   const matchedApiKeyEnvName = envRefs?.apiKeyEnvNames.find((name) => authValueEnvValue === name);
-  const authValueEnvMode = matchedApiKeyEnvName ?? (authValueEnvValue !== '' || authEnvCustom ? CUSTOM_AUTH_VALUE_ENV_OPTION : undefined);
+  const authValueEnvMode = authEnvCustom ? CUSTOM_AUTH_VALUE_ENV_OPTION : (matchedApiKeyEnvName ?? (authValueEnvValue !== '' ? CUSTOM_AUTH_VALUE_ENV_OPTION : undefined));
   const authHeaderValue = watch('authHeader') ?? '';
 
   return (

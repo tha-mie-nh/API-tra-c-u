@@ -55,6 +55,9 @@ export function validateCrossFieldConstraints(config: DatasourceConfigFile, conf
       }
     }
     for (const f of ds.input.fields) {
+      if (f.in === 'body' && ds.transport.kind === 'http' && ds.transport.method === 'GET') {
+        issues.push(`${ds.code}: input field "${f.name}" has in=body but the transport method is GET (a GET has no body)`);
+      }
       if (f.optionsRef && !(f.optionsRef in dictionaries)) {
         issues.push(`${ds.code}: input field "${f.name}" optionsRef references unknown dictionary "${f.optionsRef}"`);
       }

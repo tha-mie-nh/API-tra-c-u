@@ -123,6 +123,9 @@ RUN DATABASE_URL="postgresql://user:pass@localhost:5432/db?schema=app" \
   && chown -R node:node apps/api/node_modules/.prisma apps/api/node_modules/@prisma 2>/dev/null || true
 COPY --from=build --chown=node:node /repo/packages/shared/dist packages/shared/dist
 COPY --from=build --chown=node:node /repo/apps/api/dist apps/api/dist
+# The config DSL schema ships with the code (see config-snapshot-builder.ts): a mounted config/ dir that still holds
+# an older config.schema.json must not be able to override it and reject newer keys.
+COPY --chown=node:node config/config.schema.json schema/config.schema.json
 
 # The official node:*-bookworm-slim base bundles its own global `npm` CLI
 # (and npm's own vendored copies of tar/pacote/sigstore etc — see

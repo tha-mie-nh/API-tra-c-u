@@ -150,6 +150,22 @@ pnpm dev                                            # api :3000 + web :5173
 3. `config/config.json` (xem bằng `git diff` hoặc mở file): field có dạng `{ "name": "ngaySinh", "label": "Ngày sinh", ... }`, không có `mapTo`/`from`.
 4. Config cũ vẫn chạy: lấy file cũ có `mapTo`/`from` đặt vào chạy thử, vẫn tra cứu bình thường. Chuyển bằng script: `node scripts/migrate-config-single-key.js <file> --write`.
 
+## 10b. Định dạng ngày của trường input, tra cứu bằng query param
+
+1. **Quản trị → Nguồn dữ liệu → Sửa** `IMMIGRATION_HISTORY`. Ở trường input `ngaySinh` (kiểu Ngày) có ô **Định dạng gửi lên API thật (format)**: chọn `DD/MM/YYYY` (dưới ô có ví dụ), Lưu. Lưu thành công.
+2. Tạo nguồn thử trỏ vào API giả echo (`http://localhost:4200`, mục 6) với method **GET**, đường dẫn `/search`, input `soHC` (Chuỗi) và `ngaySinh` (Ngày, format `DD/MM/YYYY`). Tra cứu `B999` và ngày sinh 12-05-1999: log của `echo-mock` (`docker logs echo-mock`) phải có `GET /search?soHC=B999&ngaySinh=12%2F05%2F1999` (GET gửi bằng query).
+3. Đổi sang method **POST**, ở phần mở rộng của từng dòng input chọn **Gửi lên API thật bằng = Query param**, format ngày `YYYYMMDD`. Tra cứu lại: log echo `POST /search?soHC=B999&ngaySinh=19990512 ... body=-` (không có body).
+4. Chọn `Body JSON` cho một trường rồi đổi method về GET và Lưu: bị từ chối ("has in=body but the transport method is GET").
+5. Xóa các nguồn thử.
+
+## 10c. Chọn URL env rồi sửa thành URL tự viết
+
+Sửa nguồn dữ liệu có URL dạng biến môi trường, ô URL chọn **✏️ Tự viết URL khác**: ô nhập hiện ra với giá trị cũ (`${...}`), gõ URL riêng được, Lưu thì `config.json` có URL mới. Tương tự với ô biến API key (**Tên biến khác**).
+
+## 10d. Lưu không bị "must NOT have additional properties"
+
+Trên môi trường dùng image mới: để lại `config.schema.json` bản cũ trong thư mục config được mount, mở form sửa nguồn dữ liệu, chọn trường làm tiêu đề (`labelField`) và định dạng hiển thị ngày, Lưu: phải thành công (schema trong image được dùng, không phải bản trong thư mục mount).
+
 ## 11. Trace FE ↔ BE
 
 **Yêu cầu:** backend log kỹ để trace transaction; frontend chỉ cần warn/error.

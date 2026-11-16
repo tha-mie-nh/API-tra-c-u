@@ -4,6 +4,7 @@ import type { DatasourceEntry, TransportHttp, UpstreamRequestSnapshot, UpstreamR
 import type { ResolvedHttpSecrets } from '../datasource-config.loader';
 import type { AdapterExecuteInput, AdapterExecuteResult, DatasourceAdapter, RawRecord, UpstreamExchange } from './datasource-adapter.interface';
 import { UpstreamError, UpstreamTimeoutError } from './adapter-errors';
+import { buildUpstreamParts } from './upstream-request-params.util';
 import { buildExchange, parseBodyText, redactHeaders, safeUrl } from './upstream-exchange.util';
 import { withTimeout } from './with-timeout.util';
 
@@ -98,7 +99,8 @@ export class HttpInfoAdapter implements DatasourceAdapter {
   private async callOnce(input: AdapterExecuteInput, attempt: number, tracker: ExchangeTracker): Promise<AdapterExecuteResult> {
     const url = new URL(this.transport.path, this.secrets.baseUrl);
     for (const [key, value] of Object.entries(this.transport.queryParams ?? {})) url.searchParams.set(key, value);
-    const body = this.buildUpstreamBody(input.params);
+    const { body, query } = buildUpstreamParts(this.datasource.input.fields, input.params, this.transport.method);
+    for (const [key, value] of Object.entries(query)) url.searchParams.set(key, value);
     const headers: Record<string, string> = { 'content-type': 'application/json', ...this.transport.headers };
     if (input.requestId) headers['x-request-id'] = input.requestId;
     if (this.transport.auth?.kind === 'apiKeyHeader' && this.transport.auth.header && this.secrets.apiKeyValue) {
@@ -107,7 +109,8 @@ export class HttpInfoAdapter implements DatasourceAdapter {
       headers.authorization = `Bearer ${this.secrets.apiKeyValue}`;
     }
 
-    const sendsBody = this.transport.method === 'POST';
+    // POST with every field in the query (search by params only) sends no body at all.
+    const sendsBody = this.transport.method === 'POST' && Object.keys(body).length > 0;
     const snapshot: UpstreamRequestSnapshot = {
       transport: 'http',
       method: this.transport.method,
@@ -158,16 +161,6 @@ export class HttpInfoAdapter implements DatasourceAdapter {
     const total = getByPath(json, this.datasource.output.totalPath) as number | undefined;
     const requestId = getByPath(json, this.datasource.output.requestIdPath) as string | undefined;
     return { records, total, requestId, exchange: tracker.last };
-  }
-
-  private buildUpstreamBody(params: Record<string, unknown>): Record<string, unknown> {
-    const body: Record<string, unknown> = {};
-    for (const field of this.datasource.input.fields) {
-      const value = params[field.name];
-      if (value === undefined) continue;
-      body[field.mapTo ?? field.name] = value;
-    }
-    return body;
   }
 }
 

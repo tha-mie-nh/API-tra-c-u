@@ -1,6 +1,6 @@
 import Ajv, { type ErrorObject, type ValidateFunction } from 'ajv';
 import addFormats from 'ajv-formats';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import type { DatasourceConfigFile } from '@app/shared';
 import { validateCrossFieldConstraints } from './config-cross-field-validator';
@@ -26,7 +26,16 @@ export interface BuildSnapshotOptions {
 // Same depth as datasource-config.loader.ts's REPO_ROOT (this file lives in
 // the same directory): src/datasources -> src -> api -> apps -> repo root.
 const REPO_ROOT = join(__dirname, '..', '..', '..', '..');
-const CONFIG_SCHEMA_PATH = join(REPO_ROOT, 'config', 'config.schema.json');
+/**
+ * The schema belongs to the CODE (the DSL it validates is implemented here), not to the operator's mounted `config/`
+ * directory. The Docker image therefore carries its own copy (`/repo/schema/config.schema.json`) and that copy wins:
+ * a stale `config.schema.json` left in a mounted config dir by an earlier release used to reject every key added since
+ * ("must NOT have additional properties" on Lưu). In dev there is no bundled copy, so the repo's `config/` one is used.
+ * `CONFIG_SCHEMA_PATH` overrides both.
+ */
+const BUNDLED_SCHEMA_PATH = join(REPO_ROOT, 'schema', 'config.schema.json');
+export const CONFIG_SCHEMA_PATH =
+  process.env.CONFIG_SCHEMA_PATH ?? (existsSync(BUNDLED_SCHEMA_PATH) ? BUNDLED_SCHEMA_PATH : join(REPO_ROOT, 'config', 'config.schema.json'));
 
 let cachedValidate: ValidateFunction | undefined;
 

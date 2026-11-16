@@ -224,4 +224,27 @@ describe('buildConfigSnapshot', () => {
     (entry.output.fields[1] as Record<string, unknown>).sourceTimeZone = 'Asia/Ho_Chi_Minh';
     expect(() => buildConfigSnapshot(configFile([entry]), { configDir: CONFIG_DIR, nodeEnv: 'development', allowMock: false })).not.toThrow();
   });
+
+  describe('input field `in` / `format`', () => {
+    const opts = { configDir: CONFIG_DIR, nodeEnv: 'development', allowMock: false };
+    const withInput = (method: 'GET' | 'POST', field: Record<string, unknown>) => {
+      const entry = httpEntry('IN_DS', { input: { fields: [{ name: 'q', label: 'Q', type: 'string', ...field }] } });
+      (entry.transport as Record<string, unknown>).method = method;
+      return configFile([entry]);
+    };
+
+    it('accepts `in: query` on a POST and a date `format` (schema regression)', () => {
+      expect(() => buildConfigSnapshot(withInput('POST', { in: 'query' }), opts)).not.toThrow();
+      expect(() => buildConfigSnapshot(withInput('GET', { type: 'date', format: 'DD/MM/YYYY' }), opts)).not.toThrow();
+    });
+
+    it('rejects `in: body` when the transport method is GET (a GET has no body)', () => {
+      expect(() => buildConfigSnapshot(withInput('GET', { in: 'body' }), opts)).toThrow(/has in=body but the transport method is GET/);
+    });
+
+    it('rejects an unknown `in` value', () => {
+      expect(() => buildConfigSnapshot(withInput('POST', { in: 'header' }), opts)).toThrow();
+    });
+  });
 });
+

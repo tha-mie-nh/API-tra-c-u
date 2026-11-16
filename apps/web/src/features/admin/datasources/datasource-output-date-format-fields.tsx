@@ -15,6 +15,8 @@ const SOURCE_PRESETS = [
   'DD/MM/YYYY HH:mm',
   'DD/MM/YYYY HH:mm:ss|DD/MM/YYYY HH:mm|DD/MM/YYYY',
 ];
+/** Formats an upstream may expect for a date/datetime the user picked in the search form (default is ISO YYYY-MM-DD). */
+export const INPUT_SEND_PRESETS = ['DD/MM/YYYY', 'DD-MM-YYYY', 'YYYYMMDD', 'YYYY-MM-DD HH:mm:ss', 'DD/MM/YYYY HH:mm:ss', 'YYYYMMDDHHmmss'];
 const DISPLAY_PRESETS = ['DD/MM/YYYY', 'DD-MM-YYYY', 'YYYY-MM-DD', 'DD/MM/YYYY HH:mm', 'DD/MM/YYYY HH:mm:ss', 'HH:mm DD/MM/YYYY'];
 const TIME_ZONES = ['UTC', 'Asia/Ho_Chi_Minh', 'Asia/Bangkok', 'Asia/Singapore', 'Asia/Tokyo', 'Europe/London', 'America/New_York'];
 const DEFAULT_VALUE = '__default__';
@@ -31,14 +33,16 @@ interface DateFormatSelectProps {
   onChange: (value: string) => void;
   register: ReturnType<UseFormRegister<DatasourceFormValues>>;
   preview?: boolean;
+  /** Zone used to render the preview (input formats re-arrange digits as typed, so they preview in UTC = no shift). */
+  previewTimeZone?: string;
 }
 
-function DateFormatSelect({ label, hint, defaultLabel, presets, value, onChange, register, preview }: DateFormatSelectProps) {
+export function DateFormatSelect({ label, hint, defaultLabel, presets, value, onChange, register, preview, previewTimeZone }: DateFormatSelectProps) {
   const t = vi.admin.datasources;
   const isPreset = value === '' || presets.includes(value);
   const [custom, setCustom] = useState(!isPreset);
   const mode = custom || !isPreset ? CUSTOM_VALUE : value === '' ? DEFAULT_VALUE : value;
-  const example = preview && value ? formatWithPattern(PREVIEW_ISO, value) : null;
+  const example = preview && value ? formatWithPattern(PREVIEW_ISO, value, previewTimeZone) : null;
 
   return (
     <div className="flex min-w-[220px] flex-1 flex-col gap-1.5">
