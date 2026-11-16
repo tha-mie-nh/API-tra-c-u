@@ -70,8 +70,12 @@ export interface OutputFieldDef {
    * sending "31/12/1999" or "20/10/2024 12:30:45") — tokens `DD`/`MM`/
    * `YYYY`/`HH`/`mm`/`ss`, any other character is a literal separator.
    * Server normalizes to ISO 8601 before the client ever sees it. Absent
-   * means the upstream already sends ISO 8601 (pass-through, unchanged). */
+   * means the upstream already sends ISO 8601 (pass-through, unchanged).
+   * Several alternatives may be listed separated by `|`. */
   format?: string;
+  /** How the client renders a `date`/`datetime` output value (default
+   * `DD-MM-YYYY` / `DD-MM-YYYY HH:mm`). Same tokens as `format`, shown in Asia/Ho_Chi_Minh. */
+  displayFormat?: string;
 }
 
 export type TransportAuthKind = 'apiKeyHeader' | 'bearer' | 'basic' | 'none';

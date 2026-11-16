@@ -69,6 +69,8 @@ export function outputFieldToRow(field: OutputFieldDef): OutputFieldRow {
     name: field.name,
     label: field.label,
     from: field.from ?? '',
+    format: field.format ?? '',
+    displayFormat: field.displayFormat ?? '',
     type: field.type,
     valueMap: recordToKeyValueRows(field.valueMap),
     iconMap: recordToKeyValueRows(field.iconMap),
@@ -83,6 +85,8 @@ export function outputFieldToRow(field: OutputFieldDef): OutputFieldRow {
 export function rowToOutputField(row: OutputFieldRow): OutputFieldDef {
   const field: OutputFieldDef = { name: row.name.trim(), label: row.label.trim(), type: row.type };
   if (row.from.trim()) field.from = row.from.trim();
+  if (row.format.trim()) field.format = row.format.trim();
+  if (row.displayFormat.trim()) field.displayFormat = row.displayFormat.trim();
   const valueMap = keyValueRowsToRecord(row.valueMap);
   if (valueMap) field.valueMap = valueMap;
   const iconMap = keyValueRowsToRecord(row.iconMap);

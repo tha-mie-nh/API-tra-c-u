@@ -48,3 +48,25 @@ export function formatNumber(value: number | null | undefined): string {
   if (value === null || value === undefined) return '—';
   return new Intl.NumberFormat('vi-VN').format(value);
 }
+
+const PATTERN_TOKEN_RE = /YYYY|MM|DD|HH|mm|ss/g;
+
+/** Formats an ISO timestamp with a config-driven pattern (tokens `DD` `MM` `YYYY` `HH` `mm` `ss`,
+ * anything else is a literal) in Asia/Ho_Chi_Minh. Returns `null` for an unparseable value. */
+export function formatWithPattern(iso: string, pattern: string): string | null {
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return null;
+  const parts = new Intl.DateTimeFormat('en-GB', {
+    timeZone: DISPLAY_TIME_ZONE,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hourCycle: 'h23',
+  }).formatToParts(date);
+  const get = (type: string) => parts.find((p) => p.type === type)?.value ?? '';
+  const values: Record<string, string> = { YYYY: get('year'), MM: get('month'), DD: get('day'), HH: get('hour'), mm: get('minute'), ss: get('second') };
+  return pattern.replace(PATTERN_TOKEN_RE, (token) => values[token] ?? token);
+}

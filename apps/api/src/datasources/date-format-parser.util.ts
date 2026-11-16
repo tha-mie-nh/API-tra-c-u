@@ -47,3 +47,34 @@ export function parseWithFormat(value: string, format: string): string | undefin
   if (date.getUTCFullYear() !== year || date.getUTCMonth() !== month - 1 || date.getUTCDate() !== day) return undefined;
   return date.toISOString();
 }
+
+/** First alternative of a `|`-separated `format` that parses `value`, else `undefined`. */
+export function parseWithFormats(value: string, format?: string): string | undefined {
+  for (const alt of (format ?? '').split('|').map((f) => f.trim()).filter(Boolean)) {
+    const parsed = parseWithFormat(value.trim(), alt);
+    if (parsed) return parsed;
+  }
+  return undefined;
+}
+
+const ISO_LIKE_RE = /^\d{4}-\d{2}-\d{2}([T ]\d{2}:\d{2}(:\d{2}(\.\d+)?)?)?(Z|[+-]\d{2}:?\d{2})?$/;
+
+/**
+ * Normalizes an upstream date/datetime string to ISO 8601, or `undefined`
+ * when nothing matches. `format` may list alternatives separated by `|`
+ * (e.g. `"DD/MM/YYYY HH:mm:ss|DD/MM/YYYY HH:mm|DD/MM/YYYY"`) because real
+ * upstreams mix shapes inside one field; the first alternative that parses
+ * wins, then an ISO-looking value passes through. Never throws.
+ */
+export function parseDateValue(value: string, format?: string): string | undefined {
+  const text = value.trim();
+  const fromFormat = parseWithFormats(text, format);
+  if (fromFormat) return fromFormat;
+  if (ISO_LIKE_RE.test(text)) {
+    const iso = text.replace(' ', 'T');
+    // No explicit zone -> UTC, same convention as `parseWithFormat` (never the server's local zone).
+    const time = new Date(/(Z|[+-]\d{2}:?\d{2})$/.test(iso) ? iso : `${iso}Z`).getTime();
+    if (!Number.isNaN(time)) return new Date(time).toISOString();
+  }
+  return undefined;
+}

@@ -1,4 +1,4 @@
-import { parseWithFormat } from './date-format-parser.util';
+import { parseDateValue, parseWithFormat, parseWithFormats } from './date-format-parser.util';
 
 describe('parseWithFormat', () => {
   it('parses DD/MM/YYYY into ISO 8601 (UTC midnight)', () => {
@@ -19,5 +19,19 @@ describe('parseWithFormat', () => {
 
   it('returns undefined for an empty string', () => {
     expect(parseWithFormat('', 'DD/MM/YYYY')).toBeUndefined();
+  });
+});
+
+describe('parseWithFormats / parseDateValue', () => {
+  const formats = 'DD/MM/YYYY HH:mm:ss|DD/MM/YYYY HH:mm|DD/MM/YYYY';
+
+  it('tries each |-separated alternative', () => {
+    expect(parseWithFormats('20/10/2024 12:30', formats)).toBe('2024-10-20T12:30:00.000Z');
+    expect(parseWithFormats('20/10/2024', formats)).toBe('2024-10-20T00:00:00.000Z');
+  });
+
+  it('parseDateValue falls back to ISO-looking values and returns undefined otherwise', () => {
+    expect(parseDateValue('2026-01-15 09:30:00')).toBe('2026-01-15T09:30:00.000Z');
+    expect(parseDateValue('không phải ngày', formats)).toBeUndefined();
   });
 });

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import type { DatasourceEntry, QueryColumn, QueryEnvelope, QueryPage, QueryRecord, QueryRecordGroup } from '@app/shared';
 import type { RawRecord } from './adapters/datasource-adapter.interface';
-import { parseWithFormat } from './date-format-parser.util';
+import { parseDateValue, parseWithFormats } from './date-format-parser.util';
 
 export interface MapOptions {
   page?: number;
@@ -24,8 +24,7 @@ export interface MapOptions {
 @Injectable()
 export class ResponseMapperService {
   map(rawRecords: RawRecord[], datasource: DatasourceEntry, options: MapOptions): QueryEnvelope {
-    const mapped = rawRecords.map((r) => this.mapOne(r, datasource));
-    this.sortByTimestamp(mapped, datasource);
+    const mapped = this.sortByTimestamp(rawRecords, datasource);
 
     const total = mapped.length;
     const limit = datasource.limits?.maxResults ?? 100;
@@ -75,27 +74,32 @@ export class ResponseMapperService {
     const mapped: QueryRecord = {};
     for (const field of datasource.output.fields) {
       let rawValue = field.from ? raw[field.from] : raw[field.name];
-      if (field.format && (field.type === 'date' || field.type === 'datetime') && typeof rawValue === 'string' && rawValue !== '') {
-        rawValue = parseWithFormat(rawValue, field.format) ?? rawValue;
+      if ((field.type === 'date' || field.type === 'datetime') && typeof rawValue === 'string' && rawValue !== '') {
+        rawValue = parseWithFormats(rawValue, field.format) ?? rawValue;
       }
       mapped[field.name] = field.valueMap && rawValue !== undefined ? (field.valueMap[String(rawValue)] ?? rawValue) : rawValue;
     }
     return mapped;
   }
 
-  private sortByTimestamp(records: QueryRecord[], datasource: DatasourceEntry): void {
+  /** Maps then sorts by the timestamp field. The sort key is derived from the RAW upstream value (via the
+   * field's `format`) so sorting works even when the field is declared `string` or the value isn't ISO. */
+  private sortByTimestamp(rawRecords: RawRecord[], datasource: DatasourceEntry): QueryRecord[] {
     const { timestampField, sortOrder } = datasource.output;
     const direction = sortOrder === 'asc' ? 1 : -1;
-    records.sort((a, b) => {
-      const aTime = this.toComparableTime(a[timestampField]);
-      const bTime = this.toComparableTime(b[timestampField]);
-      return (aTime - bTime) * direction;
+    const tsField = datasource.output.fields.find((f) => f.name === timestampField);
+    const keyed = rawRecords.map((raw) => {
+      const rawValue = tsField ? (tsField.from ? raw[tsField.from] : raw[tsField.name]) : undefined;
+      return { record: this.mapOne(raw, datasource), key: this.toComparableTime(rawValue, tsField?.format) };
     });
+    keyed.sort((a, b) => (a.key - b.key) * direction);
+    return keyed.map((k) => k.record);
   }
 
-  private toComparableTime(value: unknown): number {
+  private toComparableTime(value: unknown, format?: string): number {
     if (typeof value !== 'string') return 0;
-    const time = new Date(value).getTime();
+    const iso = parseDateValue(value, format);
+    const time = iso ? new Date(iso).getTime() : Number.NaN;
     return Number.isNaN(time) ? 0 : time;
   }
 
@@ -129,6 +133,7 @@ export class ResponseMapperService {
       ...(f.emphasize ? { emphasize: f.emphasize } : {}),
       ...(f.iconMap ? { iconMap: f.iconMap } : {}),
       ...(f.headerField ? { headerField: f.headerField } : {}),
+      ...(f.displayFormat ? { displayFormat: f.displayFormat } : {}),
     }));
   }
 }

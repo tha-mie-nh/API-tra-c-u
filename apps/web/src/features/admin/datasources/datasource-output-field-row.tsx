@@ -113,6 +113,20 @@ export function DatasourceOutputFieldRow({
               </div>
             ))}
           </div>
+          {(row.type === 'date' || row.type === 'datetime') && (
+            <div className="grid grid-cols-2 gap-2">
+              <div className="flex flex-col gap-1.5">
+                <span className="text-xs font-medium">{t.outputFieldFormat}</span>
+                <Input placeholder="DD/MM/YYYY HH:mm:ss" title={t.outputFieldFormatHint} {...register(`outputFields.${index}.format`)} />
+                <span className="text-muted-foreground text-xs">{t.outputFieldFormatHint}</span>
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <span className="text-xs font-medium">{t.outputFieldDisplayFormat}</span>
+                <Input placeholder="DD/MM/YYYY HH:mm" title={t.outputFieldDisplayFormatHint} {...register(`outputFields.${index}.displayFormat`)} />
+                <span className="text-muted-foreground text-xs">{t.outputFieldDisplayFormatHint}</span>
+              </div>
+            </div>
+          )}
           <div className="grid grid-cols-2 gap-2">
             <div className="flex flex-col gap-1.5">
               <span className="text-xs font-medium">{t.outputFieldValueMap}</span>

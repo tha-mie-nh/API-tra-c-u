@@ -52,6 +52,38 @@ describe('ResponseMapperService', () => {
     expect(groupA?.records.map((r) => r.recordedAt)).toEqual(['2026-01-01T00:00:00Z', '2024-01-01T00:00:00Z']);
   });
 
+  it('sorts by a Vietnamese-format timestamp even when the field is declared as string', () => {
+    const base = makeDatasource();
+    const ds = makeDatasource({
+      output: {
+        ...base.output,
+        fields: base.output.fields.map((f) =>
+          f.name === 'recordedAt' ? { ...f, type: 'string' as const, format: 'DD/MM/YYYY HH:mm:ss' } : f,
+        ),
+      },
+    });
+    const rows: RawRecord[] = [
+      { cccd: 'A1', thoi_diem: '05/01/2026 08:00:00' },
+      { cccd: 'A1', thoi_diem: '20/12/2026 08:00:00' },
+      { cccd: 'A1', thoi_diem: '10/03/2026 08:00:00' },
+    ];
+    const envelope = mapper.map(rows, ds, { requestId: 'r1', tookMs: 1 });
+    expect(envelope.groups[0]?.records.map((r) => r.recordedAt)).toEqual(['20/12/2026 08:00:00', '10/03/2026 08:00:00', '05/01/2026 08:00:00']);
+  });
+
+  it('normalizes mixed datetime shapes listed in `format` alternatives', () => {
+    const base = makeDatasource();
+    const ds = makeDatasource({
+      output: {
+        ...base.output,
+        fields: base.output.fields.map((f) => (f.name === 'recordedAt' ? { ...f, format: 'DD/MM/YYYY HH:mm:ss|DD/MM/YYYY HH:mm' } : f)),
+      },
+    });
+    const rows: RawRecord[] = [{ cccd: 'A1', thoi_diem: '05/01/2026 08:00:00' }, { cccd: 'A1', thoi_diem: '06/01/2026 09:15' }];
+    const envelope = mapper.map(rows, ds, { requestId: 'r1', tookMs: 1 });
+    expect(envelope.groups[0]?.records.map((r) => r.recordedAt)).toEqual(['2026-01-06T09:15:00.000Z', '2026-01-05T08:00:00.000Z']);
+  });
+
   it('sorts ascending when sortOrder=asc', () => {
     const ds = makeDatasource({ output: { ...makeDatasource().output, sortOrder: 'asc' } });
     const envelope = mapper.map(raw, ds, { requestId: 'r1', tookMs: 5 });
