@@ -35,32 +35,29 @@
       "input": {
         "fields": [
           {
-            "name": "citizenId",
+            "name": "cccd",
             "label": "Số CCCD",
             "type": "string",
             "required": false,
-            "pattern": "^[0-9]{12}$",
-            "mapTo": "cccd"
+            "pattern": "^[0-9]{12}$"
           },
           {
-            "name": "fullName",
+            "name": "ho_ten",
             "label": "Họ và tên",
             "type": "string",
             "required": false,
             "minLength": 2,
-            "maxLength": 100,
-            "mapTo": "ho_ten"
+            "maxLength": 100
           },
           {
-            "name": "dob",
+            "name": "ngay_sinh",
             "label": "Ngày sinh",
             "type": "date",
             "required": false,
-            "mapTo": "ngay_sinh",
             "format": "YYYY-MM-DD"
           },
           {
-            "name": "gender",
+            "name": "gioi_tinh",
             "label": "Giới tính",
             "type": "enum",
             "required": false,
@@ -73,45 +70,40 @@
                 "value": "F",
                 "label": "Nữ"
               }
-            ],
-            "mapTo": "gioi_tinh"
+            ]
           }
         ],
         "atLeastOneOf": [
-          "citizenId",
-          "fullName",
-          "dob",
-          "gender"
+          "cccd",
+          "ho_ten",
+          "ngay_sinh",
+          "gioi_tinh"
         ]
       },
       "output": {
-        "timestampField": "recordedAt",
+        "timestampField": "thoi_diem",
         "sortOrder": "desc",
-        "identityField": "citizenId",
+        "identityField": "cccd",
         "fields": [
           {
-            "name": "citizenId",
+            "name": "cccd",
             "label": "Số CCCD",
-            "from": "cccd",
             "type": "string",
             "sensitive": true
           },
           {
-            "name": "fullName",
+            "name": "ho_ten",
             "label": "Họ và tên",
-            "from": "ho_ten",
             "type": "string"
           },
           {
-            "name": "dob",
+            "name": "ngay_sinh",
             "label": "Ngày sinh",
-            "from": "ngay_sinh",
             "type": "date"
           },
           {
-            "name": "gender",
+            "name": "gioi_tinh",
             "label": "Giới tính",
-            "from": "gioi_tinh",
             "type": "enum",
             "valueMap": {
               "1": "Nam",
@@ -119,19 +111,18 @@
             }
           },
           {
-            "name": "address",
+            "name": "dia_chi",
             "label": "Địa chỉ",
-            "from": "dia_chi",
             "type": "string"
           },
           {
-            "name": "recordedAt",
+            "name": "thoi_diem",
             "label": "Thời điểm ghi nhận",
-            "from": "thoi_diem",
             "type": "datetime"
           }
         ],
-        "recordsPath": "data"
+        "recordsPath": "data",
+        "labelField": "ho_ten"
       },
       "limits": {
         "maxResults": 100,
@@ -163,67 +154,60 @@
       "input": {
         "fields": [
           {
-            "name": "citizenId",
+            "name": "so_cccd",
             "label": "Số CCCD",
             "type": "string",
             "required": true,
-            "pattern": "^[0-9]{12}$",
-            "mapTo": "so_cccd"
+            "pattern": "^[0-9]{12}$"
           },
           {
-            "name": "occupation",
+            "name": "nghe_nghiep",
             "label": "Nghề nghiệp",
             "type": "string",
             "required": false,
-            "maxLength": 100,
-            "mapTo": "nghe_nghiep"
+            "maxLength": 100
           }
         ]
       },
       "output": {
-        "timestampField": "updatedAt",
+        "timestampField": "ngay_cap_nhat",
         "sortOrder": "asc",
-        "identityField": "citizenId",
+        "identityField": "so_cccd",
         "fields": [
           {
-            "name": "citizenId",
+            "name": "so_cccd",
             "label": "Số CCCD",
-            "from": "so_cccd",
             "type": "string",
             "sensitive": true
           },
           {
-            "name": "fullName",
+            "name": "ho_va_ten",
             "label": "Họ và tên",
-            "from": "ho_va_ten",
             "type": "string"
           },
           {
-            "name": "birthYear",
+            "name": "nam_sinh",
             "label": "Năm sinh",
-            "from": "nam_sinh",
             "type": "number"
           },
           {
-            "name": "occupation",
+            "name": "nghe_nghiep",
             "label": "Nghề nghiệp",
-            "from": "nghe_nghiep",
             "type": "string"
           },
           {
-            "name": "currentAddress",
+            "name": "noi_o_hien_tai",
             "label": "Nơi ở hiện tại",
-            "from": "noi_o_hien_tai",
             "type": "string"
           },
           {
-            "name": "updatedAt",
+            "name": "ngay_cap_nhat",
             "label": "Cập nhật lúc",
-            "from": "ngay_cap_nhat",
             "type": "datetime"
           }
         ],
-        "recordsPath": "data"
+        "recordsPath": "data",
+        "labelField": "ho_va_ten"
       },
       "limits": {
         "maxResults": 100,
@@ -255,56 +239,49 @@
       "input": {
         "fields": [
           {
-            "name": "citizenId",
+            "name": "citizen_id",
             "label": "Số CCCD",
             "type": "string",
             "required": true,
-            "pattern": "^[0-9]{12}$",
-            "mapTo": "citizen_id"
+            "pattern": "^[0-9]{12}$"
           },
           {
-            "name": "houseNumber",
+            "name": "ho_khau_so",
             "label": "Số hộ khẩu",
             "type": "string",
-            "required": false,
-            "mapTo": "ho_khau_so"
+            "required": false
           }
         ]
       },
       "output": {
-        "timestampField": "registeredAt",
+        "timestampField": "ngay_dang_ky",
         "sortOrder": "desc",
-        "identityField": "citizenId",
+        "identityField": "citizen_id",
         "fields": [
           {
-            "name": "citizenId",
+            "name": "citizen_id",
             "label": "Số CCCD",
-            "from": "citizen_id",
             "type": "string",
             "sensitive": true
           },
           {
-            "name": "fullName",
+            "name": "full_name",
             "label": "Họ và tên",
-            "from": "full_name",
             "type": "string"
           },
           {
-            "name": "householdNumber",
+            "name": "ho_khau_so",
             "label": "Số hộ khẩu",
-            "from": "ho_khau_so",
             "type": "string"
           },
           {
-            "name": "permanentAddress",
+            "name": "dia_chi_thuong_tru",
             "label": "Địa chỉ thường trú",
-            "from": "dia_chi_thuong_tru",
             "type": "string"
           },
           {
-            "name": "registrationType",
+            "name": "loai_dang_ky",
             "label": "Loại đăng ký",
-            "from": "loai_dang_ky",
             "type": "enum",
             "valueMap": {
               "TT": "Thường trú",
@@ -312,13 +289,13 @@
             }
           },
           {
-            "name": "registeredAt",
+            "name": "ngay_dang_ky",
             "label": "Ngày đăng ký",
-            "from": "ngay_dang_ky",
             "type": "datetime"
           }
         ],
-        "recordsPath": "data"
+        "recordsPath": "data",
+        "labelField": "full_name"
       },
       "limits": {
         "maxResults": 100,
@@ -348,15 +325,14 @@
       "input": {
         "fields": [
           {
-            "name": "citizenId",
+            "name": "so_cccd",
             "label": "Số CCCD",
             "type": "string",
             "required": true,
-            "pattern": "^[0-9]{12}$",
-            "mapTo": "so_cccd"
+            "pattern": "^[0-9]{12}$"
           },
           {
-            "name": "direction",
+            "name": "chieu",
             "label": "Chiều xuất/nhập cảnh",
             "type": "enum",
             "required": false,
@@ -369,33 +345,29 @@
                 "value": "NHAP",
                 "label": "Nhập cảnh"
               }
-            ],
-            "mapTo": "chieu"
+            ]
           }
         ]
       },
       "output": {
-        "timestampField": "eventAt",
+        "timestampField": "thoi_diem",
         "sortOrder": "desc",
-        "identityField": "citizenId",
+        "identityField": "so_cccd",
         "fields": [
           {
-            "name": "citizenId",
+            "name": "so_cccd",
             "label": "Số CCCD",
-            "from": "so_cccd",
             "type": "string",
             "sensitive": true
           },
           {
-            "name": "fullName",
+            "name": "ho_ten",
             "label": "Họ và tên",
-            "from": "ho_ten",
             "type": "string"
           },
           {
-            "name": "direction",
+            "name": "chieu",
             "label": "Chiều xuất/nhập cảnh",
-            "from": "chieu",
             "type": "enum",
             "valueMap": {
               "XUAT": "Xuất cảnh",
@@ -403,31 +375,28 @@
             }
           },
           {
-            "name": "borderGate",
+            "name": "cua_khau",
             "label": "Cửa khẩu / cảng",
-            "from": "cua_khau",
             "type": "string"
           },
           {
-            "name": "country",
+            "name": "quoc_gia",
             "label": "Quốc gia đối tác",
-            "from": "quoc_gia",
             "type": "string"
           },
           {
-            "name": "purpose",
+            "name": "muc_dich",
             "label": "Mục đích chuyến đi",
-            "from": "muc_dich",
             "type": "string"
           },
           {
-            "name": "eventAt",
+            "name": "thoi_diem",
             "label": "Thời điểm xuất/nhập cảnh",
-            "from": "thoi_diem",
             "type": "datetime"
           }
         ],
-        "recordsPath": "data"
+        "recordsPath": "data",
+        "labelField": "ho_ten"
       },
       "limits": {
         "maxResults": 100,
@@ -461,15 +430,14 @@
       "input": {
         "fields": [
           {
-            "name": "citizenId",
+            "name": "so_cccd",
             "label": "Số CCCD",
             "type": "string",
             "required": true,
-            "pattern": "^[0-9]{12}$",
-            "mapTo": "so_cccd"
+            "pattern": "^[0-9]{12}$"
           },
           {
-            "name": "documentType",
+            "name": "loai_giay_to",
             "label": "Loại giấy tờ",
             "type": "enum",
             "required": false,
@@ -490,33 +458,29 @@
                 "value": "THE_CAN_CUOC",
                 "label": "Thẻ căn cước"
               }
-            ],
-            "mapTo": "loai_giay_to"
+            ]
           }
         ]
       },
       "output": {
-        "timestampField": "issuedAt",
+        "timestampField": "ngay_cap",
         "sortOrder": "desc",
-        "identityField": "citizenId",
+        "identityField": "so_cccd",
         "fields": [
           {
-            "name": "citizenId",
+            "name": "so_cccd",
             "label": "Số CCCD",
-            "from": "so_cccd",
             "type": "string",
             "sensitive": true
           },
           {
-            "name": "fullName",
+            "name": "ho_ten",
             "label": "Họ và tên",
-            "from": "ho_ten",
             "type": "string"
           },
           {
-            "name": "documentType",
+            "name": "loai_giay_to",
             "label": "Loại giấy tờ",
-            "from": "loai_giay_to",
             "type": "enum",
             "valueMap": {
               "CMND9": "CMND 9 số",
@@ -526,43 +490,38 @@
             }
           },
           {
-            "name": "documentNumber",
+            "name": "so_giay_to",
             "label": "Số giấy tờ",
-            "from": "so_giay_to",
             "type": "string"
           },
           {
-            "name": "ageAtIssue",
+            "name": "tuoi_luc_cap",
             "label": "Tuổi tại thời điểm cấp",
-            "from": "tuoi_luc_cap",
             "type": "number"
           },
           {
-            "name": "height",
+            "name": "chieu_cao",
             "label": "Chiều cao (cm)",
-            "from": "chieu_cao",
             "type": "number"
           },
           {
-            "name": "identifyingFeatures",
+            "name": "dac_diem_nhan_dang",
             "label": "Đặc điểm nhận dạng",
-            "from": "dac_diem_nhan_dang",
             "type": "string"
           },
           {
-            "name": "issuePlace",
+            "name": "noi_cap",
             "label": "Nơi cấp",
-            "from": "noi_cap",
             "type": "string"
           },
           {
-            "name": "issuedAt",
+            "name": "ngay_cap",
             "label": "Ngày cấp",
-            "from": "ngay_cap",
             "type": "datetime"
           }
         ],
-        "recordsPath": "data"
+        "recordsPath": "data",
+        "labelField": "ho_ten"
       },
       "limits": {
         "maxResults": 100,
@@ -594,15 +553,14 @@
       "input": {
         "fields": [
           {
-            "name": "citizenId",
+            "name": "so_cccd",
             "label": "Số CCCD",
             "type": "string",
             "required": true,
-            "pattern": "^[0-9]{12}$",
-            "mapTo": "so_cccd"
+            "pattern": "^[0-9]{12}$"
           },
           {
-            "name": "vehicleType",
+            "name": "loai_xe",
             "label": "Loại phương tiện",
             "type": "enum",
             "required": false,
@@ -615,33 +573,29 @@
                 "value": "O_TO",
                 "label": "Ô tô"
               }
-            ],
-            "mapTo": "loai_xe"
+            ]
           }
         ]
       },
       "output": {
-        "timestampField": "registeredAt",
+        "timestampField": "ngay_dang_ky",
         "sortOrder": "desc",
-        "identityField": "citizenId",
+        "identityField": "so_cccd",
         "fields": [
           {
-            "name": "citizenId",
+            "name": "so_cccd",
             "label": "Số CCCD",
-            "from": "so_cccd",
             "type": "string",
             "sensitive": true
           },
           {
-            "name": "fullName",
+            "name": "chu_so_huu",
             "label": "Chủ sở hữu",
-            "from": "chu_so_huu",
             "type": "string"
           },
           {
-            "name": "vehicleType",
+            "name": "loai_xe",
             "label": "Loại phương tiện",
-            "from": "loai_xe",
             "type": "enum",
             "valueMap": {
               "XE_MAY": "Xe máy",
@@ -649,43 +603,38 @@
             }
           },
           {
-            "name": "brand",
+            "name": "hang_xe",
             "label": "Hãng xe",
-            "from": "hang_xe",
             "type": "string"
           },
           {
-            "name": "model",
+            "name": "dong_xe",
             "label": "Dòng xe",
-            "from": "dong_xe",
             "type": "string"
           },
           {
-            "name": "plateNumber",
+            "name": "bien_so",
             "label": "Biển số đăng ký",
-            "from": "bien_so",
             "type": "string"
           },
           {
-            "name": "value",
+            "name": "gia_tri",
             "label": "Giá trị xe (VNĐ)",
-            "from": "gia_tri",
             "type": "number"
           },
           {
-            "name": "registrationOffice",
+            "name": "noi_dang_ky",
             "label": "Nơi đăng ký",
-            "from": "noi_dang_ky",
             "type": "string"
           },
           {
-            "name": "registeredAt",
+            "name": "ngay_dang_ky",
             "label": "Ngày đăng ký",
-            "from": "ngay_dang_ky",
             "type": "datetime"
           }
         ],
-        "recordsPath": "data"
+        "recordsPath": "data",
+        "labelField": "chu_so_huu"
       },
       "limits": {
         "maxResults": 100,
@@ -717,15 +666,14 @@
       "input": {
         "fields": [
           {
-            "name": "citizenId",
+            "name": "so_cccd",
             "label": "Số CCCD",
             "type": "string",
             "required": true,
-            "pattern": "^[0-9]{12}$",
-            "mapTo": "so_cccd"
+            "pattern": "^[0-9]{12}$"
           },
           {
-            "name": "eventType",
+            "name": "loai_su_kien",
             "label": "Loại sự kiện",
             "type": "enum",
             "required": false,
@@ -746,33 +694,29 @@
                 "value": "LY_HON",
                 "label": "Ly hôn"
               }
-            ],
-            "mapTo": "loai_su_kien"
+            ]
           }
         ]
       },
       "output": {
-        "timestampField": "eventAt",
+        "timestampField": "ngay_su_kien",
         "sortOrder": "desc",
-        "identityField": "citizenId",
+        "identityField": "so_cccd",
         "fields": [
           {
-            "name": "citizenId",
+            "name": "so_cccd",
             "label": "Số CCCD",
-            "from": "so_cccd",
             "type": "string",
             "sensitive": true
           },
           {
-            "name": "fullName",
+            "name": "ho_ten",
             "label": "Họ và tên",
-            "from": "ho_ten",
             "type": "string"
           },
           {
-            "name": "eventType",
+            "name": "loai_su_kien",
             "label": "Loại sự kiện",
-            "from": "loai_su_kien",
             "type": "enum",
             "valueMap": {
               "KHAI_SINH": "Khai sinh",
@@ -782,38 +726,34 @@
             }
           },
           {
-            "name": "relatedPersonRelation",
+            "name": "quan_he",
             "label": "Mối quan hệ",
-            "from": "quan_he",
             "type": "string"
           },
           {
-            "name": "relatedPersonName",
+            "name": "nguoi_lien_quan",
             "label": "Người liên quan",
-            "from": "nguoi_lien_quan",
             "type": "string"
           },
           {
-            "name": "relatedPersonId",
+            "name": "cccd_nguoi_lien_quan",
             "label": "Số CCCD người liên quan",
-            "from": "cccd_nguoi_lien_quan",
             "type": "string",
             "sensitive": true
           },
           {
-            "name": "registrationOffice",
+            "name": "noi_dang_ky",
             "label": "Nơi đăng ký hộ tịch",
-            "from": "noi_dang_ky",
             "type": "string"
           },
           {
-            "name": "eventAt",
+            "name": "ngay_su_kien",
             "label": "Ngày sự kiện",
-            "from": "ngay_su_kien",
             "type": "datetime"
           }
         ],
-        "recordsPath": "data"
+        "recordsPath": "data",
+        "labelField": "ho_ten"
       },
       "limits": {
         "maxResults": 100,
@@ -845,28 +785,25 @@
       "input": {
         "fields": [
           {
-            "name": "passportNumber",
+            "name": "soHC",
             "label": "Số hộ chiếu",
             "type": "string",
-            "required": false,
-            "mapTo": "soHC"
+            "required": false
           },
           {
-            "name": "fullName",
+            "name": "hoTen",
             "label": "Họ và tên",
             "type": "string",
-            "required": false,
-            "mapTo": "hoTen"
+            "required": false
           },
           {
-            "name": "dob",
+            "name": "ngaySinh",
             "label": "Ngày sinh",
             "type": "date",
-            "required": false,
-            "mapTo": "ngaySinh"
+            "required": false
           },
           {
-            "name": "gender",
+            "name": "gioiTinh",
             "label": "Giới tính",
             "type": "enum",
             "required": false,
@@ -879,44 +816,40 @@
                 "value": "F",
                 "label": "Nữ"
               }
-            ],
-            "mapTo": "gioiTinh"
+            ]
           }
         ],
         "requireGroups": [
           [
-            "passportNumber"
+            "soHC"
           ],
           [
-            "fullName",
-            "dob",
-            "gender"
+            "hoTen",
+            "ngaySinh",
+            "gioiTinh"
           ]
         ]
       },
       "output": {
         "recordsPath": "data.0.data",
-        "timestampField": "eventAt",
+        "timestampField": "ngayXuatNhap",
         "sortOrder": "desc",
-        "identityField": "passportNumber",
+        "identityField": "soHoChieu",
         "fields": [
           {
-            "name": "fullName",
+            "name": "hoTen",
             "label": "Họ và tên",
-            "from": "hoTen",
             "type": "string"
           },
           {
-            "name": "dob",
+            "name": "ngaySinh",
             "label": "Ngày sinh",
-            "from": "ngaySinh",
             "type": "date",
             "format": "DD/MM/YYYY"
           },
           {
-            "name": "dobAccuracy",
+            "name": "defNgaySinh",
             "label": "Độ chính xác ngày sinh",
-            "from": "defNgaySinh",
             "type": "enum",
             "valueMap": {
               "D": "Chính xác đến ngày",
@@ -925,9 +858,8 @@
             }
           },
           {
-            "name": "gender",
+            "name": "gioiTinh",
             "label": "Giới tính",
-            "from": "gioiTinh",
             "type": "enum",
             "valueMap": {
               "M": "Nam",
@@ -936,16 +868,14 @@
             }
           },
           {
-            "name": "passportNumber",
+            "name": "soHoChieu",
             "label": "Số hộ chiếu",
-            "from": "soHoChieu",
             "type": "string",
             "sensitive": true
           },
           {
-            "name": "passportType",
+            "name": "loaiHoChieu",
             "label": "Loại hộ chiếu",
-            "from": "loaiHoChieu",
             "type": "enum",
             "valueMap": {
               "PT": "Phổ thông",
@@ -955,53 +885,45 @@
             }
           },
           {
-            "name": "passportExpiry",
+            "name": "hanHoChieu",
             "label": "Ngày hết hạn hộ chiếu",
-            "from": "hanHoChieu",
             "type": "date",
             "format": "DD/MM/YYYY"
           },
           {
-            "name": "passportIssuePlace",
+            "name": "noiCapHoChieu",
             "label": "Nơi cấp hộ chiếu",
-            "from": "noiCapHoChieu",
             "type": "string"
           },
           {
-            "name": "nationality",
+            "name": "quocTich",
             "label": "Quốc tịch",
-            "from": "quocTich",
             "type": "string"
           },
           {
-            "name": "visaNumber",
+            "name": "soThiThuc",
             "label": "Số thị thực",
-            "from": "soThiThuc",
             "type": "string"
           },
           {
-            "name": "visaType",
+            "name": "loaiThiThuc",
             "label": "Loại thị thực",
-            "from": "loaiThiThuc",
             "type": "string"
           },
           {
-            "name": "visaIssueDate",
+            "name": "ngayThiThuc",
             "label": "Ngày cấp thị thực",
-            "from": "ngayThiThuc",
             "type": "date",
             "format": "DD/MM/YYYY"
           },
           {
-            "name": "visaIssuePlace",
+            "name": "noiCapThiThuc",
             "label": "Nơi cấp thị thực",
-            "from": "noiCapThiThuc",
             "type": "string"
           },
           {
-            "name": "direction",
+            "name": "xuatNhap",
             "label": "Xuất/nhập cảnh",
-            "from": "xuatNhap",
             "type": "enum",
             "valueMap": {
               "X": "Xuất cảnh",
@@ -1015,37 +937,33 @@
             "headerField": true
           },
           {
-            "name": "eventAt",
+            "name": "ngayXuatNhap",
             "label": "Ngày giờ xuất/nhập cảnh",
-            "from": "ngayXuatNhap",
             "type": "datetime",
             "format": "DD/MM/YYYY HH:mm:ss"
           },
           {
-            "name": "borderGate",
+            "name": "cuaKhau",
             "label": "Cửa khẩu",
-            "from": "cuaKhau",
             "type": "string"
           },
           {
-            "name": "purpose",
+            "name": "mucDich",
             "label": "Mục đích",
-            "from": "mucDich",
             "type": "string"
           },
           {
-            "name": "route",
+            "name": "tuyenDuong",
             "label": "Tuyến đường",
-            "from": "tuyenDuong",
             "type": "string"
           },
           {
-            "name": "vehicleNumber",
+            "name": "soHieuPhuongTien",
             "label": "Số hiệu phương tiện",
-            "from": "soHieuPhuongTien",
             "type": "string"
           }
-        ]
+        ],
+        "labelField": "hoTen"
       },
       "limits": {
         "maxResults": 100,
@@ -1077,28 +995,25 @@
       "input": {
         "fields": [
           {
-            "name": "citizenId",
+            "name": "soCCCD",
             "label": "Số CMND/CCCD",
             "type": "string",
-            "required": false,
-            "mapTo": "soCCCD"
+            "required": false
           },
           {
-            "name": "fullName",
+            "name": "hoTen",
             "label": "Họ và tên",
             "type": "string",
-            "required": false,
-            "mapTo": "hoTen"
+            "required": false
           },
           {
-            "name": "dob",
+            "name": "ngaySinh",
             "label": "Ngày sinh",
             "type": "date",
-            "required": false,
-            "mapTo": "ngaySinh"
+            "required": false
           },
           {
-            "name": "gender",
+            "name": "gioiTinh",
             "label": "Giới tính",
             "type": "enum",
             "required": false,
@@ -1111,44 +1026,40 @@
                 "value": "F",
                 "label": "Nữ"
               }
-            ],
-            "mapTo": "gioiTinh"
+            ]
           }
         ],
         "requireGroups": [
           [
-            "citizenId"
+            "soCCCD"
           ],
           [
-            "fullName",
-            "dob",
-            "gender"
+            "hoTen",
+            "ngaySinh",
+            "gioiTinh"
           ]
         ]
       },
       "output": {
         "recordsPath": "data.0.data",
-        "timestampField": "passportIssueDate",
+        "timestampField": "ngayCapHoChieu",
         "sortOrder": "desc",
-        "identityField": "citizenId",
+        "identityField": "soGiayToDangKy",
         "fields": [
           {
-            "name": "fullName",
+            "name": "hoTen",
             "label": "Họ và tên",
-            "from": "hoTen",
             "type": "string"
           },
           {
-            "name": "dob",
+            "name": "ngaySinh",
             "label": "Ngày sinh",
-            "from": "ngaySinh",
             "type": "date",
             "format": "DD/MM/YYYY"
           },
           {
-            "name": "gender",
+            "name": "gioiTinh",
             "label": "Giới tính",
-            "from": "gioiTinh",
             "type": "enum",
             "valueMap": {
               "M": "Nam",
@@ -1156,113 +1067,97 @@
             }
           },
           {
-            "name": "birthPlace",
+            "name": "noiSinh",
             "label": "Nơi sinh",
-            "from": "noiSinh",
             "type": "string"
           },
           {
-            "name": "ethnicity",
+            "name": "danToc",
             "label": "Dân tộc",
-            "from": "danToc",
             "type": "string"
           },
           {
-            "name": "citizenId",
+            "name": "soGiayToDangKy",
             "label": "Số CMND/CCCD",
-            "from": "soGiayToDangKy",
             "type": "string",
             "sensitive": true
           },
           {
-            "name": "citizenIdIssuePlace",
+            "name": "noiCapGiayTo",
             "label": "Nơi cấp CMND/CCCD",
-            "from": "noiCapGiayTo",
             "type": "string"
           },
           {
-            "name": "citizenIdIssueDate",
+            "name": "ngayCapGiayTo",
             "label": "Ngày cấp CMND/CCCD",
-            "from": "ngayCapGiayTo",
             "type": "date",
             "format": "DD/MM/YYYY"
           },
           {
-            "name": "phone",
+            "name": "soDienThoai",
             "label": "Số điện thoại",
-            "from": "soDienThoai",
             "type": "string"
           },
           {
-            "name": "occupation",
+            "name": "ngheNghiep",
             "label": "Nghề nghiệp",
-            "from": "ngheNghiep",
             "type": "string"
           },
           {
-            "name": "workplace",
+            "name": "noiLamViec",
             "label": "Nơi làm việc",
-            "from": "noiLamViec",
             "type": "string"
           },
           {
-            "name": "position",
+            "name": "chucVu",
             "label": "Chức vụ",
-            "from": "chucVu",
             "type": "string"
           },
           {
-            "name": "permanentAddress",
+            "name": "diaChiThuongTru",
             "label": "Địa chỉ thường trú",
-            "from": "diaChiThuongTru",
             "type": "string"
           },
           {
-            "name": "temporaryAddress",
+            "name": "diaChiTamTru",
             "label": "Địa chỉ tạm trú",
-            "from": "diaChiTamTru",
             "type": "string"
           },
           {
-            "name": "passportNumber",
+            "name": "soHoChieu",
             "label": "Số hộ chiếu",
-            "from": "soHoChieu",
             "type": "string"
           },
           {
-            "name": "passportIssueDate",
+            "name": "ngayCapHoChieu",
             "label": "Ngày cấp hộ chiếu",
-            "from": "ngayCapHoChieu",
             "type": "date",
             "format": "DD/MM/YYYY"
           },
           {
-            "name": "passportExpiry",
+            "name": "hanHoChieu",
             "label": "Hạn hộ chiếu",
-            "from": "hanHoChieu",
             "type": "date",
             "format": "DD/MM/YYYY"
           },
           {
-            "name": "passportIssuePlace",
+            "name": "noiCapHoChieu",
             "label": "Nơi cấp hộ chiếu",
-            "from": "noiCapHoChieu",
             "type": "string"
           },
           {
-            "name": "status",
+            "name": "trangThai",
             "label": "Trạng thái",
-            "from": "trangThai",
             "type": "string"
           },
           {
-            "name": "revokedDate",
+            "name": "ngayHuy",
             "label": "Ngày hủy",
-            "from": "ngayHuy",
             "type": "date",
             "format": "DD/MM/YYYY"
           }
-        ]
+        ],
+        "labelField": "hoTen"
       },
       "limits": {
         "maxResults": 100,
@@ -1294,84 +1189,73 @@
       "input": {
         "fields": [
           {
-            "name": "fullName",
+            "name": "hoVaTen",
             "label": "Họ tên",
             "type": "string",
-            "required": true,
-            "mapTo": "hoVaTen"
+            "required": true
           },
           {
-            "name": "licenseNumber",
+            "name": "soGplx",
             "label": "Số GPLX",
             "type": "string",
-            "required": true,
-            "mapTo": "soGplx"
+            "required": true
           },
           {
-            "name": "citizenId",
+            "name": "soCCCD",
             "label": "Số CMND/CCCD",
             "type": "string",
-            "required": true,
-            "mapTo": "soCCCD"
+            "required": true
           },
           {
-            "name": "dob",
+            "name": "ngaySinh",
             "label": "Ngày sinh",
             "type": "date",
-            "required": true,
-            "mapTo": "ngaySinh"
+            "required": true
           },
           {
-            "name": "licenseClass",
+            "name": "hangGPLX",
             "label": "Hạng GPLX",
             "type": "string",
-            "required": true,
-            "mapTo": "hangGPLX"
+            "required": true
           }
         ]
       },
       "output": {
         "recordsPath": "data.0.data",
-        "timestampField": "issueDate",
+        "timestampField": "ngayCap",
         "sortOrder": "desc",
-        "identityField": "citizenId",
+        "identityField": "soCCCD",
         "fields": [
           {
-            "name": "citizenId",
+            "name": "soCCCD",
             "label": "Số CMND/CCCD",
-            "from": "soCCCD",
             "type": "string",
             "sensitive": true
           },
           {
-            "name": "licenseNumber",
+            "name": "soGplx",
             "label": "Số GPLX",
-            "from": "soGplx",
             "type": "string"
           },
           {
-            "name": "dob",
+            "name": "ngaySinh",
             "label": "Ngày sinh",
-            "from": "ngaySinh",
             "type": "date",
             "format": "DD/MM/YYYY"
           },
           {
-            "name": "licenseClass",
+            "name": "hangGPLX",
             "label": "Hạng GPLX",
-            "from": "hangGPLX",
             "type": "string"
           },
           {
-            "name": "photo",
+            "name": "hinhAnh",
             "label": "Ảnh GPLX",
-            "from": "hinhAnh",
             "type": "image"
           },
           {
-            "name": "issueDate",
+            "name": "ngayCap",
             "label": "Ngày cấp GPLX",
-            "from": "ngayCap",
             "type": "date",
             "format": "DD/MM/YYYY"
           }
@@ -1407,37 +1291,33 @@
       "input": {
         "fields": [
           {
-            "name": "citizenId",
+            "name": "soCCCD",
             "label": "Số CMND/CCCD",
             "type": "string",
-            "required": true,
-            "mapTo": "soCCCD"
+            "required": true
           }
         ]
       },
       "output": {
         "recordsPath": "data",
-        "timestampField": "capturedAt",
+        "timestampField": "created_at",
         "sortOrder": "desc",
-        "identityField": "citizenId",
+        "identityField": "soCCCD",
         "fields": [
           {
-            "name": "citizenId",
+            "name": "soCCCD",
             "label": "Số CMND/CCCD",
-            "from": "soCCCD",
             "type": "string",
             "sensitive": true
           },
           {
-            "name": "photo",
+            "name": "hinhAnh",
             "label": "Ảnh mặt",
-            "from": "hinhAnh",
             "type": "image"
           },
           {
-            "name": "capturedAt",
+            "name": "created_at",
             "label": "Thời gian nhận ảnh",
-            "from": "created_at",
             "type": "datetime",
             "format": "DD/MM/YYYY HH:mm:ss"
           }
