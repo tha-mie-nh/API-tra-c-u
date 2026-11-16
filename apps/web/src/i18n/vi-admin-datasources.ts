@@ -173,6 +173,9 @@ export const viAdminDatasources = {
   addMapRowButton: 'Thêm dòng',
 
   timestampFieldLabel: 'Trường mốc thời gian (timestampField)',
+  labelFieldLabel: 'Trường làm tiêu đề nhóm kết quả (labelField)',
+  labelFieldDefault: 'Mặc định (fullName nếu có, không thì trường định danh)',
+  labelFieldHint: 'Giá trị của trường này hiện làm tiêu đề cho mỗi nhóm kết quả, ví dụ họ tên.',
   identityFieldLabel: 'Trường định danh (identityField)',
   sortOrderLabel: 'Thứ tự sắp xếp',
   sortOrderDesc: 'Mới nhất trước (desc)',

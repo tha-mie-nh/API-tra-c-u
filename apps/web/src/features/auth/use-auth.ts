@@ -32,6 +32,9 @@ export function useAuthBootstrap(): void {
     (async () => {
       try {
         const session = await authApi.refreshSession();
+        // Store the token BEFORE /auth/me: otherwise /me goes out without a Bearer, always 401s, and costs a
+        // second /auth/refresh (extra rotation of the refresh cookie) on every page load.
+        useAuthStore.getState().setAccessToken(session.accessToken);
         const me = await authApi.fetchMe();
         setSession(session.accessToken, me);
       } catch {
@@ -49,6 +52,7 @@ export function useLogin() {
   return useCallback(
     async (username: string, password: string) => {
       const session = await authApi.login({ username, password });
+      useAuthStore.getState().setAccessToken(session.accessToken); // same reason as in the bootstrap above
       const me = await authApi.fetchMe();
       setSession(session.accessToken, me);
       return me;

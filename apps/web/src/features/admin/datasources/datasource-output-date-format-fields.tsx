@@ -46,6 +46,7 @@ function DateFormatSelect({ label, hint, defaultLabel, presets, value, onChange,
       <Select
         value={mode}
         onValueChange={(v) => {
+          if (!v) return;
           setCustom(v === CUSTOM_VALUE);
           if (v === CUSTOM_VALUE) return;
           onChange(v === DEFAULT_VALUE ? '' : v);

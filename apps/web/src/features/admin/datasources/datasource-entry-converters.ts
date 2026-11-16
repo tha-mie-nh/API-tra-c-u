@@ -48,6 +48,7 @@ export function entryToFormValues(entry: AdminDatasource): DatasourceFormValues 
     outputFields: output.fields.length ? output.fields.map(outputFieldToRow) : [makeEmptyOutputFieldRow()],
     outputTimestampField: output.timestampField,
     outputIdentityField: output.identityField,
+    outputLabelField: output.labelField ?? '',
     outputSortOrder: output.sortOrder,
     outputRecordsPath: output.recordsPath ?? '',
     outputTotalPath: output.totalPath ?? '',
@@ -92,16 +93,26 @@ function buildTransport(values: DatasourceFormValues, original?: TransportConfig
   };
 }
 
+/** Keys of `output` the form edits itself — everything else on the stored object is carried over on save, so a
+ * key the form does not know about (newer DSL options) is never silently dropped by "Lưu". */
+const OUTPUT_FORM_KEYS = ['timestampField', 'sortOrder', 'identityField', 'labelField', 'fields', 'recordsPath', 'totalPath', 'requestIdPath', 'imageRef'];
+
+function omitKeys<T extends object>(source: T | undefined, keys: string[]): Partial<T> {
+  if (!source) return {};
+  return Object.fromEntries(Object.entries(source).filter(([key]) => !keys.includes(key))) as Partial<T>;
+}
+
 function buildLimits(values: DatasourceFormValues): DatasourceLimits | undefined {
   if (!values.maxResults?.trim() || !values.pageSize?.trim()) return undefined;
   return { maxResults: Number(values.maxResults), pageSize: Number(values.pageSize) };
 }
 
 /** Builds `input` for the submit payload from the field-builder rows. */
-function buildInput(values: DatasourceFormValues): DatasourceInput {
+function buildInput(values: DatasourceFormValues, original?: DatasourceInput): DatasourceInput {
   const atLeastOneOf = values.inputAtLeastOneOf.filter((name) => name.trim());
   const requireGroups = values.inputRequireGroups.map((group) => group.filter((name) => name.trim())).filter((group) => group.length > 0);
   return {
+    ...omitKeys(original, ['fields', 'atLeastOneOf', 'requireGroups']),
     fields: values.inputFields.map(rowToInputField),
     ...(atLeastOneOf.length ? { atLeastOneOf } : {}),
     ...(requireGroups.length ? { requireGroups } : {}),
@@ -109,7 +120,7 @@ function buildInput(values: DatasourceFormValues): DatasourceInput {
 }
 
 /** Builds `output` for the submit payload from the field-builder rows. */
-function buildOutput(values: DatasourceFormValues): DatasourceOutput {
+function buildOutput(values: DatasourceFormValues, original?: DatasourceOutput): DatasourceOutput {
   const imageRef =
     values.outputImageRefEnabled &&
     values.outputImageRefBucketField?.trim() &&
@@ -123,10 +134,12 @@ function buildOutput(values: DatasourceFormValues): DatasourceOutput {
       : undefined;
 
   return {
+    ...omitKeys(original, OUTPUT_FORM_KEYS),
     timestampField: values.outputTimestampField.trim(),
     sortOrder: values.outputSortOrder,
     identityField: values.outputIdentityField.trim(),
     fields: values.outputFields.map(rowToOutputField),
+    ...(values.outputLabelField.trim() ? { labelField: values.outputLabelField.trim() } : {}),
     ...(values.outputRecordsPath?.trim() ? { recordsPath: values.outputRecordsPath.trim() } : {}),
     ...(values.outputTotalPath?.trim() ? { totalPath: values.outputTotalPath.trim() } : {}),
     ...(values.outputRequestIdPath?.trim() ? { requestIdPath: values.outputRequestIdPath.trim() } : {}),
@@ -145,8 +158,8 @@ export function formValuesToEntryPayload(values: DatasourceFormValues, original?
     type: values.type,
     enabled: values.enabled,
     transport: buildTransport(values, original?.transport as TransportConfig | undefined),
-    input: buildInput(values),
-    output: buildOutput(values),
+    input: buildInput(values, original?.input as DatasourceInput | undefined),
+    output: buildOutput(values, original?.output as DatasourceOutput | undefined),
     limits: buildLimits(values),
   };
 }

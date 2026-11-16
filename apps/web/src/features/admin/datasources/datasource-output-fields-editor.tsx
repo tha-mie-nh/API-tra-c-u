@@ -63,7 +63,7 @@ export function DatasourceOutputFieldsEditor({ control, register, watch, setValu
           <Label>{t.timestampFieldLabel}</Label>
           <Select
             value={watch('outputTimestampField') || undefined}
-            onValueChange={(v) => setValue('outputTimestampField', v === '__none__' ? '' : v)}
+            onValueChange={(v) => v && setValue('outputTimestampField', v === '__none__' ? '' : v)}
           >
             <SelectTrigger className="w-full" aria-invalid={!!errors.outputTimestampField}>
               <SelectValue placeholder={t.selectFieldPlaceholder} />
@@ -83,7 +83,7 @@ export function DatasourceOutputFieldsEditor({ control, register, watch, setValu
           <Label>{t.identityFieldLabel}</Label>
           <Select
             value={watch('outputIdentityField') || undefined}
-            onValueChange={(v) => setValue('outputIdentityField', v === '__none__' ? '' : v)}
+            onValueChange={(v) => v && setValue('outputIdentityField', v === '__none__' ? '' : v)}
           >
             <SelectTrigger className="w-full" aria-invalid={!!errors.outputIdentityField}>
               <SelectValue placeholder={t.selectFieldPlaceholder} />
@@ -103,7 +103,7 @@ export function DatasourceOutputFieldsEditor({ control, register, watch, setValu
           <Label>{t.sortOrderLabel}</Label>
           <Select
             value={watch('outputSortOrder') || undefined}
-            onValueChange={(v) => setValue('outputSortOrder', (v === '__none__' ? '' : v) as 'asc' | 'desc')}
+            onValueChange={(v) => v && setValue('outputSortOrder', (v === '__none__' ? '' : v) as 'asc' | 'desc')}
           >
             <SelectTrigger className="w-full">
               <SelectValue placeholder={t.clearSelectionOption} />
@@ -115,6 +115,24 @@ export function DatasourceOutputFieldsEditor({ control, register, watch, setValu
             </SelectContent>
           </Select>
         </div>
+      </div>
+
+      <div className="mt-2 flex flex-col gap-1.5">
+        <Label>{t.labelFieldLabel}</Label>
+        <Select value={watch('outputLabelField') || '__none__'} onValueChange={(v) => v && setValue('outputLabelField', v === '__none__' ? '' : v)}>
+          <SelectTrigger className="w-full">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="__none__">{t.labelFieldDefault}</SelectItem>
+            {fieldNames.map((name) => (
+              <SelectItem key={name} value={name}>
+                {name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <p className="text-muted-foreground text-xs">{t.labelFieldHint}</p>
       </div>
 
       <div className="mt-2 grid grid-cols-3 gap-3">

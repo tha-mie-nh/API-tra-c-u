@@ -25,7 +25,10 @@ interface DatasourceTransportFieldsProps {
 const CUSTOM_BASE_URL_OPTION = '__custom__';
 const CUSTOM_AUTH_VALUE_ENV_OPTION = '__custom__';
 
-/** Transport mock|http subform (phase-03 Architecture). `minio-pg` is
+/** Note: every Select here ignores an empty `onValueChange('')` — Radix emits it when its item list changes
+ * (env names loading after the dialog opened), which used to write `${}` into baseUrl and blank `valueEnv`.
+ *
+ * Transport mock|http subform (phase-03 Architecture). `minio-pg` is
  * intentionally never offered — the backend rejects it on write
  * (phase-02 Key Insights). */
 export function DatasourceTransportFields({ register, watch, setValue, control, errors, envRefs, envStatus }: DatasourceTransportFieldsProps) {
@@ -54,7 +57,7 @@ export function DatasourceTransportFields({ register, watch, setValue, control, 
         <Label htmlFor="transportKind">{t.fieldTransportKind}</Label>
         <Select
           value={kind || undefined}
-          onValueChange={(v) => setValue('transportKind', (v === '__none__' ? '' : v) as 'mock' | 'http')}
+          onValueChange={(v) => v && setValue('transportKind', (v === '__none__' ? '' : v) as 'mock' | 'http')}
         >
           <SelectTrigger id="transportKind" className="w-full">
             <SelectValue placeholder={t.clearSelectionOption} />
@@ -73,6 +76,7 @@ export function DatasourceTransportFields({ register, watch, setValue, control, 
             <Select
               value={baseUrlMode}
               onValueChange={(v) => {
+                if (!v) return; // see header note: Radix emits '' on item-list changes
                 setBaseUrlCustom(v === CUSTOM_BASE_URL_OPTION);
                 // Keep what is stored when switching to manual entry; only an env pick rewrites the value.
                 if (v !== CUSTOM_BASE_URL_OPTION) setValue('httpBaseUrl', `\${${v}}`);
@@ -116,7 +120,7 @@ export function DatasourceTransportFields({ register, watch, setValue, control, 
               <Label htmlFor="httpMethod">{t.fieldMethod}</Label>
               <Select
                 value={watch('httpMethod') || undefined}
-                onValueChange={(v) => setValue('httpMethod', (v === '__none__' ? '' : v) as 'GET' | 'POST')}
+                onValueChange={(v) => v && setValue('httpMethod', (v === '__none__' ? '' : v) as 'GET' | 'POST')}
               >
                 <SelectTrigger id="httpMethod" className="w-full">
                   <SelectValue placeholder={t.clearSelectionOption} />
@@ -174,7 +178,7 @@ export function DatasourceTransportFields({ register, watch, setValue, control, 
           <div className="flex flex-col gap-1.5 rounded-md border p-3">
             <Label htmlFor="authKind">{t.fieldAuthKind}</Label>
             <p className="text-muted-foreground text-xs">{t.authSectionHint}</p>
-            <Select value={authKind} onValueChange={(v) => setValue('authKind', v as DatasourceFormValues['authKind'])}>
+            <Select value={authKind} onValueChange={(v) => v && setValue('authKind', v as DatasourceFormValues['authKind'])}>
               <SelectTrigger id="authKind" className="w-full">
                 <SelectValue />
               </SelectTrigger>
@@ -200,6 +204,7 @@ export function DatasourceTransportFields({ register, watch, setValue, control, 
                   <Select
                     value={authValueEnvMode}
                     onValueChange={(v) => {
+                      if (!v) return;
                       setAuthEnvCustom(v === CUSTOM_AUTH_VALUE_ENV_OPTION);
                       if (v !== CUSTOM_AUTH_VALUE_ENV_OPTION) setValue('authValueEnv', v);
                     }}

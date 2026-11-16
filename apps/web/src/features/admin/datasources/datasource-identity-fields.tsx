@@ -87,7 +87,7 @@ export function DatasourceIdentityFields({
           <Label htmlFor="type">{t.fieldType}</Label>
           <Select
             value={watch('type') || undefined}
-            onValueChange={(v) => setValue('type', (v === '__none__' ? '' : v) as DatasourceFormValues['type'])}
+            onValueChange={(v) => v && setValue('type', (v === '__none__' ? '' : v) as DatasourceFormValues['type'])}
           >
             <SelectTrigger id="type" className="w-full">
               <SelectValue placeholder={t.clearSelectionOption} />

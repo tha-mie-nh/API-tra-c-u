@@ -129,4 +129,31 @@ describe('input/output field builder round trip (follow-up to phase-03: visual b
     expect(payload.input).not.toHaveProperty('requireGroups');
     expect(payload.output).not.toHaveProperty('imageRef');
   });
+
+  it('round trip keeps labelField, queryParams, and output/input keys the form does not edit', () => {
+    const original = httpAdminDatasource();
+    (original.transport as { queryParams?: Record<string, string> }).queryParams = { tab: '1' };
+    original.output = { ...(original.output as object), labelField: 'id', futureOption: { keep: true } } as AdminDatasource['output'];
+    original.input = { ...(original.input as object), futureInputOption: 1 } as AdminDatasource['input'];
+
+    const payload = formValuesToEntryPayload(entryToFormValues(original), original);
+
+    expect((payload.transport as { queryParams?: unknown }).queryParams).toEqual({ tab: '1' });
+    expect(payload.output).toMatchObject({ labelField: 'id', futureOption: { keep: true } });
+    expect(payload.input).toMatchObject({ futureInputOption: 1 });
+  });
+
+  it('clearing a form-managed output key (recordsPath/labelField) removes it instead of resurrecting the stored value', () => {
+    const original = httpAdminDatasource();
+    original.output = { ...(original.output as object), recordsPath: 'data.items', labelField: 'id' } as AdminDatasource['output'];
+
+    const values = entryToFormValues(original);
+    values.outputRecordsPath = '';
+    values.outputLabelField = '';
+    const payload = formValuesToEntryPayload(values, original);
+
+    expect(payload.output).not.toHaveProperty('recordsPath');
+    expect(payload.output).not.toHaveProperty('labelField');
+  });
 });
+

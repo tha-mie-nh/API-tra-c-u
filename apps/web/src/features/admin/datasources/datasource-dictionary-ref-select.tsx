@@ -19,7 +19,7 @@ export function DictionaryRefSelect({ value, onChange }: DictionaryRefSelectProp
   return (
     <div className="flex flex-col gap-1.5">
       <span className="text-xs font-medium">{t.dictionaryPick}</span>
-      <Select value={value || NONE} onValueChange={(v) => onChange(v === NONE ? '' : v)}>
+      <Select value={value || NONE} onValueChange={(v) => v && onChange(v === NONE ? '' : v)}>
         <SelectTrigger className="w-full">
           <SelectValue />
         </SelectTrigger>

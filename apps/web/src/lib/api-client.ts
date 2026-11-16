@@ -52,8 +52,17 @@ async function parseError(res: Response): Promise<ApiError> {
   );
 }
 
-function buildHeaders(hasBody: boolean): Headers {
+/** Unique per request. `crypto.randomUUID` only exists in secure contexts (https/localhost) and the app is
+ * served over plain http inside the intranet, so build the id from `getRandomValues`, which is always there. */
+function newRequestId(): string {
+  const bytes = new Uint8Array(12);
+  crypto.getRandomValues(bytes);
+  return `web-${Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('')}`;
+}
+
+function buildHeaders(hasBody: boolean, requestId: string): Headers {
   const headers = new Headers();
+  headers.set('X-Request-Id', requestId);
   if (hasBody) headers.set('Content-Type', 'application/json');
   const token = getAccessToken();
   if (token) headers.set('Authorization', `Bearer ${token}`);
@@ -99,21 +108,37 @@ export interface ApiFetchOptions {
 
 async function request<T>(path: string, options: ApiFetchOptions, allowRetry: boolean): Promise<T> {
   const hasBody = options.body !== undefined;
-  const res = await fetch(`${API_BASE}${path}`, {
-    method: options.method ?? 'GET',
-    headers: buildHeaders(hasBody),
-    credentials: 'include',
-    body: hasBody ? JSON.stringify(options.body) : undefined,
-  });
+  const method = options.method ?? 'GET';
+  const requestId = newRequestId();
+  let res: Response;
+  try {
+    res = await fetch(`${API_BASE}${path}`, {
+      method,
+      headers: buildHeaders(hasBody, requestId),
+      credentials: 'include',
+      body: hasBody ? JSON.stringify(options.body) : undefined,
+    });
+  } catch (err) {
+    // The request never reached (or never came back from) the server — the backend has no log line for it,
+    // so the browser console is the only trace. Frontend logs warn/error only.
+    console.error(`[api] network error ${method} ${path} requestId=${requestId}: ${(err as Error).message}`);
+    throw err;
+  }
 
   if (res.status === 401 && allowRetry && !isAuthEndpoint(path)) {
+    console.warn(`[api] 401 on ${method} ${path} requestId=${requestId} — refreshing session and retrying once`);
     const newToken = await refreshAccessToken();
     if (newToken) return request<T>(path, options, false);
+    console.error(`[api] session refresh failed after 401 on ${method} ${path} requestId=${requestId} — signing out`);
     useAuthStore.getState().clearSession();
     throw await parseError(res);
   }
 
-  if (!res.ok) throw await parseError(res);
+  if (!res.ok) {
+    const error = await parseError(res);
+    console.warn(`[api] ${res.status} ${method} ${path} code=${error.code} requestId=${error.requestId || requestId}`);
+    throw error;
+  }
   if (res.status === 204) return undefined as T;
   return (await res.json()) as T;
 }
@@ -138,7 +163,7 @@ export interface ApiBlobResult {
  * a blob link — never a raw MinIO URL (reference-config-schema.md Security).
  */
 async function requestBlob(path: string, allowRetry: boolean): Promise<ApiBlobResult> {
-  const res = await fetch(`${API_BASE}${path}`, { headers: buildHeaders(false), credentials: 'include' });
+  const res = await fetch(`${API_BASE}${path}`, { headers: buildHeaders(false, newRequestId()), credentials: 'include' });
 
   if (res.status === 401 && allowRetry) {
     const newToken = await refreshAccessToken();
