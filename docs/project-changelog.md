@@ -2,6 +2,20 @@
 
 Ghi lại các thay đổi đáng chú ý theo ngày. Mới nhất ở trên cùng.
 
+## 2026-11-16
+
+### Sửa lỗi: ngày/giờ không sort, datetime hiện `-`, thêm định dạng hiển thị cấu hình được
+- **Sort**: khóa sort lấy từ giá trị gốc của upstream + `format` của field, nên sort đúng cả khi field khai báo `string` hoặc giá trị dạng `DD/MM/YYYY HH:mm:ss` (trước đây `new Date()` ra NaN nên mọi dòng bằng nhau).
+- **`format` nhận nhiều dạng**, ngăn cách bằng `|` (vd `DD/MM/YYYY HH:mm:ss|DD/MM/YYYY HH:mm|DD/MM/YYYY`); giá trị dạng ISO vẫn đi qua như cũ. Chuỗi ISO không có múi giờ được hiểu là UTC.
+- **`displayFormat` (mới)** trên output field `date`/`datetime`: định dạng hiển thị (token `DD MM YYYY HH mm ss`, múi giờ Asia/Ho_Chi_Minh). Mặc định giữ `DD-MM-YYYY` / `DD-MM-YYYY HH:mm`.
+- **FE**: giá trị ngày không parse được hiển thị nguyên văn thay vì `—`.
+- **Form admin datasource**: output field có ô `format` và `displayFormat`. Trước đây form không có `format` nên **lưu từ giao diện làm mất `format`** đã cấu hình trong config.json (nguyên nhân khả dĩ của lỗi datetime sai định dạng sau khi sửa trong admin).
+
+### Log backend dạng text, ghi file
+- Định dạng `YYYY-MM-DD HH:mm:ss,SSS - LEVEL - context - message` (context đóng vai threadName), thay cho JSON pino. `LOG_LEVEL`, `LOG_TIMEZONE` (mặc định Asia/Ho_Chi_Minh), `LOG_FILE` (tùy chọn, vd `/var/log/app/api.log`).
+- Mỗi request có dòng `-->` khi vào và `<--` khi trả (status, ms, requestId, user); không ghi body/query string. Lỗi 4xx ghi WARN, 5xx ghi ERROR kèm stack. `QueryService` ghi `query start/ok/failed` kèm nguyên nhân thật của lỗi upstream (trước đây bị nuốt).
+- `docker-compose.prod.yml`: mount `./logs:/var/log/app` và `LOG_FILE`; entrypoint chown thư mục log cho user `node`. Cần build lại image api.
+
 ## 2026-11-13
 
 ### Bảo mật: vá libxslt trong image web (giữ nguyên tag `web-v15`)
