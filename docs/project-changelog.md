@@ -12,6 +12,15 @@ Ghi lại các thay đổi đáng chú ý theo ngày. Mới nhất ở trên cù
 - **FE**: giá trị ngày không parse được hiển thị nguyên văn thay vì `—`.
 - **Form admin datasource**: output field có ô `format` và `displayFormat`. Trước đây form không có `format` nên **lưu từ giao diện làm mất `format`** đã cấu hình trong config.json (nguyên nhân khả dĩ của lỗi datetime sai định dạng sau khi sửa trong admin).
 
+### Sửa lỗi: bấm tra cứu treo đến hết timeout, bấm lại 2-3 lần mới được
+- **Triệu chứng**: giao diện gửi request nhưng backend không có dấu vết (không thấy request vào hay gọi sang server đích), màn hình treo cho đến hết timeout, sau đó bấm lại 2-3 lần mới có kết quả. Khác với lỗi 502 tức thời ở mục retry bên dưới (lỗi đó thử lại được, lỗi này thì không vì không có phản hồi nào để biết mà thử lại).
+- **Nguyên nhân (tái hiện được)**: một kết nối bị firewall/NAT/lớp chuyển tiếp cổng của máy "âm thầm bỏ" trong lúc trang nhàn rỗi (không có FIN/RST). Trình duyệt vẫn tưởng kết nối còn sống nên dùng lại, request được gửi vào và không bao giờ được trả lời; chỉ lần bấm sau (kết nối mới) mới chạy. Tái hiện bằng `scripts/load-test/mock-blackhole-proxy.js` (proxy đứng trước web, sau khi nhàn rỗi thì nuốt dữ liệu, không đóng kết nối): bản `web-v16` treo 35+ giây ở lần bấm đầu sau 12 giây nghỉ.
+- **Sửa**:
+  - Web (`apps/web/src/lib/api-client.ts`): sau 10 giây không gọi API, gửi song song 6 request `GET /health` rất nhỏ (tối đa 2,5 giây) trước request thật; kết nối nào không trả lời bị hủy, trình duyệt bỏ socket chết, request thật đi bằng kết nối sạch. Kết nối khỏe tốn vài mili giây. Cùng bài thử: lần bấm đầu thành công, console ghi `[api] N stale connection(s) did not answer ... dropped, reconnecting`.
+  - nginx (`docker/nginx.conf`, `deploy-check/docker/nginx.conf`): `keepalive_timeout 15s` (đóng kết nối nhàn rỗi sớm), `resolver ... ipv6=off` (tránh treo khi hết hạn cache DNS), `proxy_connect_timeout 5s` (không chờ 60 giây khi không nối được api).
+  - API gọi upstream (`http-info.adapter.ts`): dùng agent riêng, đóng socket nhàn rỗi sau 1 giây (không dùng lại socket cũ) và hết hạn kết nối mới sau 3 giây (rồi retry bình thường).
+- **Giới hạn**: nếu chính upstream nhận request rồi im lặng trên kết nối mới thì vẫn phải chờ hết timeout của nguồn dữ liệu (không phân biệt được với upstream chậm). Cần build lại image api và web để có hiệu lực.
+
 ### Phát hành image
 - `gthanh/app_tra_cuu:api-v13` (digest `sha256:0bb9b208e082634ef650df4fbac4fa171697adb7d36c8bea4e78c879bed558ab`) và `web-v16` (digest `sha256:8168a1ee52c7fefffeec9db9800f3cf343afa1acc85cdcdd1c5691515f0572c5`, libxslt 1.1.42-r3), gồm toàn bộ thay đổi ngày 2026-11-16 bên dưới. `docker-compose.prod.yml` trỏ tới hai tag này.
 - Thư mục config cần dùng bản mới (đã chuyển sang map một lần, schema có khóa mới): `deploy-check/config/*`. Config cũ có `mapTo`/`from` vẫn chạy nhưng schema cũ sẽ từ chối `displayFormat`, múi giờ, `dictionaries`, `queryParams`, `labelField`, nên phải cập nhật cả `config.schema.json` đi kèm.

@@ -106,6 +106,19 @@ pnpm dev                                            # api :3000 + web :5173
 3. (So sánh với lỗi cũ: bản trước lần bấm đầu trả "Upstream datasource request failed" 502, bấm lại mới được.)
 4. Token hết hạn giữa chừng (mặc định 15 phút): để tab nhàn rỗi quá hạn rồi bấm Tra cứu một lần. Kết quả đúng: vẫn có dữ liệu ngay lần đầu, console có `[api] 401 on POST ... refreshing session and retrying once`.
 
+## 7b. Treo đến hết timeout rồi bấm lại mới được (kết nối chết khi nhàn rỗi)
+
+**Lỗi cũ:** sau một lúc để trang nhàn rỗi, bấm Tra cứu thì treo rất lâu (không có dấu vết ở backend), hết timeout bấm lại 2-3 lần mới được.
+
+1. Dựng bản web mới và chạy proxy mô phỏng kết nối bị bỏ âm thầm trước nó:
+   ```bash
+   cd apps/web && npx vite build && npx vite preview --port 4173 &       # web mới, /api đi tới API :3000
+   node scripts/load-test/mock-blackhole-proxy.js --listen 8091 --target localhost:4173 --idle-ms 4000 &
+   ```
+2. Mở http://localhost:8091, đăng nhập, vào một trang tra cứu. **Để trang nhàn rỗi 12 giây**, rồi bấm Tra cứu **một lần**.
+3. Kết quả đúng: có dữ liệu sau khoảng 2-3 giây (không treo). Console trình duyệt có `[api] N stale connection(s) did not answer after 12s idle — dropped, reconnecting`. Terminal của proxy có dòng `swallowed ... (request never answered)` cho các kết nối chết.
+4. Đối chứng (bản cũ): chạy proxy trỏ vào stack dùng `web-v16` (`--target localhost:8081`, mở cổng proxy đó) và làm lại bước 2: bản cũ treo hàng chục giây và không có kết quả.
+
 ## 8. Mất URL và API key khi xóa cache
 
 **Lỗi cũ:** form sửa nguồn dữ liệu hiện `${}` ở URL và mất tên biến API key.

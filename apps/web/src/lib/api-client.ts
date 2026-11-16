@@ -60,6 +60,55 @@ function newRequestId(): string {
   return `web-${Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('')}`;
 }
 
+/**
+ * A connection that a firewall / NAT / local port-forwarder silently dropped while the page sat idle looks alive to
+ * the browser: the next request on it is written and then never answered, nothing reaches the backend, and the user
+ * waits out the whole timeout — only a click on a fresh connection works ("press it 2-3 times").
+ * After a quiet spell we therefore send a few tiny `GET /health` first. Any that is not answered within a few seconds
+ * is aborted, which makes the browser drop that socket, so the real request opens a fresh one (cost: at most
+ * PROBE_TIMEOUT_MS once, instead of a full timeout). Healthy connections pay a few milliseconds.
+ */
+const IDLE_PROBE_AFTER_MS = 10_000;
+const PROBE_TIMEOUT_MS = 2_500;
+/** Browsers keep up to 6 sockets per host; probing on all of them at once means every idle (possibly dead) socket
+ * is either answered or aborted, so the real request is guaranteed a clean one. */
+const PROBE_FANOUT = 6;
+let lastApiActivityAt = Date.now();
+let probeInFlight: Promise<void> | null = null;
+
+function markApiActivity(): void {
+  lastApiActivityAt = Date.now();
+}
+
+async function ensureLiveConnection(): Promise<void> {
+  if (Date.now() - lastApiActivityAt < IDLE_PROBE_AFTER_MS) return;
+  if (!probeInFlight) {
+    probeInFlight = (async () => {
+      const idleSeconds = Math.round((Date.now() - lastApiActivityAt) / 1000);
+      let unanswered = 0;
+      await Promise.all(
+        Array.from({ length: PROBE_FANOUT }, async () => {
+          const controller = new AbortController();
+          const timer = setTimeout(() => controller.abort(), PROBE_TIMEOUT_MS);
+          try {
+            await fetch(`${API_BASE}/health`, { cache: 'no-store', signal: controller.signal });
+          } catch {
+            unanswered += 1;
+          } finally {
+            clearTimeout(timer);
+          }
+        }),
+      );
+      if (unanswered > 0) {
+        console.warn(`[api] ${unanswered} stale connection(s) did not answer after ${idleSeconds}s idle — dropped, reconnecting`);
+      }
+      markApiActivity();
+      probeInFlight = null;
+    })();
+  }
+  await probeInFlight;
+}
+
 function buildHeaders(hasBody: boolean, requestId: string): Headers {
   const headers = new Headers();
   headers.set('X-Request-Id', requestId);
@@ -111,6 +160,7 @@ async function request<T>(path: string, options: ApiFetchOptions, allowRetry: bo
   const method = options.method ?? 'GET';
   const requestId = newRequestId();
   let res: Response;
+  await ensureLiveConnection();
   try {
     res = await fetch(`${API_BASE}${path}`, {
       method,
@@ -124,6 +174,7 @@ async function request<T>(path: string, options: ApiFetchOptions, allowRetry: bo
     console.error(`[api] network error ${method} ${path} requestId=${requestId}: ${(err as Error).message}`);
     throw err;
   }
+  markApiActivity();
 
   if (res.status === 401 && allowRetry && !isAuthEndpoint(path)) {
     console.warn(`[api] 401 on ${method} ${path} requestId=${requestId} — refreshing session and retrying once`);
@@ -163,7 +214,9 @@ export interface ApiBlobResult {
  * a blob link — never a raw MinIO URL (reference-config-schema.md Security).
  */
 async function requestBlob(path: string, allowRetry: boolean): Promise<ApiBlobResult> {
+  await ensureLiveConnection();
   const res = await fetch(`${API_BASE}${path}`, { headers: buildHeaders(false, newRequestId()), credentials: 'include' });
+  markApiActivity();
 
   if (res.status === 401 && allowRetry) {
     const newToken = await refreshAccessToken();

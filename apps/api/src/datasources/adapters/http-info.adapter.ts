@@ -1,11 +1,20 @@
 import { Logger } from '@nestjs/common';
-import { request } from 'undici';
+import { Agent, request } from 'undici';
 import type { DatasourceEntry, TransportHttp, UpstreamRequestSnapshot, UpstreamResponseSnapshot } from '@app/shared';
 import type { ResolvedHttpSecrets } from '../datasource-config.loader';
 import type { AdapterExecuteInput, AdapterExecuteResult, DatasourceAdapter, RawRecord, UpstreamExchange } from './datasource-adapter.interface';
 import { UpstreamError, UpstreamTimeoutError } from './adapter-errors';
 import { buildExchange, parseBodyText, redactHeaders, safeUrl } from './upstream-exchange.util';
 import { withTimeout } from './with-timeout.util';
+
+/**
+ * Connection hygiene for upstream calls. A lookup is a rare request, so keeping sockets around buys nothing, while
+ * reusing a socket that a firewall/NAT/relay silently dropped makes the request hang until the full timeout and only
+ * the NEXT attempt (on a fresh socket) succeeds — "press it 2-3 times". Idle sockets are therefore closed after 1 s,
+ * and a connection that cannot be established fails after 3 s (then the normal retry runs) instead of waiting out
+ * the whole request timeout.
+ */
+const upstreamAgent = new Agent({ keepAliveTimeout: 1000, keepAliveMaxTimeout: 1000, connect: { timeout: 3000 } });
 
 /** Mutable holder for the latest attempt's exchange (read by `execute` when an attempt fails or times out). */
 interface ExchangeTracker {
@@ -121,6 +130,7 @@ export class HttpInfoAdapter implements DatasourceAdapter {
         headers,
         body: sendsBody ? JSON.stringify(body) : undefined,
         signal: AbortSignal.timeout(this.transport.timeoutMs ?? 10_000),
+        dispatcher: upstreamAgent,
       });
     } catch (err) {
       record({ error: `network error: ${(err as Error).message}` });

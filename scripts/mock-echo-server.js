@@ -15,7 +15,7 @@
  *
  * Env: PORT (default 4200), MOCK_ECHO_RESPONSE (path to a JSON file overriding the default record),
  *      MOCK_ECHO_DELAY_MS (artificial latency), MOCK_ECHO_STATUS (force a status, e.g. 500, to test errors),
- *      MOCK_ECHO_FAIL_FIRST (number: the first N requests fail with MOCK_ECHO_FAIL_MODE=reset|503 — emulates a flaky
+ *      MOCK_ECHO_FAIL_FIRST (number: the first N requests fail with MOCK_ECHO_FAIL_MODE=reset|503|hang — emulates a flaky
  *      upstream / stale keep-alive socket, to test retries; default mode reset = socket destroyed, no response),
  *      MOCK_ECHO_JITTER_MS (random extra latency 0..N ms), MOCK_ECHO_FAIL_RATE (0..1 chance a request fails, same
  *      MOCK_ECHO_FAIL_MODE), MOCK_ECHO_QUIET=1 (no per-request INFO lines; for load tests).
@@ -78,6 +78,7 @@ const server = http.createServer((req, res) => {
     if (seen <= FAIL_FIRST || (FAIL_RATE > 0 && Math.random() < FAIL_RATE)) {
       log('WARN', `<-- simulated failure (${FAIL_MODE}) for request #${seen}/${FAIL_FIRST} requestId=${requestId}`);
       if (FAIL_MODE === 'reset') return req.socket.destroy();
+      if (FAIL_MODE === 'hang') return; // accept the request and never answer (silent drop / black-holed connection)
       res.writeHead(503, { 'content-type': 'application/json' });
       return res.end(JSON.stringify({ error: { code: 'MOCK_FLAKY', message: 'simulated 503' } }));
     }
