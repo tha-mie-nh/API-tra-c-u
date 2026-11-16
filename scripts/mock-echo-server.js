@@ -14,7 +14,9 @@
  * really sent the request and with which query/body. Credential-like headers are redacted.
  *
  * Env: PORT (default 4200), MOCK_ECHO_RESPONSE (path to a JSON file overriding the default record),
- *      MOCK_ECHO_DELAY_MS (artificial latency), MOCK_ECHO_STATUS (force a status, e.g. 500, to test errors).
+ *      MOCK_ECHO_DELAY_MS (artificial latency), MOCK_ECHO_STATUS (force a status, e.g. 500, to test errors),
+ *      MOCK_ECHO_FAIL_FIRST (number: the first N requests fail with MOCK_ECHO_FAIL_MODE=reset|503 — emulates a flaky
+ *      upstream / stale keep-alive socket, to test retries; default mode reset = socket destroyed, no response).
  */
 const http = require('node:http');
 const fs = require('node:fs');
@@ -26,6 +28,9 @@ const { setTimeout } = require('node:timers');
 const PORT = Number(process.env.PORT ?? 4200);
 const DELAY_MS = Number(process.env.MOCK_ECHO_DELAY_MS ?? 0);
 const FORCED_STATUS = process.env.MOCK_ECHO_STATUS ? Number(process.env.MOCK_ECHO_STATUS) : undefined;
+const FAIL_FIRST = Number(process.env.MOCK_ECHO_FAIL_FIRST ?? 0);
+const FAIL_MODE = process.env.MOCK_ECHO_FAIL_MODE ?? 'reset';
+let seen = 0;
 const SECRET_HEADER = /key|token|authorization|secret|cookie|access/i;
 
 const DEFAULT_RECORD = process.env.MOCK_ECHO_RESPONSE
@@ -59,6 +64,13 @@ const server = http.createServer((req, res) => {
     const query = Object.fromEntries(url.searchParams.entries());
     log('INFO', `--> ${req.method} ${url.pathname}${url.search} requestId=${requestId} body=${rawBody || '-'}`);
 
+    seen += 1;
+    if (seen <= FAIL_FIRST) {
+      log('WARN', `<-- simulated failure (${FAIL_MODE}) for request #${seen}/${FAIL_FIRST} requestId=${requestId}`);
+      if (FAIL_MODE === 'reset') return req.socket.destroy();
+      res.writeHead(503, { 'content-type': 'application/json' });
+      return res.end(JSON.stringify({ error: { code: 'MOCK_FLAKY', message: 'simulated 503' } }));
+    }
     const status = FORCED_STATUS ?? 200;
     const payload =
       status >= 400

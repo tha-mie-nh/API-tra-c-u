@@ -28,10 +28,23 @@ Theo góp ý đợt 1 của leader: field kiểu Ngày/Ngày giờ trong form ad
 
 **Lỗi của bản trước được phát hiện và sửa:** định dạng hiển thị (`displayFormat`) bị schema từ chối khi lưu (schema không cho phép khóa này), nghĩa là ô chọn format hiển thị ở bản trước chưa lưu được. Đã sửa và có test hồi quy. Phải build lại image api và web mới có tác dụng.
 
+## Lỗi tìm được và sửa ở phía ứng dụng (đợt 3)
+
+Đã tái hiện bằng trình duyệt thật và upstream giả chập chờn, không còn chỉ là suy đoán.
+
+| Triệu chứng của Hưng | Nguyên nhân thật | Đã sửa |
+|---|---|---|
+| Lần đầu tra cứu không gửi được, bấm lần 2-3 mới được | `defaults` trong config (retry 2 lần, timeout, giới hạn) **không được dùng ở đâu**. Nguồn dữ liệu không khai báo `retry` có 0 lần thử lại, một lần upstream reset kết nối hoặc trả 503 là báo lỗi 502 ngay | Áp dụng `defaults` vào cấu hình chạy. Tái hiện: lần 1 trả 502, lần 2-3 trả 200. Sau sửa: lần 1 tự thử lại và trả 200 |
+| Xóa cache thì mất URL và API key trong form nguồn dữ liệu | Ô chọn (Radix Select) tự bắn giá trị rỗng khi danh sách biến môi trường tải về sau. Form ghi `${}` vào URL và xóa tên biến API key | Bỏ qua giá trị rỗng. Kiểm tra lại bằng trình duyệt: hiện đúng tên biến |
+| Cấu hình đổi sau khi bấm Lưu mà không sửa gì | Form không biết một số khóa (như `labelField`) nên lưu xong là mất | Form giữ nguyên khóa nó không quản lý, thêm ô `labelField`. Lưu không sửa gì cho kết quả giống hệt bản trước |
+| Không trace được transaction | Backend không log request, FE không có id | Log request/response/truy vấn/upstream ở BE. FE gửi `X-Request-Id` và ghi warn/error kèm id để khớp với dòng log BE. Image echo `mock-echo-v1` có chế độ giả lập upstream chập chờn |
+
+Ngoài ra: lúc tải trang và đăng nhập, `/auth/me` gọi trước khi có token nên luôn 401 rồi phải refresh thêm. Đã sửa.
+
 ## Chưa sửa
 
-- **Request lần đầu không gửi, phải bấm 2-3 lần**: backend gọi lần đầu đã trả 200, chưa tái hiện được. Log mới (cả phía app và phía upstream) cùng API echo dùng để truy vết khi xảy ra lại.
-- Log phía frontend: để nguyên theo góp ý (chỉ cần warn/error).
+- Chưa thấy trường hợp nào khác làm "lần đầu không gửi" trên máy mình. Nếu lab vẫn còn, mở console trình duyệt (có dòng `[api] ... requestId=...`) và tìm requestId đó trong log backend: không có dòng `-->` nghĩa là request không tới được server.
+- Log phía frontend: để nguyên theo góp ý (chỉ warn/error).
 
 ## Khi triển khai
 
