@@ -21,11 +21,15 @@ interface InfoRecordTableProps {
   timestampField: string;
 }
 
-function formatCellValue(value: unknown, type: QueryColumn['type'], displayFormat?: string): string {
+function formatCellValue(value: unknown, type: QueryColumn['type'], displayFormat?: string, timeZone?: string): string {
   if (value === null || value === undefined || value === '') return '—';
   if (type === 'datetime' || type === 'date') {
     const text = String(value);
-    const formatted = displayFormat ? formatWithPattern(text, displayFormat) : type === 'datetime' ? formatDateTime(text) : formatDate(text);
+    const formatted = displayFormat
+      ? formatWithPattern(text, displayFormat, timeZone)
+      : type === 'datetime'
+        ? formatDateTime(text, timeZone)
+        : formatDate(text, timeZone);
     // An unparseable upstream value is shown as-is instead of a bare "—" that hides the data.
     return formatted && formatted !== '—' ? formatted : text;
   }
@@ -42,7 +46,7 @@ function renderCellValue(value: unknown, column: QueryColumn | undefined): React
     return <Base64ImageCell value={value} label={column.label} />;
   }
 
-  const text = formatCellValue(value, column?.type ?? 'string', column?.displayFormat);
+  const text = formatCellValue(value, column?.type ?? 'string', column?.displayFormat, column?.displayTimeZone);
   const Icon = column?.iconMap ? ICON_BY_KEY[column.iconMap[text] ?? ''] : undefined;
 
   if (!column?.emphasize && !Icon) return text;
@@ -90,7 +94,7 @@ export function InfoRecordTable({ columns, records, timestampField }: InfoRecord
             <span className="bg-primary absolute top-1.5 -left-[21px] size-2.5 rounded-full" aria-hidden="true" />
             {timestampCell && (
               <p className="flex flex-wrap items-center gap-3 text-sm font-semibold">
-                <span>{formatCellValue(timestampCell.getValue(), columnsByName.get(timestampField)?.type ?? 'datetime', columnsByName.get(timestampField)?.displayFormat)}</span>
+                <span>{formatCellValue(timestampCell.getValue(), columnsByName.get(timestampField)?.type ?? 'datetime', columnsByName.get(timestampField)?.displayFormat, columnsByName.get(timestampField)?.displayTimeZone)}</span>
                 {headerFieldCells.map((cell) => (
                   <span key={cell.id}>{renderCellValue(cell.getValue(), columnsByName.get(cell.column.id))}</span>
                 ))}

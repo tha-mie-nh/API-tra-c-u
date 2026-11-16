@@ -1,6 +1,7 @@
+import { useState } from 'react';
 import { useFieldArray, type Control, type FieldErrors, type UseFormRegister, type UseFormSetValue, type UseFormWatch } from 'react-hook-form';
 import { Plus, Trash2 } from 'lucide-react';
-import type { DatasourceEnvRefs } from '@shared/index';
+import type { AdminDatasource, DatasourceEnvRefs } from '@shared/index';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
@@ -17,6 +18,8 @@ interface DatasourceTransportFieldsProps {
   /** `GET /admin/datasources/env-refs` result — names only, for the
    * baseUrl/`auth.valueEnv` pickers (never values). `undefined` while loading. */
   envRefs?: DatasourceEnvRefs;
+  /** Server-side "is this env var set on the API instance?" for the entry being edited (edit mode only). */
+  envStatus?: AdminDatasource['envStatus'];
 }
 
 const CUSTOM_BASE_URL_OPTION = '__custom__';
@@ -25,19 +28,24 @@ const CUSTOM_AUTH_VALUE_ENV_OPTION = '__custom__';
 /** Transport mock|http subform (phase-03 Architecture). `minio-pg` is
  * intentionally never offered — the backend rejects it on write
  * (phase-02 Key Insights). */
-export function DatasourceTransportFields({ register, watch, setValue, control, errors, envRefs }: DatasourceTransportFieldsProps) {
+export function DatasourceTransportFields({ register, watch, setValue, control, errors, envRefs, envStatus }: DatasourceTransportFieldsProps) {
+  // "Nhập tay" empties the value, so the custom input must be driven by this flag, not by a non-empty value
+  // (otherwise choosing it hides the input and the field looks like it vanished).
+  const [baseUrlCustom, setBaseUrlCustom] = useState(false);
+  const [authEnvCustom, setAuthEnvCustom] = useState(false);
   const kind = watch('transportKind');
   const authKind = watch('authKind');
   const { fields, append, remove } = useFieldArray({ control, name: 'headers' });
+  const query = useFieldArray({ control, name: 'queryParams' });
   const t = vi.admin.datasources;
 
   const baseUrlValue = watch('httpBaseUrl') ?? '';
   const matchedEnvName = envRefs?.baseUrlEnvNames.find((name) => baseUrlValue === `\${${name}}`);
-  const baseUrlMode = baseUrlValue === '' ? undefined : (matchedEnvName ?? CUSTOM_BASE_URL_OPTION);
+  const baseUrlMode = matchedEnvName ?? (baseUrlValue !== '' || baseUrlCustom ? CUSTOM_BASE_URL_OPTION : undefined);
 
   const authValueEnvValue = watch('authValueEnv') ?? '';
   const matchedApiKeyEnvName = envRefs?.apiKeyEnvNames.find((name) => authValueEnvValue === name);
-  const authValueEnvMode = authValueEnvValue === '' ? undefined : (matchedApiKeyEnvName ?? CUSTOM_AUTH_VALUE_ENV_OPTION);
+  const authValueEnvMode = matchedApiKeyEnvName ?? (authValueEnvValue !== '' || authEnvCustom ? CUSTOM_AUTH_VALUE_ENV_OPTION : undefined);
   const authHeaderValue = watch('authHeader') ?? '';
 
   return (
@@ -64,7 +72,11 @@ export function DatasourceTransportFields({ register, watch, setValue, control, 
             <Label htmlFor="httpBaseUrl">{t.fieldBaseUrl}</Label>
             <Select
               value={baseUrlMode}
-              onValueChange={(v) => setValue('httpBaseUrl', v === CUSTOM_BASE_URL_OPTION ? '' : `\${${v}}`)}
+              onValueChange={(v) => {
+                setBaseUrlCustom(v === CUSTOM_BASE_URL_OPTION);
+                // Keep what is stored when switching to manual entry; only an env pick rewrites the value.
+                if (v !== CUSTOM_BASE_URL_OPTION) setValue('httpBaseUrl', `\${${v}}`);
+              }}
             >
               <SelectTrigger id="httpBaseUrl" className="w-full" aria-invalid={!!errors.httpBaseUrl}>
                 <SelectValue placeholder={t.fieldBaseUrlPlaceholder} />
@@ -86,6 +98,7 @@ export function DatasourceTransportFields({ register, watch, setValue, control, 
                 onChange={(e) => setValue('httpBaseUrl', e.target.value)}
               />
             )}
+            {envStatus?.baseUrlEnvSet === false && <p className="text-destructive text-xs">{t.baseUrlEnvUnset}</p>}
             {errors.httpBaseUrl && <p className="text-destructive text-sm">{errors.httpBaseUrl.message}</p>}
           </div>
 
@@ -140,6 +153,24 @@ export function DatasourceTransportFields({ register, watch, setValue, control, 
             </Button>
           </div>
 
+          <div className="flex flex-col gap-1.5">
+            <Label>{t.fieldQueryParams}</Label>
+            <p className="text-muted-foreground text-xs">{t.queryParamsHint}</p>
+            {query.fields.map((field, index) => (
+              <div key={field.id} className="flex gap-2">
+                <Input placeholder={t.headerKeyPlaceholder} {...register(`queryParams.${index}.key`)} />
+                <Input placeholder={t.headerValuePlaceholder} {...register(`queryParams.${index}.value`)} />
+                <Button type="button" variant="ghost" size="icon-sm" onClick={() => query.remove(index)} aria-label={t.removeHeaderButton}>
+                  <Trash2 />
+                </Button>
+              </div>
+            ))}
+            <Button type="button" variant="outline" size="sm" onClick={() => query.append({ key: '', value: '' })}>
+              <Plus data-icon="inline-start" />
+              {t.addQueryParamButton}
+            </Button>
+          </div>
+
           <div className="flex flex-col gap-1.5 rounded-md border p-3">
             <Label htmlFor="authKind">{t.fieldAuthKind}</Label>
             <p className="text-muted-foreground text-xs">{t.authSectionHint}</p>
@@ -168,7 +199,10 @@ export function DatasourceTransportFields({ register, watch, setValue, control, 
                   <Label htmlFor="authValueEnv">{t.fieldAuthValueEnv}</Label>
                   <Select
                     value={authValueEnvMode}
-                    onValueChange={(v) => setValue('authValueEnv', v === CUSTOM_AUTH_VALUE_ENV_OPTION ? '' : v)}
+                    onValueChange={(v) => {
+                      setAuthEnvCustom(v === CUSTOM_AUTH_VALUE_ENV_OPTION);
+                      if (v !== CUSTOM_AUTH_VALUE_ENV_OPTION) setValue('authValueEnv', v);
+                    }}
                   >
                     <SelectTrigger id="authValueEnv" className="w-full" aria-invalid={!!errors.authValueEnv}>
                       <SelectValue placeholder={t.authValueEnvPlaceholder} />
@@ -190,6 +224,7 @@ export function DatasourceTransportFields({ register, watch, setValue, control, 
                       onChange={(e) => setValue('authValueEnv', e.target.value)}
                     />
                   )}
+                  {envStatus?.apiKeyEnvSet === false && <p className="text-destructive text-xs">{t.apiKeyEnvUnset}</p>}
                   {errors.authValueEnv && <p className="text-destructive text-sm">{errors.authValueEnv.message}</p>}
                   {authKind === 'apiKeyHeader' && authHeaderValue && authValueEnvValue && (
                     <p className="text-muted-foreground text-xs">

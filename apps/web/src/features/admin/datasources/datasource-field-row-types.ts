@@ -34,6 +34,7 @@ export const inputFieldRowSchema = z.object({
   pattern: z.string(),
   format: z.string(),
   mapTo: z.string(),
+  optionsRef: z.string(),
   options: z.array(fieldOptionRowSchema),
 });
 export type InputFieldRow = z.infer<typeof inputFieldRowSchema>;
@@ -49,6 +50,7 @@ export const makeEmptyInputFieldRow = (): InputFieldRow => ({
   pattern: '',
   format: '',
   mapTo: '',
+  optionsRef: '',
   options: [],
 });
 
@@ -58,6 +60,9 @@ export const outputFieldRowSchema = z.object({
   from: z.string(),
   format: z.string(),
   displayFormat: z.string(),
+  sourceTimeZone: z.string(),
+  displayTimeZone: z.string(),
+  valueMapRef: z.string(),
   type: z.enum(FIELD_TYPE_VALUES),
   valueMap: z.array(keyValueRowSchema),
   iconMap: z.array(keyValueRowSchema),
@@ -73,6 +78,9 @@ export const makeEmptyOutputFieldRow = (): OutputFieldRow => ({
   from: '',
   format: '',
   displayFormat: '',
+  sourceTimeZone: '',
+  displayTimeZone: '',
+  valueMapRef: '',
   type: 'string',
   valueMap: [],
   iconMap: [],

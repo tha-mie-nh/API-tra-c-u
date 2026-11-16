@@ -127,6 +127,7 @@ export function DatasourceFormDialog({ open, onOpenChange, entry, existingDataso
               />
 
               <DatasourceTransportFields
+                envStatus={entry?.envStatus}
                 register={register}
                 watch={watch}
                 setValue={setValue}

@@ -49,7 +49,7 @@ describe('DatasourceInputFieldsEditor (row add/remove + live atLeastOneOf list)'
     render(<Harness />);
 
     await user.click(screen.getByRole('button', { name: 'Thêm trường' }));
-    const nameInputs = screen.getAllByPlaceholderText('Tên (name)');
+    const nameInputs = screen.getAllByPlaceholderText('Key theo API (name)');
     await user.type(nameInputs[0]!, 'first');
     await user.type(nameInputs[1]!, 'second');
 
@@ -57,7 +57,7 @@ describe('DatasourceInputFieldsEditor (row add/remove + live atLeastOneOf list)'
     const moveUpButtons = screen.getAllByRole('button', { name: 'Lên' });
     await user.click(moveUpButtons[1]!);
 
-    const reordered = screen.getAllByPlaceholderText('Tên (name)');
+    const reordered = screen.getAllByPlaceholderText('Key theo API (name)');
     expect(reordered[0]).toHaveValue('second');
     expect(reordered[1]).toHaveValue('first');
     expect(screen.getByTestId('row-count')).toHaveTextContent('2');
@@ -69,7 +69,7 @@ describe('DatasourceInputFieldsEditor (row add/remove + live atLeastOneOf list)'
 
     expect(screen.queryByText('citizenId')).not.toBeInTheDocument();
 
-    await user.type(screen.getByPlaceholderText('Tên (name)'), 'citizenId');
+    await user.type(screen.getByPlaceholderText('Key theo API (name)'), 'citizenId');
     const option = screen.getByText('citizenId').closest('div')!;
 
     const checkbox = within(option).getByRole('checkbox');

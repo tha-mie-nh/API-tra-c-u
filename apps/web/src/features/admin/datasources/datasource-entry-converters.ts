@@ -36,6 +36,7 @@ export function entryToFormValues(entry: AdminDatasource): DatasourceFormValues 
     httpMethod: isHttp ? transport.method : 'GET',
     httpTimeoutMs: isHttp && transport.timeoutMs !== undefined ? String(transport.timeoutMs) : '',
     headers: isHttp ? headersToRows(transport.headers) : [],
+    queryParams: isHttp ? headersToRows(transport.queryParams) : [],
     authKind: auth?.kind ?? 'none',
     authHeader: auth?.header ?? '',
     authValueEnv: auth?.valueEnv ?? '',
@@ -85,6 +86,7 @@ function buildTransport(values: DatasourceFormValues, original?: TransportConfig
     path: values.httpPath?.trim() ?? '',
     method: values.httpMethod ?? 'GET',
     headers: rowsToHeaders(values.headers),
+    queryParams: rowsToHeaders(values.queryParams),
     timeoutMs: values.httpTimeoutMs?.trim() ? Number(values.httpTimeoutMs) : undefined,
     auth,
   };

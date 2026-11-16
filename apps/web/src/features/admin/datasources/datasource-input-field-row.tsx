@@ -9,6 +9,7 @@ import { vi } from '@/i18n/vi';
 import type { DatasourceFormValues } from './datasource-form-schema';
 import { FIELD_TYPE_VALUES, makeEmptyFieldOptionRow } from './datasource-field-row-types';
 import { PairRowsEditor } from './datasource-pair-rows-editor';
+import { DictionaryRefSelect } from './datasource-dictionary-ref-select';
 
 interface DatasourceInputFieldRowProps {
   index: number;
@@ -107,8 +108,13 @@ export function DatasourceInputFieldRow({
           <Input placeholder={t.fieldRowMax} type="number" {...register(`inputFields.${index}.max`)} />
           <Input placeholder={t.fieldRowPattern} {...register(`inputFields.${index}.pattern`)} />
           <Input placeholder={t.fieldRowFormat} {...register(`inputFields.${index}.format`)} />
-          <Input placeholder={t.fieldRowMapTo} {...register(`inputFields.${index}.mapTo`)} />
+          {row.mapTo && <Input placeholder={t.fieldRowMapTo} {...register(`inputFields.${index}.mapTo`)} />}
           {row.type === 'enum' && (
+            <div className="col-span-2 flex flex-col gap-1.5">
+              <DictionaryRefSelect value={row.optionsRef} onChange={(v) => setValue(`inputFields.${index}.optionsRef`, v)} />
+            </div>
+          )}
+          {row.type === 'enum' && !row.optionsRef && (
             <div className="col-span-2 flex flex-col gap-1.5">
               <span className="text-xs font-medium">{t.fieldRowOptions}</span>
               <PairRowsEditor

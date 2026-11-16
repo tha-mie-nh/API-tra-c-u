@@ -16,6 +16,7 @@ const SOURCE_PRESETS = [
   'DD/MM/YYYY HH:mm:ss|DD/MM/YYYY HH:mm|DD/MM/YYYY',
 ];
 const DISPLAY_PRESETS = ['DD/MM/YYYY', 'DD-MM-YYYY', 'YYYY-MM-DD', 'DD/MM/YYYY HH:mm', 'DD/MM/YYYY HH:mm:ss', 'HH:mm DD/MM/YYYY'];
+const TIME_ZONES = ['UTC', 'Asia/Ho_Chi_Minh', 'Asia/Bangkok', 'Asia/Singapore', 'Asia/Tokyo', 'Europe/London', 'America/New_York'];
 const DEFAULT_VALUE = '__default__';
 const CUSTOM_VALUE = '__custom__';
 /** 09:30 on 2026-01-15 in Asia/Ho_Chi_Minh — a fixed example so the preview is stable. */
@@ -101,6 +102,24 @@ export function DatasourceOutputDateFormatFields({ index, register, watch, setVa
         onChange={(v) => setValue(`outputFields.${index}.displayFormat`, v)}
         register={register(`outputFields.${index}.displayFormat`)}
         preview
+      />
+      <DateFormatSelect
+        label={t.timeZoneSourceLabel}
+        hint={t.timeZoneSourceHint}
+        defaultLabel={t.timeZoneSourceDefault}
+        presets={TIME_ZONES}
+        value={row.sourceTimeZone}
+        onChange={(v) => setValue(`outputFields.${index}.sourceTimeZone`, v)}
+        register={register(`outputFields.${index}.sourceTimeZone`)}
+      />
+      <DateFormatSelect
+        label={t.timeZoneDisplayLabel}
+        hint={t.timeZoneDisplayHint}
+        defaultLabel={t.timeZoneDisplayDefault}
+        presets={TIME_ZONES}
+        value={row.displayTimeZone}
+        onChange={(v) => setValue(`outputFields.${index}.displayTimeZone`, v)}
+        register={register(`outputFields.${index}.displayTimeZone`)}
       />
     </div>
   );

@@ -39,6 +39,7 @@ export function inputFieldToRow(field: InputFieldDef): InputFieldRow {
     pattern: field.pattern ?? '',
     format: field.format ?? '',
     mapTo: field.mapTo ?? '',
+    optionsRef: field.optionsRef ?? '',
     options: optionsToRows(field.options),
   };
 }
@@ -56,7 +57,9 @@ export function rowToInputField(row: InputFieldRow): InputFieldDef {
   if (row.pattern.trim()) field.pattern = row.pattern.trim();
   if (row.format.trim()) field.format = row.format.trim();
   if (row.mapTo.trim()) field.mapTo = row.mapTo.trim();
-  if (row.type === 'enum') {
+  if (row.type === 'enum' && row.optionsRef.trim()) {
+    field.optionsRef = row.optionsRef.trim();
+  } else if (row.type === 'enum') {
     const options = rowsToOptions(row.options);
     if (options) field.options = options;
   }
@@ -71,6 +74,9 @@ export function outputFieldToRow(field: OutputFieldDef): OutputFieldRow {
     from: field.from ?? '',
     format: field.format ?? '',
     displayFormat: field.displayFormat ?? '',
+    sourceTimeZone: field.sourceTimeZone ?? '',
+    displayTimeZone: field.displayTimeZone ?? '',
+    valueMapRef: field.valueMapRef ?? '',
     type: field.type,
     valueMap: recordToKeyValueRows(field.valueMap),
     iconMap: recordToKeyValueRows(field.iconMap),
@@ -87,7 +93,10 @@ export function rowToOutputField(row: OutputFieldRow): OutputFieldDef {
   if (row.from.trim()) field.from = row.from.trim();
   if (row.format.trim()) field.format = row.format.trim();
   if (row.displayFormat.trim()) field.displayFormat = row.displayFormat.trim();
-  const valueMap = keyValueRowsToRecord(row.valueMap);
+  if (row.sourceTimeZone.trim()) field.sourceTimeZone = row.sourceTimeZone.trim();
+  if (row.displayTimeZone.trim()) field.displayTimeZone = row.displayTimeZone.trim();
+  if (row.valueMapRef.trim()) field.valueMapRef = row.valueMapRef.trim();
+  const valueMap = row.valueMapRef.trim() ? undefined : keyValueRowsToRecord(row.valueMap);
   if (valueMap) field.valueMap = valueMap;
   const iconMap = keyValueRowsToRecord(row.iconMap);
   if (iconMap) field.iconMap = iconMap;

@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router';
-import { Home, History, Users, KeyRound, ScrollText, Database, BarChart3, SearchCheck } from 'lucide-react';
+import { Home, History, Users, KeyRound, ScrollText, Database, BarChart3, SearchCheck, List } from 'lucide-react';
 import { FEATURE_PERMISSION_CODES } from '@shared/index';
 import { cn } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -101,6 +101,12 @@ export function SidebarNav() {
             <NavLink to="/quan-tri/nguon-du-lieu" className={linkClass}>
               <Database className="size-4" />
               {vi.nav.adminDatasources}
+            </NavLink>
+          )}
+          {canViewDatasources && (
+            <NavLink to="/quan-tri/danh-muc" className={linkClass}>
+              <List className="size-4" />
+              {vi.nav.adminDictionaries}
             </NavLink>
           )}
           {canViewQueryStats && (

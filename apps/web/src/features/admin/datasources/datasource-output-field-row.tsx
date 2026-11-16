@@ -9,6 +9,7 @@ import { vi } from '@/i18n/vi';
 import type { DatasourceFormValues } from './datasource-form-schema';
 import { FIELD_TYPE_VALUES, makeEmptyKeyValueRow } from './datasource-field-row-types';
 import { PairRowsEditor } from './datasource-pair-rows-editor';
+import { DictionaryRefSelect } from './datasource-dictionary-ref-select';
 import { DatasourceOutputDateFormatFields } from './datasource-output-date-format-fields';
 
 interface DatasourceOutputFieldRowProps {
@@ -64,12 +65,6 @@ export function DatasourceOutputFieldRow({
           aria-invalid={!!rowErrors?.label}
           {...register(`outputFields.${index}.label`)}
         />
-        <Input
-          className="min-w-[140px] flex-1 basis-40"
-          placeholder={t.outputFieldFrom}
-          title={t.outputFieldFromHint}
-          {...register(`outputFields.${index}.from`)}
-        />
         <Select
           value={row.type || undefined}
           onValueChange={(v) =>
@@ -118,6 +113,10 @@ export function DatasourceOutputFieldRow({
               </div>
             ))}
           </div>
+          {row.from && (
+            <Input placeholder={t.outputFieldFrom} title={t.outputFieldFromHint} {...register(`outputFields.${index}.from`)} />
+          )}
+          <DictionaryRefSelect value={row.valueMapRef} onChange={(v) => setValue(`outputFields.${index}.valueMapRef`, v)} />
           <div className="grid grid-cols-2 gap-2">
             <div className="flex flex-col gap-1.5">
               <span className="text-xs font-medium">{t.outputFieldValueMap}</span>

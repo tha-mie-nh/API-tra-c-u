@@ -27,6 +27,9 @@ const RolesPage = lazy(() => import('@/features/admin/roles/roles-page').then((m
 const AuditLogPage = lazy(() =>
   import('@/features/admin/audit/audit-log-page').then((m) => ({ default: m.AuditLogPage })),
 );
+const DictionariesAdminPage = lazy(() =>
+  import('@/features/admin/dictionaries/dictionaries-admin-page').then((m) => ({ default: m.DictionariesAdminPage })),
+);
 const DatasourcesAdminPage = lazy(() =>
   import('@/features/admin/datasources/datasources-admin-page').then((m) => ({ default: m.DatasourcesAdminPage })),
 );
@@ -131,6 +134,14 @@ export function AppRoutes() {
             element={
               <RequirePermission anyOf={[FEATURE_PERMISSION_CODES.ADMIN_DATASOURCES]}>
                 <DatasourcesAdminPage />
+              </RequirePermission>
+            }
+          />
+          <Route
+            path="quan-tri/danh-muc"
+            element={
+              <RequirePermission anyOf={[FEATURE_PERMISSION_CODES.ADMIN_DATASOURCES]}>
+                <DictionariesAdminPage />
               </RequirePermission>
             }
           />
