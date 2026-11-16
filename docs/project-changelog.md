@@ -12,6 +12,11 @@ Ghi lại các thay đổi đáng chú ý theo ngày. Mới nhất ở trên cù
 - **FE**: giá trị ngày không parse được hiển thị nguyên văn thay vì `—`.
 - **Form admin datasource**: output field có ô `format` và `displayFormat`. Trước đây form không có `format` nên **lưu từ giao diện làm mất `format`** đã cấu hình trong config.json (nguyên nhân khả dĩ của lỗi datetime sai định dạng sau khi sửa trong admin).
 
+### Phát hành image
+- `gthanh/app_tra_cuu:api-v13` (digest `sha256:0bb9b208e082634ef650df4fbac4fa171697adb7d36c8bea4e78c879bed558ab`) và `web-v16` (digest `sha256:8168a1ee52c7fefffeec9db9800f3cf343afa1acc85cdcdd1c5691515f0572c5`, libxslt 1.1.42-r3), gồm toàn bộ thay đổi ngày 2026-11-16 bên dưới. `docker-compose.prod.yml` trỏ tới hai tag này.
+- Thư mục config cần dùng bản mới (đã chuyển sang map một lần, schema có khóa mới): `deploy-check/config/*`. Config cũ có `mapTo`/`from` vẫn chạy nhưng schema cũ sẽ từ chối `displayFormat`, múi giờ, `dictionaries`, `queryParams`, `labelField`, nên phải cập nhật cả `config.schema.json` đi kèm.
+- Chưa tạo thư mục `./logs` thì không ghi được file log (app vẫn chạy, chỉ cảnh báo một lần).
+
 ### Tìm và sửa 3 lỗi gốc phía ứng dụng (đợt 3, tái hiện bằng trình duyệt thật + upstream giả chập chờn)
 - **"Lần đầu bấm tra cứu lỗi, bấm lần 2-3 mới được"**: nguyên nhân là `defaults` trong config (`retry`, `timeoutMs`, `maxResults`, `pageSize`) **không được áp dụng ở đâu cả**, nên nguồn dữ liệu không khai báo `transport.retry` có 0 lần thử lại; một lần socket bị reset hoặc upstream trả 503 là người dùng thấy lỗi 502 ngay. Tái hiện: upstream giả hỏng request đầu, lần 1 trả 502 (`attempt=1`, `other side closed`), lần 2-3 trả 200. Nay `defaults` được áp dụng vào cấu hình chạy (không ghi đè file); lần 1 tự thử lại (`attempt=2`) và trả 200. Cấu hình riêng của transport vẫn được ưu tiên.
 - **"Mất URL và API key sau khi xóa cache"**: tái hiện được. API trả đúng (`${IMMIGRATION_HISTORY_BASE_URL}`), nhưng ô chọn (Radix Select) bắn `onValueChange('')` khi danh sách biến môi trường tải về chậm hơn lúc mở form (xóa cache thì chậm hơn); code ghi `${}` vào URL và rỗng vào tên biến API key. Nay bỏ qua giá trị rỗng ở mọi ô chọn của form; kiểm tra lại bằng trình duyệt thật: hiện đúng `IMMIGRATION_HISTORY_BASE_URL` và `IMMIGRATION_HISTORY_API_KEY`.
