@@ -9,7 +9,7 @@
 # Nguồn -> đích:
 #   docker-compose.prod.yml, docker/{api,web}.Dockerfile, docker/nginx.conf, docker/api-entrypoint.sh
 #   config/config.schema.json, .env.prod.example, scripts/init-env-prod.sh (-> init-env-prod.sh)
-#   docs/deployment-guide.md (-> deployment-guide.md), docs/docker-images-explained.md
+#   docs/deployment-guide.md (-> deployment-guide.md)
 #   apps/api/prisma/migrations/*/migration.sql -> schema/NN-<tên>.sql (đánh số theo thứ tự migration)
 # KHÔNG đồng bộ: config/config.json (cấu hình phát hành, chỉnh có chủ đích), .env.prod (secret thật của từng máy).
 set -euo pipefail
@@ -40,7 +40,6 @@ put config/config.schema.json config/config.schema.json
 put .env.prod.example .env.prod.example
 put scripts/init-env-prod.sh init-env-prod.sh
 put docs/deployment-guide.md deployment-guide.md
-put docs/docker-images-explained.md docker-images-explained.md
 
 # Schema SQL cho PG có sẵn: sinh từ các migration, giữ tên/số thứ tự ổn định (01-init, 02-..., ...)
 n=0

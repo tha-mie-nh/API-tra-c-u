@@ -42,12 +42,11 @@ deploy-check/
 ├── config/                        (config.json, config.schema.json)
 ├── schema/                        (các file .sql theo thứ tự — chỉ cần nếu dùng PG có sẵn, xem "Về Postgres")
 ├── deployment-guide.md            (file này)
-├── docker-images-explained.md     (tùy chọn — giải thích image Docker đóng gói gì)
 └── docker/                        (tùy chọn — bản gốc Dockerfile)
 ```
 
-5 mục đầu cần để chạy app (`schema/` chỉ cần nếu không dùng Postgres tự chứa). `docker/` và
-`docker-images-explained.md` chỉ để đọc/kiểm tra trước khi tin tưởng chạy, không bắt buộc.
+5 mục đầu cần để chạy app (`schema/` chỉ cần nếu không dùng Postgres tự chứa). `docker/` chỉ để đọc/kiểm tra trước khi
+tin tưởng chạy (compose có khai báo `build:` nhưng khi chạy bằng image đã pull thì không dùng), không bắt buộc.
 
 ## Bước 2 — Tạo `.env.prod` trên máy này (bắt buộc)
 
