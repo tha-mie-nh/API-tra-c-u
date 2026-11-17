@@ -22,6 +22,11 @@ interface DatasourcesAdminTableProps {
 
 const columnHelper = createColumnHelper<AdminDatasource>();
 
+/** Cột Thao tác (Sửa/Xóa) dính mép phải: bảng rộng hơn màn hình vẫn luôn thấy nút, không phải cuộn ngang. */
+function stickyActionsClass(columnId: string): string | undefined {
+  return columnId === 'actions' ? 'bg-background sticky right-0 shadow-[-8px_0_8px_-8px_rgba(0,0,0,0.15)]' : undefined;
+}
+
 /** `apiKeyEnvSet`/`baseUrlEnvSet === false` (referenced but unset on THIS
  * instance) shows the DevOps warning (phase-03 Requirements); `null` means
  * "not applicable" and shows nothing. */
@@ -30,7 +35,8 @@ function EnvStatusBadge({ entry }: { entry: AdminDatasource }) {
   const missing = apiKeyEnvSet === false || baseUrlEnvSet === false;
   if (apiKeyEnvSet === null && baseUrlEnvSet === null) return <span className="text-muted-foreground">—</span>;
   return (
-    <Badge variant={missing ? 'destructive' : 'secondary'}>
+    // Cho phép xuống dòng: badge mặc định `whitespace-nowrap h-5` làm bảng rộng quá màn hình và đẩy cột Thao tác ra ngoài.
+    <Badge variant={missing ? 'destructive' : 'secondary'} className="h-auto max-w-xs whitespace-normal py-1 text-left">
       {missing ? vi.admin.datasources.envMissing : vi.admin.datasources.envOk}
     </Badge>
   );
@@ -97,7 +103,7 @@ export function DatasourcesAdminTable({ items, onToggle, onEdit, onDelete }: Dat
         {table.getHeaderGroups().map((headerGroup) => (
           <TableRow key={headerGroup.id}>
             {headerGroup.headers.map((header) => (
-              <TableHead key={header.id}>
+              <TableHead key={header.id} className={stickyActionsClass(header.column.id)}>
                 {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
               </TableHead>
             ))}
@@ -108,7 +114,7 @@ export function DatasourcesAdminTable({ items, onToggle, onEdit, onDelete }: Dat
         {table.getRowModel().rows.map((row) => (
           <TableRow key={row.id}>
             {row.getVisibleCells().map((cell) => (
-              <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
+              <TableCell key={cell.id} className={stickyActionsClass(cell.column.id)}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
             ))}
           </TableRow>
         ))}

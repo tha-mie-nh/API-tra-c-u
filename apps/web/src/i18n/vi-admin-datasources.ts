@@ -16,7 +16,7 @@ export const viAdminDatasources = {
   actionEdit: 'Sửa',
   actionDelete: 'Xóa',
   envOk: 'Đã có biến môi trường',
-  envMissing: 'Chưa có biến môi trường — cần DevOps thêm vào .env.prod + khởi động lại',
+  envMissing: 'Chưa có biến môi trường: nhập API key trên giao diện, hoặc thêm biến vào .env.prod rồi tạo lại container api',
   toggleSuccess: 'Đã cập nhật trạng thái bật/tắt',
   deleteConfirmTitle: 'Xóa nguồn dữ liệu?',
   deleteConfirmBody: (name: string) =>
