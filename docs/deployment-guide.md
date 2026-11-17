@@ -26,8 +26,7 @@ Cần Docker Compose **v2** (`docker compose`, có dấu cách) — script trên
 
 ## Bước 1 — Lấy bộ file deploy
 
-Nhận file **`deploy-check.zip`** qua kênh an toàn (không qua email/chat thường — bên trong có
-`.env.prod` chứa secret thật). Giải nén:
+Nhận file **`deploy-check.zip`** qua kênh an toàn (không qua email/chat thường). Giải nén:
 
 ```bash
 mkdir -p /opt/app-tra-cuu
@@ -38,7 +37,8 @@ cd /opt/app-tra-cuu/deploy-check
 ```
 deploy-check/
 ├── docker-compose.prod.yml
-├── .env.prod
+├── .env.prod.example              (mẫu, không có secret)
+├── init-env-prod.sh               (sinh .env.prod thật trên máy đích)
 ├── config/                        (config.json, config.schema.json)
 ├── schema/                        (3 file .sql — chỉ cần nếu dùng PG có sẵn, xem "Về Postgres")
 ├── deployment-guide.md            (file này)
@@ -46,25 +46,34 @@ deploy-check/
 └── docker/                        (tùy chọn — bản gốc Dockerfile)
 ```
 
-4 mục đầu cần để chạy app (`schema/` chỉ cần nếu không dùng Postgres tự chứa). `docker/` và
+5 mục đầu cần để chạy app (`schema/` chỉ cần nếu không dùng Postgres tự chứa). `docker/` và
 `docker-images-explained.md` chỉ để đọc/kiểm tra trước khi tin tưởng chạy, không bắt buộc.
 
-## Bước 2 — Sửa `.env.prod` (thường không cần)
+## Bước 2 — Tạo `.env.prod` trên máy này (bắt buộc)
 
-Mặc định chạy ngay ở `http://<IP-server>`. Chỉ sửa khi cần:
-
-| Biến | Khi nào sửa |
-|---|---|
-| `WEB_PORT` | đổi cổng 80 sang cổng khác |
-| `CORS_ORIGIN` | chỉ khi tách FE/BE ra 2 origin khác nhau |
-| `COOKIE_SECURE` | đổi `true` khi có proxy/gateway khác đứng trước lo HTTPS |
+Bộ file **không** chứa `.env.prod` và không chứa secret nào. `.env.prod` là file thật của đúng máy bạn đang
+deploy: sinh ngay tại chỗ từ mẫu `.env.prod.example`, **không copy từ máy khác** (máy dev, lab, prod mỗi nơi một
+bộ secret riêng; dùng chung thì token ký ở nơi này hợp lệ ở nơi kia).
 
 ```bash
-chmod 600 .env.prod
-nano .env.prod
+./init-env-prod.sh            # tạo .env.prod (quyền 600), sinh JWT_ACCESS_SECRET, JWT_REFRESH_SECRET,
+                              # POSTGRES_PASSWORD, DATABASE_URL (khớp mật khẩu), BOOTSTRAP_ADMIN_PASSWORD
+nano .env.prod                # tự điền các biến script liệt kê (đang là __SET_ME__)
+./init-env-prod.sh --check    # kiểm tra: còn biến chưa điền, secret yếu/giống nhau, NODE_ENV, quyền file
 ```
 
-Không commit, không gửi qua chat/email không mã hóa.
+Script in mật khẩu `admin` **một lần** (cũng nằm trong `.env.prod`); lần đăng nhập đầu bị buộc đổi (tối thiểu 12 ký tự).
+Script từ chối ghi đè `.env.prod` có sẵn; dùng `--force` thì file cũ được lưu thành `.env.prod.bak-<giờ>` (xóa khi không cần).
+
+Biến **bắt buộc tự điền** (script liệt kê):
+| Biến | Điền gì |
+|---|---|
+| `CORS_ORIGIN` | địa chỉ người dùng gõ vào trình duyệt, ví dụ `http://10.10.10.110` |
+| `*_BASE_URL`, `*_API_KEY` của từng nguồn dữ liệu đang bật | địa chỉ và khóa API thật. Địa chỉ phải truy cập được **từ trong container `api`** (không dùng `localhost`) |
+
+Biến nên xem lại tùy môi trường: `WEB_PORT` (đổi cổng 80), `COOKIE_SECURE` (`true` khi có proxy lo HTTPS), `TRUST_PROXY`
+(mặc định `1` cho nginx của stack; để trống thì mọi người dùng bị tính chung một IP). Không commit, không gửi `.env.prod`
+qua chat/email.
 
 ## Bước 3 — Chạy
 
