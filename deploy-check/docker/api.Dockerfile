@@ -123,6 +123,9 @@ RUN DATABASE_URL="postgresql://user:pass@localhost:5432/db?schema=app" \
   && chown -R node:node apps/api/node_modules/.prisma apps/api/node_modules/@prisma 2>/dev/null || true
 COPY --from=build --chown=node:node /repo/packages/shared/dist packages/shared/dist
 COPY --from=build --chown=node:node /repo/apps/api/dist apps/api/dist
+# The config DSL schema ships with the code (see config-snapshot-builder.ts): a mounted config/ dir that still holds
+# an older config.schema.json must not be able to override it and reject newer keys.
+COPY --chown=node:node config/config.schema.json schema/config.schema.json
 
 # The official node:*-bookworm-slim base bundles its own global `npm` CLI
 # (and npm's own vendored copies of tar/pacote/sigstore etc — see
@@ -152,11 +155,18 @@ RUN rm -rf /usr/local/lib/node_modules/npm /usr/local/bin/npm /usr/local/bin/npx
 # (COPY --chown / chown inside the install RUN) rather than a trailing
 # `RUN chown -R /repo`, which would otherwise duplicate the entire
 # node_modules tree into a new layer (~350MB) just to flip ownership bits.
-USER node
+# No `USER node` here on purpose: the container starts as root so
+# docker/api-entrypoint.sh can chown the bind-mounted /repo/config (otherwise
+# admin-UI saves fail with EACCES when the host dir is root-owned), then the
+# script drops to `node` (setpriv) before exec'ing the app — the Node process
+# never runs as root. One-shot services that override `entrypoint` (migrate /
+# seed in docker-compose.prod.yml) pin `user: '1000:1000'` to stay non-root.
+COPY docker/api-entrypoint.sh /usr/local/bin/api-entrypoint.sh
+RUN chmod 0755 /usr/local/bin/api-entrypoint.sh
 
 EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
   CMD curl -fsS http://127.0.0.1:3000/api/v1/health || exit 1
 
-ENTRYPOINT ["/usr/bin/tini", "--"]
+ENTRYPOINT ["/usr/bin/tini", "--", "/usr/local/bin/api-entrypoint.sh"]
 CMD ["node", "apps/api/dist/main.js"]

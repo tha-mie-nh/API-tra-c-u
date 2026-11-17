@@ -29,11 +29,15 @@ Image cuối nhỏ hơn, không ai đọc được code TypeScript gốc chỉ b
 | `runtime` | Chỉ cài thư viện bản production, copy code đã biên dịch + migration Prisma |
 
 Lựa chọn bảo mật/vận hành:
-- `USER node` — không chạy bằng root.
+- Tiến trình Node **không chạy bằng root**: container khởi động bằng root chỉ đủ lâu để chỉnh quyền thư mục
+  `config/` và `logs/` được mount từ máy chủ (`api-entrypoint.sh`), rồi hạ xuống user `node` (`setpriv`) trước khi chạy
+  ứng dụng. Các dịch vụ chạy một lần (`migrate`, `seed`) đặt `user: '1000:1000'` trong compose.
 - `tini` làm tiến trình số 1 — `docker stop` tắt app đúng cách, không treo 10s rồi bị kill cứng.
 - `HEALTHCHECK` gọi `GET /api/v1/health` mỗi 30s.
 - Xóa `npm`/`npx`/`corepack` khỏi image cuối — không dùng tới lúc chạy.
 - `EXPOSE 3000` — cổng nội bộ, không tự mở ra ngoài (`api` không publish cổng nào ra host).
+- Mang theo **schema kiểm tra cấu hình** (`/repo/schema/config.schema.json`): schema thuộc về mã nguồn nên một
+  `config.schema.json` bản cũ còn trong thư mục `config/` được mount **không** làm hỏng việc lưu cấu hình.
 
 ## `docker/web.Dockerfile` — Frontend (React, build xong) + nginx
 
@@ -46,12 +50,16 @@ Lựa chọn bảo mật/vận hành:
 - `USER nginx` — không chạy bằng root.
 - `apk upgrade` — vá gói hệ thống (OpenSSL...) lúc build.
 - Cổng `8080` không phải `80` — cổng `<1024` cần quyền root.
-- `docker/nginx.conf` phục vụ giao diện và chuyển tiếp `/api/v1/*` sang backend.
+- `docker/nginx.conf` phục vụ giao diện và chuyển tiếp `/api/v1/*` sang backend; đóng kết nối nhàn rỗi sau 15 giây,
+  hạn nối tới `api` 5 giây, hỏi DNS Docker không qua IPv6 (tránh treo khi cache DNS hết hạn).
 
 ## Image cuối không chứa gì
 
 - Không có mã nguồn TypeScript gốc — chỉ có bản đã biên dịch.
-- Không có `.env`/secret nào — secret chỉ đưa vào lúc chạy container, qua `.env.prod`.
+- Không có `.env`/secret nào — secret chỉ đưa vào lúc chạy container, qua `.env.prod` (sinh trên máy đích bằng
+  `init-env-prod.sh`, không đi kèm bộ file).
+- Không có `config.json` — cấu hình nguồn dữ liệu nằm ở thư mục `config/` trên máy chủ, được mount vào `/repo/config`
+  (ghi được, vì trang quản trị lưu cấu hình thẳng vào file này).
 - Không có `devDependencies`.
 - Quét ClamAV (malware) + Trivy (lỗ hổng bảo mật) trước mỗi lần đẩy lên Docker Hub — xem
   `docs/security-checklist.md`.

@@ -40,7 +40,7 @@ deploy-check/
 ├── .env.prod.example              (mẫu, không có secret)
 ├── init-env-prod.sh               (sinh .env.prod thật trên máy đích)
 ├── config/                        (config.json, config.schema.json)
-├── schema/                        (3 file .sql — chỉ cần nếu dùng PG có sẵn, xem "Về Postgres")
+├── schema/                        (các file .sql theo thứ tự — chỉ cần nếu dùng PG có sẵn, xem "Về Postgres")
 ├── deployment-guide.md            (file này)
 ├── docker-images-explained.md     (tùy chọn — giải thích image Docker đóng gói gì)
 └── docker/                        (tùy chọn — bản gốc Dockerfile)
@@ -139,14 +139,12 @@ thuộc gì bên ngoài — dùng khi demo/test.
 **không tự ý tạo/sửa gì trên Postgres đó** — bên quản lý Postgres tự áp schema bằng công cụ của
 họ, theo đúng quy trình họ muốn.
 
-1. Áp schema vào Postgres đó: 3 file SQL trong thư mục `schema/` (`01-init.sql`,
-   `02-add-password-reset-requests.sql`, `03-add-status-code-to-query-logs.sql`), chạy **đúng
-   thứ tự số** bằng công cụ bất kỳ (psql, DBeaver, DataGrip...):
+1. Áp schema vào Postgres đó: các file SQL trong thư mục `schema/` (hiện có `01-init.sql` ... `05-add-query-log-payloads.sql`;
+   **áp hết mọi file có trong thư mục**), chạy **đúng thứ tự số** bằng công cụ bất kỳ (psql, DBeaver, DataGrip...):
    ```bash
-   psql -h <host> -U <user> -d <database> -f schema/01-init.sql
-   psql -h <host> -U <user> -d <database> -f schema/02-add-password-reset-requests.sql
-   psql -h <host> -U <user> -d <database> -f schema/03-add-status-code-to-query-logs.sql
+   for f in schema/*.sql; do psql -h <host> -U <user> -d <database> -v ON_ERROR_STOP=1 -f "$f" || break; done
    ```
+   (Nâng cấp từ bản cũ: chỉ áp các file **số lớn hơn** file bạn đã áp lần trước.)
    File `01-init.sql` tự tạo schema `app` (`CREATE SCHEMA IF NOT EXISTS "app"`) — không đụng
    tới schema nào khác của hệ thống. Cần quyền tạo schema + extension `pgcrypto` trên
    `<database>` đó (chỉ 1 lần lúc áp schema).

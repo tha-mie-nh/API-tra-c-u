@@ -39,8 +39,8 @@ deploy-check/
 ├── docker-compose.prod.yml
 ├── .env.prod.example              (mẫu, không có secret)
 ├── init-env-prod.sh               (sinh .env.prod thật trên máy đích)
-├── config/                        (config.json, config.schema.json, mock-data/)
-├── schema/                        (3 file .sql — chỉ cần nếu dùng PG có sẵn, xem "Về Postgres")
+├── config/                        (config.json, config.schema.json)
+├── schema/                        (các file .sql theo thứ tự — chỉ cần nếu dùng PG có sẵn, xem "Về Postgres")
 ├── deployment-guide.md            (file này)
 ├── docker-images-explained.md     (tùy chọn — giải thích image Docker đóng gói gì)
 └── docker/                        (tùy chọn — bản gốc Dockerfile)
@@ -110,6 +110,18 @@ Mở trình duyệt `http://<IP-server>` → thấy trang đăng nhập.
 - Bắt buộc đổi mật khẩu lần đầu. Sau khi đổi, mật khẩu trong `.env.prod` **không còn dùng được**
   (chỉ là mật khẩu khởi tạo) — dùng mật khẩu mới.
 
+**`BOOTSTRAP_ADMIN_PASSWORD` hoạt động thế nào** (`seed` chạy mỗi lần `up -d`):
+
+| Tình huống | Kết quả |
+|---|---|
+| DB trống, `seed` chạy lần đầu | Tạo `admin` với mật khẩu = `BOOTSTRAP_ADMIN_PASSWORD`, bắt đổi mật khẩu lần đầu |
+| `admin` **chưa từng đăng nhập**, bạn sửa `BOOTSTRAP_ADMIN_PASSWORD` rồi `up -d` lại | Mật khẩu `admin` **tự cập nhật theo env** (sửa nhầm/sai mật khẩu khởi tạo thì chỉ cần sửa lại env rồi `up -d`) |
+| `admin` **đã đăng nhập** (đã tự đổi mật khẩu), env đổi hay không | Giữ nguyên mật khẩu của người dùng, **không** ghi đè |
+
+Xem `seed` đã làm gì: `docker compose -f docker-compose.prod.yml --env-file .env.prod logs seed`
+(dòng `Bootstrap admin "admin": created / re-synced / kept ...`). Ký tự `$` trong mật khẩu bị
+Compose hiểu là biến — tránh `$`, hoặc viết `$$`.
+
 **Tài liệu API (Swagger)**: `http://<IP-server>/api/v1/docs` — sinh tự động từ code, luôn khớp
 API thật. Bấm "Authorize" rồi dán access token (lấy từ response của `POST /api/v1/auth/login`,
 hoặc copy từ devtools trình duyệt sau khi đăng nhập qua giao diện) để test được cả route cần
@@ -127,14 +139,12 @@ thuộc gì bên ngoài — dùng khi demo/test.
 **không tự ý tạo/sửa gì trên Postgres đó** — bên quản lý Postgres tự áp schema bằng công cụ của
 họ, theo đúng quy trình họ muốn.
 
-1. Áp schema vào Postgres đó: 3 file SQL trong thư mục `schema/` (`01-init.sql`,
-   `02-add-password-reset-requests.sql`, `03-add-status-code-to-query-logs.sql`), chạy **đúng
-   thứ tự số** bằng công cụ bất kỳ (psql, DBeaver, DataGrip...):
+1. Áp schema vào Postgres đó: các file SQL trong thư mục `schema/` (hiện có `01-init.sql` ... `05-add-query-log-payloads.sql`;
+   **áp hết mọi file có trong thư mục**), chạy **đúng thứ tự số** bằng công cụ bất kỳ (psql, DBeaver, DataGrip...):
    ```bash
-   psql -h <host> -U <user> -d <database> -f schema/01-init.sql
-   psql -h <host> -U <user> -d <database> -f schema/02-add-password-reset-requests.sql
-   psql -h <host> -U <user> -d <database> -f schema/03-add-status-code-to-query-logs.sql
+   for f in schema/*.sql; do psql -h <host> -U <user> -d <database> -v ON_ERROR_STOP=1 -f "$f" || break; done
    ```
+   (Nâng cấp từ bản cũ: chỉ áp các file **số lớn hơn** file bạn đã áp lần trước.)
    File `01-init.sql` tự tạo schema `app` (`CREATE SCHEMA IF NOT EXISTS "app"`) — không đụng
    tới schema nào khác của hệ thống. Cần quyền tạo schema + extension `pgcrypto` trên
    `<database>` đó (chỉ 1 lần lúc áp schema).
@@ -192,11 +202,21 @@ không dùng tới — chỉ là input cho container `postgres` tự chứa, kh�
      chính container đó, **không phải máy host** — dùng IP/DNS thật của máy chạy API (vd
      `http://172.22.142.171:4000`), và mở firewall giữa 2 máy nếu cần.
 2. Trong `config/config.json`, tìm đúng datasource (`IMMIGRATION_HISTORY`, `PASSPORT_INFO`,
-   `DRIVER_LICENSE`, hoặc `FACE_PHOTO`), sửa khối `"transport"` từ:
+   `DRIVER_LICENSE`, hoặc `FACE_PHOTO`) — mặc định nó đang trỏ vào server demo
+   (`scripts/mock-upstream-server.js`, qua biến `*_BASE_URL`), sửa khối `"transport"` từ dạng:
    ```json
-   "transport": { "kind": "mock", "dataFile": "mock-data/immigration-history.json", "timeoutMs": 10000 }
+   "transport": {
+     "kind": "http",
+     "baseUrl": "${IMMIGRATION_HISTORY_BASE_URL}",
+     "path": "/find",
+     "method": "POST",
+     "headers": { "X-Request-Type": "find_immihistory" },
+     "auth": { "kind": "apiKeyHeader", "header": "X-Access", "valueEnv": "IMMIGRATION_HISTORY_API_KEY" },
+     "timeoutMs": 10000
+   }
    ```
-   thành:
+   thành (điền `path`/`headers` theo đúng tài liệu API thật, giữ nguyên `baseUrl`/`auth.valueEnv`
+   — chỉ cần đổi GIÁ TRỊ của 2 biến env đó trong `.env.prod` ở bước 1, không cần đổi tên biến):
    ```json
    "transport": {
      "kind": "http",
@@ -216,8 +236,8 @@ không dùng tới — chỉ là input cho container `postgres` tự chứa, kh�
    - `auth.header`: tên header **xác thực** theo tài liệu (`X-Access`, `X-Api-Key`... tùy API
      thật đặt tên gì, điền đúng tên đó). `auth.valueEnv`: tên biến env chứa giá trị thật (đã có
      sẵn, vd `IMMIGRATION_HISTORY_API_KEY`) — không ghi giá trị thật vào `config.json`.
-   - Chỉ đổi `kind` sang `http` cho datasource **đang bật** (`enabled: true`). Datasource đang tắt
-     để nguyên `mock` — `http` mà thiếu `baseUrl`/`path` có thể làm app lỗi lúc nạp config.
+   - Mọi datasource đều đã là `"kind": "http"` — không còn kiểu `"mock"` (đọc file JSON tĩnh)
+     nữa. Thiếu `baseUrl`/`path` khi `kind` là `http` làm app lỗi lúc nạp config.
    - **Cấu trúc response của API thật phải khớp phần `output`** của datasource đó: `recordsPath`
      (vd `data.0.data`) và `from` của từng field. API thật trả JSON khác mẫu mock thì sửa
      `recordsPath`/`from` cho khớp, nếu không app trả rỗng hoặc thiếu field dù gọi thành công.
@@ -267,6 +287,8 @@ sửa `config.json` bằng tay, không cần restart `api`** cho các trường 
 (sửa `config.json` + restart, mục "4 API thật" trên) vẫn dùng được, xem "Escape hatch" dưới đây.
 
 ### Chuẩn bị (1 lần)
+
+> Image `api` tự `chown` thư mục `/repo/config` lúc khởi động (`docker/api-entrypoint.sh`: container khởi động bằng root chỉ để chown, rồi hạ xuống `node` bằng `setpriv` trước khi chạy app — tiến trình Node không chạy bằng root). Vì vậy dù host `./config` thuộc `root`, bấm **Lưu** trên trang Admin vẫn không bị `EACCES`, kể cả khi compose cũ không có `config-perms`. Service `config-perms` trong `docker-compose.prod.yml` vẫn giữ làm lớp bảo đảm thứ hai. Phần dưới chỉ áp dụng khi chạy `api` với `user:` cố định hoặc trên mount không cho `chown` (NFS root_squash, read-only) — khi đó log có dòng `[entrypoint] warning: could not chown`.
 
 Host `./config` phải **ghi được** bởi user chạy trong container (`uid 1000`, user `node` — xem
 `docker/api.Dockerfile`), vì mỗi lần lưu, API ghi file tạm + `.bak` + rename ngay trong thư mục
@@ -329,6 +351,15 @@ trên giao diện, không cần restart.
 Giống mục "4 API thật" bước 4: quyền `api:<code>` được tạo và **tự cấp cho ADMIN ngay lúc lưu**,
 không cần chạy lại `seed`. Role khác (OPERATOR, AUDITOR) vẫn phải cấp tay qua **Quản trị → Vai
 trò & quyền**.
+
+### Quyền xem thống kê và xuất CSV (`admin:query_stats`, `history:export`)
+
+- Quyền feature do `seed` tạo, chỉ ADMIN được cấp tự động. Chế độ tự chứa (`COMPOSE_PROFILES=local-db,db-setup`):
+  service `seed` nằm trong profile `db-setup` nên `up -d` tự chạy lại, ADMIN có quyền ngay sau khi nâng cấp.
+- Chế độ PG có sẵn (profile `db-setup` đã bỏ, không có `seed` tự động): chạy lại lệnh `seed` ở mục "Về Postgres", bước 4, **1 lần** sau khi nâng cấp.
+- Role tuỳ chỉnh: tick quyền `admin:query_stats` (Thống kê tra cứu) và `history:export` (Export query history (CSV)) ở **Quản trị → Vai trò & quyền**.
+  AUDITOR mặc định có `history:view_all` nhưng **không** có `history:export`.
+- Chi tiết API và công thức: [`query-stats-dashboard.md`](./query-stats-dashboard.md); drill-down và xuất CSV: [`query-log-drilldown-and-insights.md`](./query-log-drilldown-and-insights.md).
 
 ### Escape hatch — sửa `config.json` bằng tay khi cần
 
@@ -401,6 +432,102 @@ Dữ liệu trong `postgres-data` không mất.
 dùng PG có sẵn — nhận thêm file `.sql` đánh số tiếp theo (vd `04-...sql`) trong `schema/`, áp
 bằng tay giống Bước "Về Postgres" bước 1, rồi mới `pull`/`up -d` cho `api`/`web`.
 
+### Nâng cấp lên image có drill-down và phân tích
+
+Thay đổi cần làm (ngoài `pull`/`up -d` thông thường):
+
+| Việc | Chế độ tự chứa | Chế độ PG có sẵn |
+|---|---|---|
+| Quyền `history:export` cho ADMIN | Tự có khi `up -d` (service `seed`) | Chạy `seed` tay (lệnh bên dưới) |
+| 2 index `query_logs` | Tự áp qua `migrate` (xem dưới, nên làm tay nếu bảng lớn) | Áp tay bằng SQL (xem dưới) |
+| `TRUST_PROXY` | Sửa `.env.prod`, rồi `up -d api` | Như vậy |
+
+**Quyền (seed).** Chế độ PG có sẵn:
+```bash
+docker compose -f docker-compose.prod.yml --env-file .env.prod --profile db-setup run --rm seed
+```
+Lệnh chạy được nhiều lần (upsert). Lưu ý: nếu admin **chưa từng đăng nhập**, seed đặt lại mật khẩu admin theo
+`BOOTSTRAP_ADMIN_PASSWORD` (log `synced-from-env`). Sau khi admin đã đăng nhập ít nhất 1 lần thì seed không đè mật khẩu nữa.
+
+**Migration 2 index** — migration `20261111180000_add_query_logs_ip_and_upstream_request_id_indexes`:
+- `query_logs_ip_created_at_idx` trên `(ip, created_at DESC)`;
+- `query_logs_upstream_request_id_idx` trên `(upstream_request_id)`.
+
+Bảng nhỏ: để `prisma migrate deploy` tự tạo. **Bảng lớn** (hàng triệu dòng): `CREATE INDEX` thường giữ khoá ghi
+trên `query_logs` suốt lúc build, trong lúc đó lượt tra cứu phải chờ ghi log. Nên tạo bằng `CONCURRENTLY` trước
+(Prisma chạy migration trong transaction, mà `CONCURRENTLY` không chạy được trong transaction), rồi đánh dấu migration đã áp:
+
+```bash
+# Chế độ tự chứa: chạy trong container postgres
+docker compose -f docker-compose.prod.yml --env-file .env.prod exec postgres sh -c '
+  psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c "CREATE INDEX CONCURRENTLY IF NOT EXISTS query_logs_ip_created_at_idx ON app.query_logs (ip, created_at DESC);" &&
+  psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c "CREATE INDEX CONCURRENTLY IF NOT EXISTS query_logs_upstream_request_id_idx ON app.query_logs (upstream_request_id);"'
+
+# Kiểm tra: cả 2 dòng phải có indisvalid = t
+docker compose -f docker-compose.prod.yml --env-file .env.prod exec postgres sh -c '
+  psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c "SELECT indexrelid::regclass, indisvalid FROM pg_index WHERE indexrelid IN (\"app\".\"query_logs_ip_created_at_idx\"::regclass, \"app\".\"query_logs_upstream_request_id_idx\"::regclass);"'
+
+# Đánh dấu migration đã áp để migrate deploy không tạo lại (chạy trước khi up -d)
+docker compose -f docker-compose.prod.yml --env-file .env.prod --profile db-setup run --rm migrate \
+  node apps/api/node_modules/prisma/build/index.js migrate resolve --applied 20261111180000_add_query_logs_ip_and_upstream_request_id_indexes --schema=apps/api/prisma/schema.prisma
+```
+
+- Chế độ PG có sẵn: chạy 2 lệnh `CREATE INDEX CONCURRENTLY` bằng `psql` với connection string của bên quản lý
+  Postgres. Không có bước `migrate resolve` vì không có `migrate` tự động. Bộ deploy hiện chưa có file `schema/04-*.sql` cho 2 index này.
+- Nếu `CONCURRENTLY` lỗi giữa chừng, index sẽ ở trạng thái `INVALID`: xoá bằng `DROP INDEX CONCURRENTLY IF EXISTS <tên>` rồi chạy lại.
+- Chạy `up -d` sau khi đã `resolve`, để `migrate deploy` không thấy migration còn pending.
+
+**Sau nâng cấp, kiểm tra nhanh:** `GET /api/v1/health` trả OK; đăng nhập ADMIN thấy menu **Phân tích tra cứu**
+và nút xuất CSV ở Lịch sử; nếu log API có dòng `Invalid TRUST_PROXY` thì sửa `TRUST_PROXY` (mục dưới).
+
+## TRUST_PROXY: IP thật sau reverse proxy
+
+Biến `TRUST_PROXY` trong `.env.prod` quyết định `request.ip`, là IP được ghi vào `query_logs.ip` và `audit_logs.ip`.
+Mặc định **để trống = tắt** (IP là địa chỉ TCP trực tiếp).
+
+**Vì sao quan trọng:** container `web` (nginx) đứng trước API và đặt `X-Forwarded-For`. Nếu không bật `TRUST_PROXY`,
+mọi lượt tra cứu đều có IP của container proxy. Khi đó cột IP vô nghĩa, trang "Hoạt động theo IP" không dùng được,
+và "IP dùng chung" đánh dấu mọi user là cùng một nhóm.
+
+| Giá trị | Ý nghĩa | Khi nào dùng |
+|---|---|---|
+| (trống) hoặc `false` | Không tin header, IP = địa chỉ TCP trực tiếp | API mở trực tiếp, không có proxy |
+| Số nguyên `N` (vd `1`) | Tin đúng `N` hop cuối của `X-Forwarded-For` | Khuyến nghị khi biết số proxy: `1` nếu chỉ có nginx của container `web`; `2` nếu có thêm 1 proxy/LB bên ngoài |
+| `loopback`, `uniquelocal`, `linklocal` | Tin mọi proxy trong dải loopback/private | Proxy nằm trong mạng docker nội bộ |
+| IP hoặc CIDR, cách nhau bằng dấu phẩy (vd `172.16.0.0/12`) | Tin các proxy trong dải đó | Biết rõ subnet của proxy |
+| `true` | Tin **mọi** hop, client tự gửi `X-Forwarded-For` giả được | **Tránh**: làm vô hiệu cảnh báo IP dùng chung |
+| Giá trị khác (vd `yes`) | Bị bỏ qua, log cảnh báo `Invalid TRUST_PROXY="..." ignored`, trust proxy **tắt** | Sửa lại giá trị |
+
+Sau khi sửa `.env.prod`: `docker compose -f docker-compose.prod.yml --env-file .env.prod up -d api`.
+Chỉ dùng `restart` khi không đổi biến môi trường.
+
+## Môi trường test — verify image đã push trước khi báo "xong"
+
+`docker-compose.test.yml` (ở repo gốc, khác `docker-compose.yml`/`docker-compose.prod.yml`) — kéo
+**thẳng image đã push lên Docker Hub** (không build lại từ source) và chạy ở 1 project Docker
+Compose hoàn toàn tách biệt (network/volume/port riêng — `app-tra-cuu-du-lieu-test`, port mặc định
+`8081`, không đụng tới dev `5173`/`3000` hay prod `80`). Mục đích: xác nhận **đúng cái artifact sẽ
+giao cho leader** thật sự chạy được, trước khi báo "done" — không phải kiểm tra lại source code
+(việc đó dev/CI đã làm).
+
+```bash
+cp .env.test.example .env.test
+# sửa TEST_API_IMAGE/TEST_WEB_IMAGE trong .env.test thành tag vừa push, vd:
+#   TEST_API_IMAGE=gthanh/app_tra_cuu:api-v6
+#   TEST_WEB_IMAGE=gthanh/app_tra_cuu:web-v10
+
+docker compose -f docker-compose.test.yml --env-file .env.test pull   # kéo thật từ Docker Hub
+docker compose -f docker-compose.test.yml --env-file .env.test up -d
+# vào http://localhost:8081 kiểm tra, hoặc curl http://localhost:8081/api/v1/health
+
+docker compose -f docker-compose.test.yml --env-file .env.test down -v   # dọn sạch khi xong
+```
+
+Mount `deploy-check/config/` (không phải `config/` ở gốc repo) — vì `deploy-check/` mới là bản
+release thật sự giao cho leader, còn `config/` ở gốc là trạng thái làm việc/demo của dev, có thể
+đang chứa datasource demo tạm thời. Dữ liệu Postgres của môi trường test **xóa sạch sau mỗi lần
+`down -v`** — không bao giờ giữ lại, không bao giờ chứa dữ liệu thật.
+
 ## Xử lý sự cố
 
 **Không load được trang:** kiểm tra port (80 hoặc `WEB_PORT`) mở trong mạng nội bộ chưa;
@@ -454,6 +581,40 @@ hoặc mount đang `:ro` (bản `docker-compose.prod.yml` cũ), hoặc host `./c
 
 **Quên mật khẩu admin:** trang đăng nhập → "Quên mật khẩu?" → admin khác duyệt trong Quản trị →
 Người dùng. Chỉ có 1 admin duy nhất thì cần người có quyền truy cập DB reset trực tiếp.
+
+**Đăng nhập `admin` báo "Sai tên đăng nhập hoặc mật khẩu" dù đúng `BOOTSTRAP_ADMIN_PASSWORD`:**
+1. Xem seed đã làm gì: `... logs seed` — dòng `Bootstrap admin "admin": ...`. `kept` nghĩa là
+   `admin` đã từng đăng nhập (mật khẩu đã là của người dùng, env không còn áp dụng) → bước 3.
+   Không có dòng nào / `Seed failed` → `COMPOSE_PROFILES` thiếu `db-setup` hoặc
+   `BOOTSTRAP_ADMIN_PASSWORD` rỗng.
+2. Đang mở nhầm địa chỉ? Mỗi stack có DB riêng — kiểm tra đúng cổng (`WEB_PORT`) / tab trình duyệt
+   không phải stack khác chạy cùng máy (vd `localhost:8081` là stack test cục bộ, không phải server).
+3. Reset thẳng trong container (image prod không có script `reset-admin-password.ts`; đoạn dưới
+   là bản tương đương, in mật khẩu tạm mới, bắt đổi khi đăng nhập):
+   ```bash
+   cat <<'EOF' | docker exec -i -w /repo/apps/api <tên-container-api> node -
+   const { PrismaClient } = require('@prisma/client');
+   const argon2 = require('argon2');
+   const { randomBytes } = require('node:crypto');
+   (async () => {
+     const prisma = new PrismaClient();
+     const user = await prisma.user.findUnique({ where: { username: 'admin' } });
+     if (!user) { console.error('User admin not found'); process.exit(1); }
+     const tempPassword = randomBytes(20).toString('base64url').slice(0, 20);
+     const passwordHash = await argon2.hash(tempPassword, { type: argon2.argon2id });
+     await prisma.user.update({ where: { id: user.id }, data: { passwordHash, mustChangePassword: true, status: 'ACTIVE', lockedUntil: null, failedLoginCount: 0 } });
+     await prisma.refreshToken.updateMany({ where: { userId: user.id, revokedAt: null }, data: { revokedAt: new Date() } });
+     console.log('username: admin');
+     console.log('tempPassword: ' + tempPassword);
+     await prisma.$disconnect();
+   })().catch((e) => { console.error(e.message); process.exit(1); });
+   EOF
+   ```
+
+**Chạy thêm một stack song song trên cùng máy (vd thư mục `kit` cạnh stack cũ):** `docker-compose.prod.yml`
+cố định `name: app-tra-cuu-du-lieu-prod` — copy sang thư mục khác mà giữ nguyên tên sẽ **tạo lại
+container và dùng chung volume DB của stack đầu tiên**. Trước lần `up -d` đầu: đổi `name:` (vd
+`app-tra-cuu-kit`) hoặc luôn thêm `-p <tên>`, và đặt `WEB_PORT` khác cổng đang dùng trong `.env.prod`.
 
 ## Backup
 

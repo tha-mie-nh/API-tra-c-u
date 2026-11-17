@@ -46,6 +46,11 @@ jobs:
       - name: Lint
         run: pnpm lint
 
+      # deploy-check/ is the bundle shipped to lab/prod: it must always match compose, Dockerfiles, nginx.conf,
+      # config schema, migrations and the deployment guide. Fix drift with `scripts/sync-deploy-check.sh`.
+      - name: deploy-check matches its sources
+        run: ./scripts/sync-deploy-check.sh --check
+
       - name: Typecheck
         run: pnpm typecheck
 
