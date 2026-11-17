@@ -1,0 +1,370 @@
+{
+  "mock-echo": {
+    "image": "gthanh/app_tra_cuu:mock-echo-v1",
+    "datasources": [
+      {
+        "code": "ECHO_DEMO",
+        "name": "Echo demo",
+        "type": "info",
+        "enabled": true,
+        "transport": {
+          "kind": "http",
+          "baseUrl": "http://mock-echo:4200",
+          "path": "/find",
+          "method": "POST",
+          "queryParams": {
+            "tab": "1"
+          }
+        },
+        "input": {
+          "fields": [
+            {
+              "name": "soHC",
+              "label": "Số hộ chiếu",
+              "type": "string"
+            }
+          ],
+          "atLeastOneOf": [
+            "soHC"
+          ]
+        },
+        "output": {
+          "timestampField": "thoi_diem",
+          "sortOrder": "desc",
+          "identityField": "cccd",
+          "fields": [
+            {
+              "name": "cccd",
+              "label": "Số CCCD",
+              "type": "string"
+            },
+            {
+              "name": "ho_ten",
+              "label": "Họ và tên",
+              "type": "string"
+            },
+            {
+              "name": "soHC",
+              "label": "Số hộ chiếu",
+              "type": "string"
+            },
+            {
+              "name": "tab",
+              "label": "Tab",
+              "type": "string"
+            },
+            {
+              "name": "thoi_diem",
+              "label": "Thời điểm",
+              "type": "datetime",
+              "displayTimeZone": "Asia/Ho_Chi_Minh"
+            }
+          ],
+          "recordsPath": "data.items",
+          "totalPath": "total",
+          "requestIdPath": "requestId"
+        },
+        "permissionCode": "api:echo_demo"
+      }
+    ]
+  },
+  "simple-api": {
+    "image": "vhung98vp/simple-api:1.0",
+    "datasources": [
+      {
+        "code": "SA_SEARCH_GET",
+        "name": "SimpleAPI GET /search",
+        "type": "info",
+        "enabled": true,
+        "transport": {
+          "kind": "http",
+          "baseUrl": "http://simple-api:8080",
+          "path": "/search",
+          "method": "GET",
+          "headers": {
+            "X-Request-Type": "LOOKUP"
+          },
+          "auth": {
+            "kind": "apiKeyHeader",
+            "header": "X-Access-Key"
+          }
+        },
+        "input": {
+          "fields": [
+            {
+              "name": "param1",
+              "label": "Param 1",
+              "type": "string"
+            },
+            {
+              "name": "count",
+              "label": "Số lượng",
+              "type": "number",
+              "min": 1,
+              "max": 50
+            },
+            {
+              "name": "ngaySinh",
+              "label": "Ngày sinh",
+              "type": "datetime"
+            }
+          ],
+          "atLeastOneOf": [
+            "param1"
+          ]
+        },
+        "output": {
+          "timestampField": "update_at",
+          "sortOrder": "desc",
+          "identityField": "id",
+          "fields": [
+            {
+              "name": "id",
+              "label": "ID",
+              "type": "string"
+            },
+            {
+              "name": "name",
+              "label": "Tên",
+              "type": "string"
+            },
+            {
+              "name": "description",
+              "label": "Mô tả",
+              "type": "string"
+            },
+            {
+              "name": "type",
+              "label": "Loại",
+              "type": "enum",
+              "valueMap": {
+                "M": "Nam",
+                "F": "Nữ"
+              }
+            },
+            {
+              "name": "create_at",
+              "label": "Tạo lúc",
+              "type": "datetime"
+            },
+            {
+              "name": "update_at",
+              "label": "Cập nhật",
+              "type": "datetime",
+              "format": "DD/MM/YYYY HH:mm:ss"
+            },
+            {
+              "name": "delete_at",
+              "label": "Xóa lúc",
+              "type": "date",
+              "format": "DD/MM/YYYY"
+            }
+          ],
+          "labelField": "name"
+        },
+        "permissionCode": "api:sa_search_get"
+      },
+      {
+        "code": "SA_SEARCH_POST",
+        "name": "SimpleAPI POST /search (param + body)",
+        "type": "info",
+        "enabled": true,
+        "transport": {
+          "kind": "http",
+          "baseUrl": "http://simple-api:8080",
+          "path": "/search",
+          "method": "POST"
+        },
+        "input": {
+          "fields": [
+            {
+              "name": "param1",
+              "label": "Param 1",
+              "type": "string"
+            },
+            {
+              "name": "count",
+              "label": "Số lượng",
+              "type": "number",
+              "min": 1,
+              "max": 50
+            },
+            {
+              "name": "note",
+              "label": "Ghi chú (body)",
+              "type": "string",
+              "in": "body"
+            }
+          ]
+        },
+        "output": {
+          "timestampField": "update_at",
+          "sortOrder": "desc",
+          "identityField": "id",
+          "labelField": "name",
+          "fields": [
+            {
+              "name": "id",
+              "label": "ID",
+              "type": "string"
+            },
+            {
+              "name": "name",
+              "label": "Tên",
+              "type": "string"
+            },
+            {
+              "name": "description",
+              "label": "Mô tả",
+              "type": "string"
+            },
+            {
+              "name": "type",
+              "label": "Loại",
+              "type": "enum",
+              "valueMap": {
+                "M": "Nam",
+                "F": "Nữ"
+              }
+            },
+            {
+              "name": "create_at",
+              "label": "Tạo lúc",
+              "type": "datetime"
+            },
+            {
+              "name": "update_at",
+              "label": "Cập nhật",
+              "type": "datetime",
+              "format": "DD/MM/YYYY HH:mm:ss"
+            },
+            {
+              "name": "delete_at",
+              "label": "Xóa lúc",
+              "type": "date",
+              "format": "DD/MM/YYYY"
+            }
+          ],
+          "recordsPath": "data"
+        },
+        "permissionCode": "api:sa_search_post"
+      },
+      {
+        "code": "SA_IMAGES",
+        "name": "SimpleAPI ảnh",
+        "type": "image",
+        "enabled": true,
+        "transport": {
+          "kind": "http",
+          "baseUrl": "http://simple-api:8080",
+          "path": "/images",
+          "method": "GET",
+          "auth": {
+            "kind": "apiKeyHeader",
+            "header": "X-Access-Key",
+            "valueEnv": "SIMPLE_IMAGES_API_KEY"
+          }
+        },
+        "input": {
+          "fields": [
+            {
+              "name": "count",
+              "label": "Số ảnh",
+              "type": "number",
+              "min": 1,
+              "max": 5
+            }
+          ]
+        },
+        "output": {
+          "timestampField": "create_at",
+          "sortOrder": "desc",
+          "identityField": "id",
+          "labelField": "description",
+          "fields": [
+            {
+              "name": "id",
+              "label": "ID",
+              "type": "string"
+            },
+            {
+              "name": "description",
+              "label": "Mô tả",
+              "type": "string"
+            },
+            {
+              "name": "create_at",
+              "label": "Tạo lúc",
+              "type": "datetime"
+            },
+            {
+              "name": "image_base64",
+              "label": "Ảnh",
+              "type": "image"
+            }
+          ],
+          "recordsPath": "data"
+        },
+        "permissionCode": "api:sa_images"
+      },
+      {
+        "code": "SA_IMAGES_BADKEY",
+        "name": "SimpleAPI ảnh (sai khóa)",
+        "type": "image",
+        "enabled": true,
+        "transport": {
+          "kind": "http",
+          "baseUrl": "http://simple-api:8080",
+          "path": "/images",
+          "method": "GET",
+          "auth": {
+            "kind": "apiKeyHeader",
+            "header": "X-Access-Key",
+            "valueEnv": "SIMPLE_BADKEY_API_KEY"
+          }
+        },
+        "input": {
+          "fields": [
+            {
+              "name": "count",
+              "label": "Số ảnh",
+              "type": "number",
+              "min": 1,
+              "max": 5
+            }
+          ]
+        },
+        "output": {
+          "timestampField": "create_at",
+          "sortOrder": "desc",
+          "identityField": "id",
+          "labelField": "description",
+          "fields": [
+            {
+              "name": "id",
+              "label": "ID",
+              "type": "string"
+            },
+            {
+              "name": "description",
+              "label": "Mô tả",
+              "type": "string"
+            },
+            {
+              "name": "create_at",
+              "label": "Tạo lúc",
+              "type": "datetime"
+            },
+            {
+              "name": "image_base64",
+              "label": "Ảnh",
+              "type": "image"
+            }
+          ],
+          "recordsPath": "data"
+        },
+        "permissionCode": "api:sa_images_badkey"
+      }
+    ]
+  }
+}

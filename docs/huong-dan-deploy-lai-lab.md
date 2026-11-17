@@ -1,24 +1,27 @@
-# Hướng dẫn deploy lại trên máy lab (dọn sạch, dựng lại từ bộ `deploy-check`)
+# Hướng dẫn deploy lại trên máy lab (chuẩn bị ở local, `scp` lên, dựng)
 
-Quy trình ba bước: **(1) dọn sạch lab → (2) chuẩn bị bộ file ở máy local rồi `scp` lên → (3) pull image mới nhất và dựng.**
+Quy trình: **(1) dọn sạch lab → (2) chuẩn bị TOÀN BỘ ở máy local (env, compose, config, API tra cứu giả) → (3) `scp` lên lab rồi dựng một lần.**
+Lab **không cần git, không cần repo**: mọi thứ nằm trong thư mục bạn `scp` lên. Dựng xong là có đủ hệ thống và các API tra cứu.
 
-Quy ước: thư mục triển khai trên lab là `/root/kit`, project compose là `app-tra-cuu-kit`, cổng web `8082`, địa chỉ lab `<IP-lab>`. Đổi theo máy của bạn nếu khác.
+Quy ước: thư mục trên lab `/root/kit`, project compose `app-tra-cuu-kit`, cổng web `8082`, địa chỉ lab `<IP-lab>`. Đổi theo máy của bạn nếu khác.
 
 > Không ghi mật khẩu, API key vào tài liệu hay chat. Chúng chỉ nằm trong `.env.prod` (quyền 600).
+
+**Cần có ở local:** repo này, `docker`, `openssl`, `python3`, `ssh`/`scp` tới lab. **Cần có ở lab:** Docker, và kéo được image từ Docker Hub.
 
 ---
 
 ## Bước 1. Dọn sạch lab (image, DB, config cũ)
 
-> **Cảnh báo:** bước này **xóa toàn bộ dữ liệu của stack `app-tra-cuu-kit`**: user, lịch sử tra cứu, API key lưu trên giao diện, config cũ. Muốn giữ gì thì sao chép ra ngoài trước (ví dụ `cp /root/kit/.env.prod /root/env.cu.bak`).
+> **Cảnh báo:** xóa **toàn bộ dữ liệu của stack `app-tra-cuu-kit`**: user, lịch sử tra cứu, API key lưu trên giao diện, config cũ. Muốn giữ gì thì chép ra ngoài trước (ví dụ `cp /root/kit/.env.prod /root/env.cu.bak`).
 
-Mọi lệnh đi qua hàm `dc` có `-p app-tra-cuu-kit`, nên **chỉ đụng stack này**, không đụng stack khác trên máy (ví dụ stack của người khác). Không bao giờ chạy `docker system prune`, `docker rm $(docker ps -aq)` hay `docker volume prune`.
+Mọi lệnh đi qua hàm `dc` có `-p app-tra-cuu-kit`, nên **chỉ đụng stack này**, không đụng stack khác trên máy. Không chạy `docker system prune`, `docker volume prune`, `docker rm $(docker ps -aq)`.
 
 ```bash
 ssh root@<IP-lab>
 cd /root/kit
 
-# Hàm dc: tự thêm file stand-in nếu có (mục 2.4); không có thì chỉ dùng file chính
+# Hàm dc: tự thêm file API giả nếu có; không có thì chỉ dùng file chính
 F="-f docker-compose.prod.yml"; [ -f docker-compose.stand-in.yml ] && F="$F -f docker-compose.stand-in.yml"
 dc() { docker compose -p app-tra-cuu-kit $F --env-file .env.prod "$@"; }
 
@@ -38,103 +41,59 @@ cd /root && rm -rf /root/kit
 ```
 
 Hàm `dc` mất khi đóng phiên SSH; vào lại phải gõ lại hai dòng `F=` và `dc()`.
-
-Nếu `/root/kit` đã không còn (hoặc không có `docker-compose.prod.yml`) thì `dc` không chạy được: lấy lại bộ file ở Bước 2 trước rồi mới dọn.
+Nếu `/root/kit` đã không còn thì `dc` không chạy được: dùng `docker ps -a --filter label=com.docker.compose.project=app-tra-cuu-kit` để xem, và xóa bằng `docker rm -f` / `docker volume rm` đúng các mục đó.
 
 ---
 
-## Bước 2. Chuẩn bị bộ file nền: config, compose, env
+## Bước 2. Chuẩn bị tất cả ở máy local
 
-**Mục tiêu:** có một thư mục đầy đủ gồm `docker-compose.prod.yml`, `config/` (đã đúng), `.env.prod` (đã điền xong) để đưa lên lab.
+Một lệnh, chạy trong thư mục repo:
 
-### 2.1 Lấy `deploy-check` về local
-
-Chọn một trong hai cách (làm trên máy local):
-
-**Cách A: `git pull` ở local**
 ```bash
-cd <thư-mục-repo> && git pull origin main
-mkdir -p ~/lab-deploy && cp -a deploy-check/. ~/lab-deploy/
-rm -f ~/lab-deploy/.env.prod ~/lab-deploy/config/*.bak        # không mang secret/ bản backup của máy khác
+./scripts/prepare-lab-deploy.sh --cors-origin http://<IP-lab>:8082 --web-port 8082 --out ~/lab-deploy
+```
+
+Script làm theo thứ tự:
+1. Chép `deploy-check/` sang `~/lab-deploy` (không đụng `deploy-check/` trong repo; không mang theo `.env.prod` hay file `.bak` cũ).
+2. Sinh `.env.prod` bằng `init-env-prod.sh`: secret mới (JWT, mật khẩu Postgres, mật khẩu admin, `SECRETS_ENCRYPTION_KEY`), quyền 600. **In mật khẩu admin một lần: ghi lại ngay.**
+3. Điền `CORS_ORIGIN`, `WEB_PORT`, và giá trị giữ chỗ cho 4 API thật chưa có (xem dưới).
+4. **Dựng trước các API tra cứu giả:** `docker pull` image của chúng ở local (kiểm tra chắc chắn tồn tại), ghi `docker-compose.stand-in.yml`, và thêm các nguồn dữ liệu tương ứng vào `config/config.json` với địa chỉ là tên dịch vụ trong mạng Docker (`http://simple-api:8080`, `http://mock-echo:4200`). Mặc định có cả hai.
+5. Chạy `init-env-prod.sh --check`: phải **0 lỗi**.
+
+Tùy chọn:
+- `--stand-in simple-api` (chỉ một API giả) hoặc `--stand-in none` (không dùng API giả, lab chỉ có hệ thống).
+- `--no-pull` để bỏ bước pull ở local (khi đang không có mạng).
+
+### 2.1 Rà lại trước khi gửi (nên làm)
+
+```bash
 cd ~/lab-deploy
+ls -A                                  # .env.prod, docker-compose.prod.yml, docker-compose.stand-in.yml, config/ ...
+grep -n "app_tra_cuu:" docker-compose.prod.yml          # api-v13, web-v16
+grep -c '"enabled": true' config/config.json            # các nguồn đang bật
+nano .env.prod                         # chỉ khi cần đổi (xem dưới)
+./init-env-prod.sh --check             # chạy lại sau khi sửa
 ```
 
-**Cách B: chỉ kéo thư mục `deploy-check` bằng git sparse-checkout** (không cần cả repo; cần git ≥ 2.25; repo private thì cần token hoặc deploy key)
-```bash
-git clone --depth 1 --filter=blob:none --sparse https://github.com/tha-mie-nh/API-tra-c-u.git /tmp/repo-lab
-(cd /tmp/repo-lab && git sparse-checkout set deploy-check)
-mkdir -p ~/lab-deploy && cp -a /tmp/repo-lab/deploy-check/. ~/lab-deploy/ && rm -rf /tmp/repo-lab
-cd ~/lab-deploy
-```
+**4 API thật (IMMIGRATION_HISTORY, PASSPORT_INFO, DRIVER_LICENSE, FACE_PHOTO):**
+- Chưa có: giữ giá trị giữ chỗ script đã điền. Ứng dụng vẫn khởi động; tra cứu 4 nguồn này báo lỗi kết nối cho tới khi có API thật.
+- Đã có: sửa `*_BASE_URL` (địa chỉ truy cập được từ **trong container `api`**, không dùng `localhost`) và `*_API_KEY` trong `.env.prod` ở bước này, hoặc nhập trên giao diện sau khi dựng (mục "Khi có API thật").
 
-Muốn kéo thẳng trên lab (không qua local): chạy lệnh của Cách B trên lab, nhưng đích là `/root/kit`. Khi đó phần 2.2 và 2.3 làm bằng `nano` ngay trên lab.
+**Muốn đổi API giả hoặc config:** sửa `config/config.json` (nguồn nào `"enabled": true` mà thiếu biến môi trường thì `api` không khởi động), hoặc sửa/xóa dịch vụ trong `docker-compose.stand-in.yml`. Thêm một API giả khác: thêm dịch vụ vào file đó (cùng `networks: [backend]`) và thêm nguồn tương ứng vào `config.json`.
 
-### 2.2 Sinh `.env.prod` nền và điền nốt (làm ở local)
+### 2.2 `scp` lên lab
 
 ```bash
-./init-env-prod.sh --out ~/lab-deploy/.env.prod
-```
-Script sinh sẵn các secret (JWT, mật khẩu Postgres, khóa mã hóa API key `SECRETS_ENCRYPTION_KEY`, mật khẩu admin khởi tạo) và **in mật khẩu admin một lần: ghi lại ngay**. Sau đó điền các biến còn thiếu (script liệt kê danh sách):
-
-```bash
-nano ~/lab-deploy/.env.prod
-```
-Cần điền:
-- `CORS_ORIGIN=http://<IP-lab>:8082` (đúng địa chỉ người dùng gõ vào trình duyệt)
-- `WEB_PORT=8082`
-- 4 cặp `*_BASE_URL` / `*_API_KEY` của API thật (IMMIGRATION_HISTORY, PASSPORT_INFO, DRIVER_LICENSE, FACE_PHOTO):
-  - **Đã có API thật:** điền địa chỉ (truy cập được từ trong container `api`, không dùng `localhost`) và key.
-  - **Chưa có API thật:** điền giá trị giữ chỗ để ứng dụng vẫn khởi động được (tra cứu 4 nguồn đó sẽ báo lỗi kết nối cho tới khi thay giá trị thật):
-    ```bash
-    sed -i 's/^\(IMMIGRATION_HISTORY\|PASSPORT_INFO\|DRIVER_LICENSE\|FACE_PHOTO\)_BASE_URL=.*/\1_BASE_URL=http:\/\/api-chua-co.invalid/; s/^\(IMMIGRATION_HISTORY\|PASSPORT_INFO\|DRIVER_LICENSE\|FACE_PHOTO\)_API_KEY=.*/\1_API_KEY=chua-co-key/' ~/lab-deploy/.env.prod
-    ```
-
-Kiểm tra:
-```bash
-./init-env-prod.sh --check --out ~/lab-deploy/.env.prod     # phải 0 lỗi
-```
-Cảnh báo `CORS_ORIGIN đang là localhost` chỉ bình thường nếu bạn chỉ vào lab bằng SSH tunnel.
-
-### 2.3 Rà `config/config.json`
-
-`~/lab-deploy/config/config.json` là cấu hình chuẩn của bản phát hành. Nguồn dữ liệu bật/tắt ở đây; nguồn **đang bật** mà thiếu biến môi trường thì `api` không khởi động. Muốn tắt một nguồn: đặt `"enabled": false` trong file này trước khi đưa lên. Đừng mang `config.json` cũ từ lab vào nếu nó ở định dạng cũ.
-
-### 2.4 Chốt API tra cứu giả cần dùng (không bắt buộc)
-
-Chỉ làm khi lab cần thêm các API giả để thử nghiệm (không dùng cho production). **Chốt ở đây, trước khi `scp`**, rồi tạo `docker-compose.stand-in.yml` trong `~/lab-deploy` chỉ với các dịch vụ bạn chọn. Mẫu đủ hai API:
-
-```bash
-cat > ~/lab-deploy/docker-compose.stand-in.yml <<'EOF'
-# API giả cho lab: cùng mạng Docker với `api`, không mở cổng ra ngoài. Xóa dịch vụ nào không cần.
-services:
-  simple-api:                # API mẫu: GET/POST /search, GET /images (header X-Access-Key: my-secret-key)
-    image: vhung98vp/simple-api:1.0
-    restart: unless-stopped
-    networks: [backend]
-  mock-echo:                 # trả lại đúng những gì nhận được; log từng request
-    image: gthanh/app_tra_cuu:mock-echo-v1
-    restart: unless-stopped
-    environment:
-      PORT: 4200
-    networks: [backend]
-EOF
-```
-Địa chỉ để dùng sau khi dựng xong: `http://simple-api:8080` và `http://mock-echo:4200`. Nếu API giả cần biến môi trường, thêm vào `.env.prod` ở bước 2.2.
-Tạo các nguồn dữ liệu tương ứng trên giao diện (mục 3.4). Không cần file stand-in nào thì bỏ qua mục này; hàm `dc` sẽ tự chỉ dùng file chính.
-
-### 2.5 `scp` lên lab
-
-```bash
-cd ~ && scp -rp lab-deploy root@<IP-lab>:/root/kit
+scp -rp ~/lab-deploy root@<IP-lab>:/root/kit
 ssh root@<IP-lab> 'chmod 600 /root/kit/.env.prod && ls -la /root/kit'
 ```
-Trên lab phải thấy: `docker-compose.prod.yml`, `.env.prod` (quyền `-rw-------`), `config/`, `init-env-prod.sh`, `schema/`, `docker/`, và `docker-compose.stand-in.yml` nếu có.
+Trên lab phải thấy `docker-compose.prod.yml`, `docker-compose.stand-in.yml`, `.env.prod` (quyền `-rw-------`), `config/`, `init-env-prod.sh`, `schema/`, `docker/`.
 
-Sau khi `scp` xong, **xóa bản nháp ở local nếu máy không an toàn**: `rm -rf ~/lab-deploy` (trong đó có secret thật của lab).
+Gửi xong, xóa bản nháp ở local nếu máy không an toàn: `rm -rf ~/lab-deploy` (trong đó có secret thật của lab).
 
 ---
 
-## Bước 3. Pull image mới nhất và dựng
+## Bước 3. Dựng hệ thống trên lab
 
 ```bash
 ssh root@<IP-lab>
@@ -142,12 +101,11 @@ cd /root/kit
 F="-f docker-compose.prod.yml"; [ -f docker-compose.stand-in.yml ] && F="$F -f docker-compose.stand-in.yml"
 dc() { docker compose -p app-tra-cuu-kit $F --env-file .env.prod "$@"; }
 
-grep -n "app_tra_cuu:" docker-compose.prod.yml     # api-v13 và web-v16 (tag đã được ghi đè bằng bản mới nhất)
-dc pull
+dc pull          # kéo image mới nhất: api-v13, web-v16 và các API giả
 dc up -d
 dc ps
 ```
-Mong đợi: `api`, `web`, `postgres` là `healthy`; `config-perms`, `migrate`, `seed` là `Exited (0)`; `simple-api`/`mock-echo` (nếu chọn) là `Up`.
+Mong đợi: `api`, `web`, `postgres` là `healthy`; `simple-api`, `mock-echo` là `Up`; `config-perms`, `migrate`, `seed` là `Exited (0)`.
 
 ### 3.1 Kiểm tra
 
@@ -155,24 +113,27 @@ Mong đợi: `api`, `web`, `postgres` là `healthy`; `config-perms`, `migrate`, 
 curl -s -o /dev/null -w "%{http_code}\n" http://localhost:8082/api/v1/health     # 200
 dc logs api --tail 30
 ```
-Vào `http://<IP-lab>:8082/login`; nếu cổng bị firewall chặn thì dùng SSH tunnel: `ssh -L 9082:localhost:8082 root@<IP-lab>` rồi mở `http://localhost:9082/login`. Tài khoản `admin`, mật khẩu là mật khẩu đã ghi ở bước 2.2; lần đầu bị buộc đổi.
+Vào `http://<IP-lab>:8082/login`; cổng bị firewall chặn thì dùng SSH tunnel: `ssh -L 9082:localhost:8082 root@<IP-lab>` rồi mở `http://localhost:9082/login`.
+Tài khoản `admin`, mật khẩu là mật khẩu script in ở bước 2; lần đầu bị buộc đổi.
+
+Thử các nguồn mẫu trên màn hình tra cứu:
+
+| Nguồn | Nhập | Kết quả đúng |
+|---|---|---|
+| `SA_SEARCH_GET`, `SA_SEARCH_POST` | `param1` = `a` | Có bảng kết quả |
+| `SA_IMAGES` | `count` = `2` | Hiện ảnh |
+| `SA_IMAGES_BADKEY` | `count` = `2` | Báo upstream từ chối key (401): đây là **kết quả đúng** |
+| `ECHO_DEMO` | `soHC` = `B1234567` | Kết quả lặp lại đúng giá trị nhập |
 
 ### 3.2 Khi có API thật của đối tác
 
 Làm trên giao diện, không cần dựng lại: **Quản trị → Nguồn dữ liệu**, mở nguồn (ví dụ `PASSPORT_INFO`):
-1. `baseUrl`: ghi thẳng URL thật (truy cập được từ trong container `api`).
+1. `baseUrl`: ghi thẳng URL thật.
 2. Ô **API key**: nhập key. Server mã hóa (AES-256-GCM, khóa `SECRETS_ENCRYPTION_KEY`) và lưu trong Postgres; không ghi vào `config.json` hay `.env.prod`, không hiển thị lại.
 3. Lưu. Áp dụng ngay, không restart.
 
 Nếu đối tác chỉ cấp key qua biến môi trường: sửa `*_BASE_URL`/`*_API_KEY` trong `.env.prod` rồi `dc up -d` một lần.
-
-### 3.3 Thêm nguồn dữ liệu mới
-
-Cùng cách như 3.2, nhưng chọn **Thêm nguồn dữ liệu**: `baseUrl` ghi thẳng URL, key nhập vào ô API key; không cần sửa `.env.prod`, không restart.
-
-### 3.4 Tạo nguồn cho API giả (nếu đã chọn ở 2.4)
-
-**Thêm nguồn dữ liệu** trên giao diện: kiểu HTTP, `baseUrl` = `http://simple-api:8080` (hoặc `http://mock-echo:4200`). Với `simple-api` ở đường `/images`, xác thực "API key trên header", header `X-Access-Key`, key `my-secret-key` (nhập vào ô API key). Trường nhập/xuất xem cấu hình mẫu `SA_*` trong `config/config.json` của repo dev.
+Thêm nguồn dữ liệu mới hoàn toàn: **Thêm nguồn dữ liệu**, cùng cách (URL ghi thẳng, key nhập ở ô API key; không sửa `.env.prod`, không restart).
 
 ---
 
@@ -181,14 +142,17 @@ Cùng cách như 3.2, nhưng chọn **Thêm nguồn dữ liệu**: `baseUrl` ghi
 | Triệu chứng | Nguyên nhân | Xử lý |
 |---|---|---|
 | `pull` báo `manifest unknown` | Tag chưa có trên Docker Hub | Kiểm tra tên tag trong compose |
-| `api` restart liên tục, log báo biến `*_BASE_URL`/`*_API_KEY` chưa đặt | Có nguồn **đang bật** thiếu biến | Điền giá trị giữ chỗ (2.2) hoặc tắt nguồn đó trong `config.json` |
-| `api` không lên, log báo không kết nối DB | `POSTGRES_PASSWORD`/`DATABASE_URL` không khớp | Bước 1 chưa xóa hết volume: chạy lại 1.2, dựng lại |
-| `api` không lên, log báo config không hợp lệ | `config.json` định dạng cũ | Dùng bản `deploy-check/config/config.json` từ git |
-| Ô API key trên giao diện bị khóa | Thiếu/sai `SECRETS_ENCRYPTION_KEY` | Kiểm tra `./init-env-prod.sh --check`, sửa rồi `dc up -d` |
+| `api` restart liên tục, log báo biến `*_BASE_URL`/`*_API_KEY` chưa đặt | Có nguồn **đang bật** thiếu biến | Điền giá trị (hoặc giữ chỗ) trong `.env.prod` ở local, hoặc tắt nguồn trong `config.json`, rồi `scp` lại |
+| `api` không lên, log báo không kết nối DB | `POSTGRES_PASSWORD` không khớp volume cũ | Bước 1 chưa xóa hết volume: chạy lại 1.2 rồi dựng lại |
+| `api` không lên, log báo config không hợp lệ | `config.json` sai định dạng | Chạy lại script ở bước 2 (tạo `--out` mới) |
+| Ô API key trên giao diện bị khóa | Thiếu/sai `SECRETS_ENCRYPTION_KEY` | `./init-env-prod.sh --check`, sửa rồi `dc up -d` |
 | `permission denied` ở `config/` hoặc `logs/` | uid 1000 không ghi được | `chown -R 1000:1000 config logs`; NFS/SELinux xem `deployment-guide.md` |
-| Nguồn API giả báo lỗi kết nối | Chưa có `docker-compose.stand-in.yml` hoặc `dc` chưa nạp nó | `dc ps` phải thấy dịch vụ; gõ lại hai dòng `F=`/`dc()` |
+| Nguồn API giả báo lỗi kết nối | `dc` chưa nạp `docker-compose.stand-in.yml` | Gõ lại hai dòng `F=`/`dc()`; `dc ps` phải thấy `simple-api`, `mock-echo` |
+| Lab không kéo được image từ Docker Hub | Chặn mạng ra ngoài | Ở local: `docker save <image> \| ssh root@<IP-lab> docker load` cho từng image, rồi `dc up -d` |
 | Quên mật khẩu admin | | Mục "Xử lý sự cố" trong `deployment-guide.md` |
 
-## Lần cập nhật sau (không cần dọn sạch)
+## Lần cập nhật sau
 
-Trên máy dev: sửa code, build và push image, chạy `scripts/sync-deploy-check.sh`, commit, push. Trên lab, nếu chỉ đổi image: `dc pull && dc up -d`. Nếu compose hoặc config đổi: lấy lại `deploy-check` (2.1), **giữ `.env.prod` và `config/` đang chạy**, chép đè các file khác rồi `dc pull && dc up -d`.
+- Chỉ đổi image (đã push lên Hub): trên lab `dc pull && dc up -d`.
+- Đổi compose hoặc config: chạy lại Bước 2 với `--out` mới, rồi chép **chỉ các file cần đổi** lên lab (`scp ~/lab-deploy2/docker-compose.prod.yml root@<IP-lab>:/root/kit/`), giữ nguyên `.env.prod` và `config/` đang chạy (config trên giao diện lưu ở đó) trừ khi cố ý thay. Sau đó `dc up -d`.
+- Bộ `deploy-check/` trong repo luôn được đồng bộ bằng `scripts/sync-deploy-check.sh`; không sửa tay.
