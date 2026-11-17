@@ -140,6 +140,15 @@ export class QueryService {
       return { code: 'UPSTREAM_TIMEOUT', message: 'Upstream datasource timed out', status: HttpStatus.GATEWAY_TIMEOUT };
     }
     if (err instanceof UpstreamError) {
+      // Say WHAT the upstream answered (it used to be a bare "request failed"), so history shows e.g. a wrong key.
+      // The client still gets 502: a 401 here would be confused with the user's own login and sign them out.
+      const upstreamStatus = err.exchange?.response?.statusCode;
+      if (upstreamStatus === 401 || upstreamStatus === 403) {
+        return { code: 'UPSTREAM_UNAUTHORIZED', message: `Upstream rejected the access key (HTTP ${upstreamStatus})`, status: HttpStatus.BAD_GATEWAY };
+      }
+      if (upstreamStatus) {
+        return { code: 'UPSTREAM_ERROR', message: `Upstream datasource returned HTTP ${upstreamStatus}`, status: HttpStatus.BAD_GATEWAY };
+      }
       return { code: 'UPSTREAM_ERROR', message: 'Upstream datasource request failed', status: HttpStatus.BAD_GATEWAY };
     }
     return { code: 'UPSTREAM_ERROR', message: 'Upstream datasource request failed', status: HttpStatus.BAD_GATEWAY };

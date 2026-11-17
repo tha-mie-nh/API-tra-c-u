@@ -103,6 +103,7 @@ export const vi = {
       `Kết quả đã được giới hạn ở ${limit} bản ghi. Hãy thu hẹp điều kiện tra cứu để xem đầy đủ.`,
     errorValidation: 'Dữ liệu nhập không hợp lệ, vui lòng kiểm tra lại các trường được đánh dấu.',
     errorForbidden: 'Bạn không có quyền tra cứu chức năng này.',
+    errorUpstreamAuth: 'Nguồn dữ liệu từ chối khóa truy cập (API key sai hoặc hết hạn). Vui lòng báo quản trị viên kiểm tra cấu hình.',
     errorUpstream: 'Nguồn dữ liệu tạm thời không phản hồi, vui lòng thử lại sau.',
     errorRateLimited: 'Bạn đã tra cứu quá nhiều lần trong thời gian ngắn, vui lòng thử lại sau.',
     errorGeneric: 'Đã có lỗi xảy ra khi tra cứu, vui lòng thử lại.',

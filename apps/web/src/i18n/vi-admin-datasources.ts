@@ -61,6 +61,7 @@ export const viAdminDatasources = {
   addHeaderButton: 'Thêm header',
   baseUrlEnvUnset: 'Biến môi trường chứa URL chưa được đặt trên server API — giá trị vẫn được giữ trong config, cần khai báo biến này ở môi trường chạy.',
   apiKeyEnvUnset: 'Biến môi trường chứa API key chưa được đặt trên server API — tên biến vẫn được giữ trong config, cần khai báo giá trị ở môi trường chạy.',
+  saveFailed: 'Không lưu được:',
   fieldQueryParams: 'Query param tĩnh (gắn vào URL)',
   queryParamsHint: 'Ví dụ tab = 1 sẽ thành ?tab=1 trên mọi lần gọi API thật.',
   addQueryParamButton: 'Thêm query param',

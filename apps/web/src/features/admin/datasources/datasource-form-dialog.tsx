@@ -96,6 +96,10 @@ export function DatasourceFormDialog({ open, onOpenChange, entry, existingDataso
         return;
       }
       if (error instanceof ApiError && error.details?.length) {
+        // The inline messages sit next to the offending field, which in this long form can be far from the "Lưu"
+        // button, so a rejected save looked like "nothing happened, no error". Always say it out loud as well.
+        const first = error.details[0];
+        toast.error(`${t.saveFailed} ${first?.path ? `${first.path}: ` : ''}${first?.message ?? error.message}${error.details.length > 1 ? ` (+${error.details.length - 1})` : ''}`);
         const mapped = mapDatasourceValidationErrors(error.details);
         for (const { field, message } of mapped.fieldErrors) setError(field as Path<DatasourceFormValues>, { type: 'server', message });
         if (mapped.inputErrors.length) setInputBlockErrors(mapped.inputErrors);

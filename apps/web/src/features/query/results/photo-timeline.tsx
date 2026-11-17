@@ -5,13 +5,7 @@ import { formatDateTime } from '@/lib/format';
 import { vi } from '@/i18n/vi';
 import { LazyAuthorizedImage } from './lazy-authorized-image';
 import { PhotoLightbox } from './photo-lightbox';
-
-/** Convention used by every `type: "image"` datasource config so far (see
- * `config/config.json`): the per-photo row id is exposed as the output field
- * named `recordId`. `ClientDatasource` has no formal "which field is the
- * image id" marker (Unresolved Question — see report), so this name is the
- * one documented contract point, not a per-datasource-code branch. */
-const RECORD_ID_FIELD = 'recordId';
+import { hasPhoto, inlineImageOf, recordIdOf } from './photo-record-utils';
 
 interface PhotoTimelineProps {
   envelope: QueryEnvelope;
@@ -47,7 +41,7 @@ interface PhotoGroupCardProps {
 
 function PhotoGroupCard({ group, columns, code, timestampField }: PhotoGroupCardProps) {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
-  const photos = group.records.filter((record) => typeof record[RECORD_ID_FIELD] === 'string');
+  const photos = group.records.filter((record) => hasPhoto(record, columns));
 
   return (
     <Card>
@@ -61,16 +55,21 @@ function PhotoGroupCard({ group, columns, code, timestampField }: PhotoGroupCard
         ) : (
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
             {photos.map((record, index) => {
-              const recordId = record[RECORD_ID_FIELD] as string;
+              const recordId = recordIdOf(record);
+              const inline = inlineImageOf(record, columns);
               const timestamp = record[timestampField];
               return (
                 <button
-                  key={recordId}
+                  key={recordId ?? `inline-${index}`}
                   type="button"
                   className="flex flex-col gap-1 text-left"
                   onClick={() => setLightboxIndex(index)}
                 >
-                  <LazyAuthorizedImage path={`/query/${code}/image/${recordId}/thumb`} alt={group.label} className="aspect-square w-full" />
+                  {recordId ? (
+                    <LazyAuthorizedImage path={`/query/${code}/image/${recordId}/thumb`} alt={group.label} className="aspect-square w-full" />
+                  ) : (
+                    <img src={inline ?? ''} alt={group.label} className="aspect-square w-full rounded-md border object-cover" />
+                  )}
                   <span className="text-muted-foreground text-xs">
                     {typeof timestamp === 'string' ? formatDateTime(timestamp) : '—'}
                   </span>

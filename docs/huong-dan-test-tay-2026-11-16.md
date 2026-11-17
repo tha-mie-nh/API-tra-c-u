@@ -166,6 +166,14 @@ Sửa nguồn dữ liệu có URL dạng biến môi trường, ô URL chọn **
 
 Trên môi trường dùng image mới: để lại `config.schema.json` bản cũ trong thư mục config được mount, mở form sửa nguồn dữ liệu, chọn trường làm tiêu đề (`labelField`) và định dạng hiển thị ngày, Lưu: phải thành công (schema trong image được dùng, không phải bản trong thư mục mount).
 
+## 10e. Kiểm thử với simple-api (tra cứu, ảnh, lỗi 401)
+
+1. `docker run -p 8000:8080 --name simple-api -d vhung98vp/simple-api:1.0`. Đặt trong `.env` (dev): `SIMPLE_API_BASE_URL=http://localhost:8000`, `SIMPLE_IMAGES_API_KEY=my-secret-key`, `SIMPLE_BADKEY_API_KEY=wrong-key`, rồi chạy lại `pnpm dev`.
+2. Tạo nguồn dữ liệu: `GET /search` (input `param1`, `count`, không đặt `recordsPath` vì response là mảng gốc), `POST /search` (`param1`, `count` chọn "Query param", thêm một trường "Body JSON", `recordsPath` = `data`), `GET /images` (loại **Ảnh**, `recordsPath` = `data`, header xác thực `X-Access-Key` lấy từ `SIMPLE_IMAGES_API_KEY`, trường `image_base64` kiểu **Ảnh**).
+3. Tra cứu từng nguồn: GET search ra 2 bản ghi khi `count=2`; POST search thấy `param1`/`count` ở query và trường body trong mô tả; ảnh hiện thumbnail (không báo "Không có ảnh nào khớp"), bấm vào ảnh phóng to khoảng 80% chiều cao màn hình.
+4. Nguồn ảnh dùng khóa sai (`SIMPLE_BADKEY_API_KEY`): tra cứu báo "API key sai hoặc hết hạn"; trang Lịch sử ghi `UPSTREAM_UNAUTHORIZED` (HTTP 502), chi tiết nêu "Upstream rejected the access key (HTTP 401)".
+5. Form admin: gõ định dạng ngày **Tùy chỉnh…** cho trường input và output rồi Lưu: lưu được; nếu server từ chối thì có thông báo nổi nêu lỗi.
+
 ## 11. Trace FE ↔ BE
 
 **Yêu cầu:** backend log kỹ để trace transaction; frontend chỉ cần warn/error.

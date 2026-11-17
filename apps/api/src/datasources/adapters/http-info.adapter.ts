@@ -22,6 +22,14 @@ interface ExchangeTracker {
   last?: UpstreamExchange;
 }
 
+/** Records can sit in an array at `recordsPath`, be the array at the root (no `recordsPath`, e.g. `[{...}]`), or be a
+ * single object (one record); anything else means "no records" instead of crashing the mapper. */
+export function toRecordList(value: unknown): RawRecord[] {
+  if (Array.isArray(value)) return value.filter((v): v is RawRecord => v !== null && typeof v === 'object');
+  if (value !== null && typeof value === 'object') return [value as RawRecord];
+  return [];
+}
+
 /** Reads a dotted path like "data.items" out of an arbitrary upstream JSON body. */
 function getByPath(obj: unknown, path: string | undefined): unknown {
   if (!path) return undefined;
@@ -157,7 +165,7 @@ export class HttpInfoAdapter implements DatasourceAdapter {
     record({ statusCode: response.statusCode, body: parsed });
     if (text === null) throw new Error('failed to read upstream response body');
     const json = JSON.parse(text) as unknown; // invalid JSON on 2xx still throws SyntaxError like before
-    const records = (getByPath(json, this.datasource.output.recordsPath) as RawRecord[] | undefined) ?? [];
+    const records = toRecordList(this.datasource.output.recordsPath ? getByPath(json, this.datasource.output.recordsPath) : json);
     const total = getByPath(json, this.datasource.output.totalPath) as number | undefined;
     const requestId = getByPath(json, this.datasource.output.requestIdPath) as string | undefined;
     return { records, total, requestId, exchange: tracker.last };

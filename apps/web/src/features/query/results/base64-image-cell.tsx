@@ -1,12 +1,6 @@
 import { useState } from 'react';
+import { toDataUri } from './photo-record-utils';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-
-/** Upstream (spec upstream) always sends a full `data:image/...;base64,...`
- * URI in fields like `hinhAnh`; if a raw base64 string ever arrives without
- * the prefix, default to PNG rather than rendering a broken `<img>`. */
-function toDataUri(value: string): string {
-  return value.startsWith('data:') ? value : `data:image/png;base64,${value}`;
-}
 
 /**
  * Renders a base64 image (`FieldType: "image"`) inline in `InfoRecordTable`
@@ -26,11 +20,11 @@ export function Base64ImageCell({ value, label }: { value: string; label: string
         <img src={src} alt={label} className="size-64 rounded-md border object-cover shadow-sm" />
       </button>
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-w-3xl">
+        <DialogContent className="max-w-[80vw] sm:max-w-[80vw]">
           <DialogHeader>
             <DialogTitle>{label}</DialogTitle>
           </DialogHeader>
-          <img src={src} alt={label} className="w-full rounded-md" />
+          <img src={src} alt={label} className="mx-auto h-[78vh] max-w-full rounded-md object-contain" />
         </DialogContent>
       </Dialog>
     </>

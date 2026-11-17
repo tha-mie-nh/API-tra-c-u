@@ -16,6 +16,8 @@ export function queryErrorMessage(error: unknown): string {
       case 'FORBIDDEN_API':
       case 'DATASOURCE_NOT_FOUND':
         return vi.query.errorForbidden;
+      case 'UPSTREAM_UNAUTHORIZED':
+        return vi.query.errorUpstreamAuth;
       case 'UPSTREAM_TIMEOUT':
       case 'UPSTREAM_ERROR':
         return vi.query.errorUpstream;
