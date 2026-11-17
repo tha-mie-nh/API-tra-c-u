@@ -38,7 +38,8 @@ Kiểm thử bằng image `vhung98vp/simple-api:1.0` (`docker run -p 8000:8080 -
 - Thư mục `deploy-check/config` đồng bộ lại `config.schema.json`.
 
 ### Phát hành image
-- `gthanh/app_tra_cuu:api-v13` (digest `sha256:2804785b8e7b2653dd18f03f9beb43bc967825457f4a2b94d6ae355f0717f711`) và `web-v16` (digest `sha256:a5247e274f70793a0db84e6aeb61d572d88929b8a03890a9d1afabf75ec7f1b7`, libxslt 1.1.42-r3), gồm toàn bộ thay đổi ngày 2026-11-16 bên dưới, kể cả sửa lỗi treo do kết nối bị bỏ âm thầm. Hai tag này đã được build lại và ghi đè (bản push đầu tiên, digest cũ, không còn dùng). `docker-compose.prod.yml` trỏ tới hai tag này.
+- **Bản build lần ba (2026-11-17)**: thêm schema nằm trong image (`/repo/schema/config.schema.json`, thắng schema cũ trong thư mục config được mount), định dạng ngày và `in: body|query` của trường input, nút chọn URL tự viết, ảnh base64 và id số, ảnh xem lớn 80%, mã lỗi `UPSTREAM_UNAUTHORIZED`, mảng ở gốc cho `recordsPath`, ghim múi giờ cho ngày giờ không kèm múi giờ, thăm dò kết nối khi nhàn rỗi. Tag giữ nguyên `api-v13`/`web-v16` (ghi đè). **Máy đã pull trước đó phải `docker pull` lại rồi `up -d`.**
+- `gthanh/app_tra_cuu:api-v13` (digest `sha256:91ad7425ef08a3d6194bcc882586028d5fc1e482bb5567138bb5ec0b8b041a30`) và `web-v16` (digest `sha256:055778e52963822198fdaa9ca91ff31cafff986e24e6a0c23b9406d70fbe50fe`, libxslt 1.1.42-r3), gồm toàn bộ thay đổi ngày 2026-11-16 bên dưới, kể cả sửa lỗi treo do kết nối bị bỏ âm thầm. Hai tag này đã được build lại và ghi đè (bản push đầu tiên, digest cũ, không còn dùng). `docker-compose.prod.yml` trỏ tới hai tag này.
 - Thư mục config cần dùng bản mới (đã chuyển sang map một lần, schema có khóa mới): `deploy-check/config/*`. Config cũ có `mapTo`/`from` vẫn chạy nhưng schema cũ sẽ từ chối `displayFormat`, múi giờ, `dictionaries`, `queryParams`, `labelField`, nên phải cập nhật cả `config.schema.json` đi kèm.
 - Chưa tạo thư mục `./logs` thì không ghi được file log (app vẫn chạy, chỉ cảnh báo một lần).
 

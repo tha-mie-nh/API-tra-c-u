@@ -9,8 +9,8 @@ Tất cả nằm trong repo Docker Hub công khai `gthanh/app_tra_cuu`.
 
 | Image | Vai trò | Digest | Kích thước |
 |---|---|---|---|
-| `gthanh/app_tra_cuu:api-v13` | Backend NestJS (tra cứu, quản trị, log) | `sha256:2804785b8e7b2653dd18f03f9beb43bc967825457f4a2b94d6ae355f0717f711` | ~881 MB |
-| `gthanh/app_tra_cuu:web-v16` | Giao diện React đã build + nginx | `sha256:a5247e274f70793a0db84e6aeb61d572d88929b8a03890a9d1afabf75ec7f1b7` | ~99 MB |
+| `gthanh/app_tra_cuu:api-v13` | Backend NestJS (tra cứu, quản trị, log) | `sha256:91ad7425ef08a3d6194bcc882586028d5fc1e482bb5567138bb5ec0b8b041a30` | ~881 MB |
+| `gthanh/app_tra_cuu:web-v16` | Giao diện React đã build + nginx | `sha256:055778e52963822198fdaa9ca91ff31cafff986e24e6a0c23b9406d70fbe50fe` | ~99 MB |
 | `gthanh/app_tra_cuu:mock-echo-v1` | API giả để kiểm thử/trace (không dùng ở production) | `sha256:87bb5c36004e854919b381186b517566eb33399ac76c3876bc16b2fae55dc0af` | ~239 MB |
 | `mock-echo-v2` (chỉ build trên máy, chưa push) | Như v1, thêm tham số cho kiểm thử tải (jitter, tỉ lệ lỗi, chế độ im lặng) | — | ~239 MB |
 
@@ -43,6 +43,8 @@ Bản trước: `api-v12` / `web-v15`. Tag cũ giữ nguyên, không bị ghi đ
 - Phiên đăng nhập gọi `/auth/me` khi chưa có token (luôn 401 rồi refresh thừa).
 - `displayFormat` bị schema từ chối khi lưu.
 - Giá trị ngày không phải ISO không còn bị đọc kiểu tháng/ngày của Mỹ.
+
+**Bản build 2026-11-17 (ghi đè tag)** bổ sung: schema cấu hình nằm trong image; định dạng ngày và `in: body|query` cho trường input; ảnh base64 hiển thị trực tiếp, xem lớn 80%; mã lỗi `UPSTREAM_UNAUTHORIZED`; ngày giờ không kèm múi giờ được ghim về UTC (hoặc múi giờ nguồn); response mảng ở gốc.
 
 **Tính năng mới**
 - Chọn định dạng đọc/hiển thị ngày, múi giờ nguồn và múi giờ hiển thị cho từng trường.
