@@ -3,6 +3,10 @@ import type { DatasourceEntry, QueryColumn, QueryEnvelope, QueryPage, QueryRecor
 import type { RawRecord } from './adapters/datasource-adapter.interface';
 import { parseDateValue, parseWithFormats } from './date-format-parser.util';
 
+/** ISO-looking date/time WITHOUT a zone designator (`2024-10-15T09:43:27`). A browser reads such a string in ITS OWN
+ * zone, so it must be pinned to a real instant here (sourceTimeZone, default UTC) like every formatted value. */
+const ZONELESS_ISO = /^\d{4}-\d{2}-\d{2}([T ]\d{2}:\d{2}(:\d{2}(\.\d+)?)?)?$/;
+
 export interface MapOptions {
   page?: number;
   pageSize?: number;
@@ -75,7 +79,10 @@ export class ResponseMapperService {
     for (const field of datasource.output.fields) {
       let rawValue = field.from ? raw[field.from] : raw[field.name];
       if ((field.type === 'date' || field.type === 'datetime') && typeof rawValue === 'string' && rawValue !== '') {
-        rawValue = parseWithFormats(rawValue, field.format, field.sourceTimeZone) ?? rawValue;
+        rawValue =
+          parseWithFormats(rawValue, field.format, field.sourceTimeZone) ??
+          (ZONELESS_ISO.test(rawValue.trim()) ? parseDateValue(rawValue, undefined, field.sourceTimeZone) : undefined) ??
+          rawValue;
       }
       mapped[field.name] = field.valueMap && rawValue !== undefined ? (field.valueMap[String(rawValue)] ?? rawValue) : rawValue;
     }

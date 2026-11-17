@@ -84,6 +84,20 @@ describe('ResponseMapperService', () => {
     expect(envelope.groups[0]?.records.map((r) => r.recordedAt)).toEqual(['2026-01-06T09:15:00.000Z', '2026-01-05T08:00:00.000Z']);
   });
 
+  it('pins a zone-less ISO value to UTC (or sourceTimeZone) so every viewer sees the same instant', () => {
+    const base = makeDatasource();
+    const withZone = (zone?: string) =>
+      makeDatasource({
+        output: { ...base.output, fields: base.output.fields.map((f) => (f.name === 'recordedAt' ? { ...f, sourceTimeZone: zone } : f)) },
+      });
+    const rows: RawRecord[] = [{ cccd: 'A1', thoi_diem: '2024-10-15T09:43:27' }];
+    expect(mapper.map(rows, withZone(), { requestId: 'r', tookMs: 1 }).groups[0]?.records[0]?.recordedAt).toBe('2024-10-15T09:43:27.000Z');
+    expect(mapper.map(rows, withZone('Asia/Ho_Chi_Minh'), { requestId: 'r', tookMs: 1 }).groups[0]?.records[0]?.recordedAt).toBe('2024-10-15T02:43:27.000Z');
+    // a value that already carries a zone is left exactly as received
+    const zoned: RawRecord[] = [{ cccd: 'A1', thoi_diem: '2024-10-15T09:43:27+07:00' }];
+    expect(mapper.map(zoned, withZone(), { requestId: 'r', tookMs: 1 }).groups[0]?.records[0]?.recordedAt).toBe('2024-10-15T09:43:27+07:00');
+  });
+
   it('sorts ascending when sortOrder=asc', () => {
     const ds = makeDatasource({ output: { ...makeDatasource().output, sortOrder: 'asc' } });
     const envelope = mapper.map(raw, ds, { requestId: 'r1', tookMs: 5 });

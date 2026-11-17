@@ -5,7 +5,7 @@
 - Có sẵn: `docs/huong-dan-test-tay-2026-11-16.md` (sẽ được thay bằng bộ này)
 
 ## Overview
-- Ưu tiên: cao. Trạng thái: chưa làm. Đây là **danh mục gốc**: mỗi ca có ID cố định, dùng chung cho test tay, test tự động và báo cáo lỗi. Ca nào tự động được thì ghi cột "Tự động" (U = unit, A = e2e API, B = trình duyệt Playwright); ca chỉ làm tay ghi `Tay`.
+- Ưu tiên: cao. Trạng thái: **đang làm**. Phần kịch bản tay mức chi tiết cao (dữ liệu nhập chính xác, từng bước, kết quả mong đợi, cách đối chiếu) đã viết cho 9 nhóm tại [`docs/test-cases/`](../../docs/test-cases/README.md): xác thực, người dùng/vai trò, nguồn dữ liệu, danh mục, tra cứu và ngày giờ, ảnh, độ bền, lịch sử/log/cấu hình. Còn lại: thống kê và phân tích, nhật ký quản trị, MinIO, bảo mật, đa trình duyệt, và mọi phần tự động. Đây là **danh mục gốc**: mỗi ca có ID cố định, dùng chung cho test tay, test tự động và báo cáo lỗi. Ca nào tự động được thì ghi cột "Tự động" (U = unit, A = e2e API, B = trình duyệt Playwright); ca chỉ làm tay ghi `Tay`.
 
 ## Quy ước
 - **Mức ưu tiên**: P1 = phải pass mới phát hành; P2 = quan trọng; P3 = nên có.
@@ -230,7 +230,8 @@
 | REG-17 | 401 từ upstream hiển thị chung chung | RES-07, HIS-02, IMG-08 |
 | REG-18 | `/auth/me` 401 và refresh thừa khi tải trang | AUTH-07 |
 | REG-19 | Đăng nhập đồng loạt bị chặn | AUTH-11, RES-14 |
-| REG-20 | Ngày không phải ISO bị đọc kiểu Mỹ | DT-04 |
+| REG-20 | Ngày không phải ISO bị đọc kiểu Mỹ | DT-03, DT-08 |
+| REG-21 | Ngày giờ không có múi giờ bị trình duyệt hiểu là giờ máy người xem (lệch khác các trường có `format`) | DT-01, DT-05, bảng giá trị ở đầu file 05 |
 
 ## Todo List
 - [ ] Rà soát danh mục với người sở hữu từng chức năng, bổ sung ca còn thiếu
