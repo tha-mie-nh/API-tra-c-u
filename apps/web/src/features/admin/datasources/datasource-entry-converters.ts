@@ -77,7 +77,8 @@ function buildTransport(values: DatasourceFormValues, original?: TransportConfig
       : {
           kind: values.authKind,
           ...(values.authHeader?.trim() ? { header: values.authHeader.trim() } : {}),
-          ...(values.authValueEnv?.trim() ? { valueEnv: values.authValueEnv.trim() } : {}),
+          // API key nhập tay và biến môi trường loại trừ nhau: nhập key thì bỏ valueEnv.
+          ...(values.authValueEnv?.trim() && !values.authApiKey?.trim() ? { valueEnv: values.authValueEnv.trim() } : {}),
         };
 
   return {
@@ -161,5 +162,7 @@ export function formValuesToEntryPayload(values: DatasourceFormValues, original?
     input: buildInput(values, original?.input as DatasourceInput | undefined),
     output: buildOutput(values, original?.output as DatasourceOutput | undefined),
     limits: buildLimits(values),
+    ...(values.authKind !== 'none' && values.authApiKey?.trim() ? { apiKey: values.authApiKey.trim() } : {}),
+    ...(values.authKind !== 'none' && values.authClearApiKey && !values.authApiKey?.trim() ? { clearApiKey: true } : {}),
   };
 }

@@ -76,6 +76,13 @@ Dòng bắt đầu bằng `<` là biến có trong mẫu mà `.env.prod` chưa c
 nano .env.prod            # điền các biến __SET_ME__: CORS_ORIGIN, *_BASE_URL, *_API_KEY; đặt WEB_PORT=8082
 ```
 
+**Khóa mã hóa API key (cả hai chọn):** `.env.prod` phải có `SECRETS_ENCRYPTION_KEY` (64 ký tự hex). Chọn B thì script đã sinh sẵn.
+Chọn A mà `.env.prod` cũ chưa có thì thêm (lab đã từng có key lưu trong DB thì phải dùng lại đúng khóa cũ, đừng sinh khóa khác):
+```bash
+grep -q '^SECRETS_ENCRYPTION_KEY=' .env.prod || echo "SECRETS_ENCRYPTION_KEY=$(openssl rand -hex 32)" >> .env.prod
+```
+Sao lưu `.env.prod` ở nơi an toàn: mất khóa này thì các API key đã nhập trên giao diện không giải mã được nữa.
+
 Kiểm tra (cả hai chọn):
 ```bash
 ./init-env-prod.sh --check

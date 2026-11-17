@@ -32,7 +32,7 @@ find_example() {
   echo "Không thấy .env.prod.example cạnh script" >&2; exit 2
 }
 
-get() { grep -E "^$1=" "$OUT" | head -1 | cut -d= -f2-; }
+get() { { grep -E "^$1=" "$OUT" || true; } | head -1 | cut -d= -f2-; }
 set_kv() { # set_kv KEY VALUE (giá trị chỉ gồm ký tự an toàn: chữ, số, - _ . : / @)
   local tmp; tmp="$(mktemp)"
   awk -v k="$1" -v v="$2" 'BEGIN{FS=OFS="="} $1==k && !done {print k"="v; done=1; next} {print}' "$OUT" > "$tmp"
@@ -54,6 +54,7 @@ if [ "$MODE" = check ]; then
   case "$(get DATABASE_URL)" in *"$(get POSTGRES_PASSWORD)"*) ;; *) note "DATABASE_URL không chứa POSTGRES_PASSWORD (đúng nếu dùng PG có sẵn của tổ chức)";; esac
   case "$(get BOOTSTRAP_ADMIN_PASSWORD)" in change_me*|"") bad "BOOTSTRAP_ADMIN_PASSWORD còn là giá trị mẫu/trống";; esac
   v="$(get BOOTSTRAP_ADMIN_PASSWORD)"; [ "${#v}" -ge 12 ] || bad "BOOTSTRAP_ADMIN_PASSWORD ngắn hơn 12 ký tự"
+  v="$(get SECRETS_ENCRYPTION_KEY)"; printf '%s' "$v" | grep -qE '^[0-9a-fA-F]{64}$' || bad "SECRETS_ENCRYPTION_KEY thiếu/sai (cần 64 ký tự hex). Thêm: echo \"SECRETS_ENCRYPTION_KEY=\$(openssl rand -hex 32)\" >> $OUT"
   [ "$(get NODE_ENV)" = production ] || bad "NODE_ENV phải là production"
   [ "$(get ALLOW_MOCK_DATASOURCES)" = false ] || note "ALLOW_MOCK_DATASOURCES khác false"
   case "$(get CORS_ORIGIN)" in *localhost*|*127.0.0.1*) note "CORS_ORIGIN đang là localhost";; esac
@@ -82,6 +83,7 @@ pw_pg="$(openssl rand -hex 24)"
 pw_admin="$(openssl rand -base64 24 | tr -dc 'A-Za-z0-9' | cut -c1-20)Aa9"
 set_kv JWT_ACCESS_SECRET "$(openssl rand -hex 32)"
 set_kv JWT_REFRESH_SECRET "$(openssl rand -hex 32)"
+set_kv SECRETS_ENCRYPTION_KEY "$(openssl rand -hex 32)"
 set_kv POSTGRES_PASSWORD "$pw_pg"
 set_kv BOOTSTRAP_ADMIN_PASSWORD "$pw_admin"
 set_kv DATABASE_URL "postgresql://$(get POSTGRES_USER):$pw_pg@postgres:5432/$(get POSTGRES_DB)"

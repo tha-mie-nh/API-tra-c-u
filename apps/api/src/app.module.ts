@@ -10,6 +10,7 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { RolesModule } from './roles/roles.module';
 import { AuditModule } from './audit/audit.module';
+import { DatasourceSecretsModule } from './datasource-secrets/datasource-secrets.module';
 import { DatasourcesModule } from './datasources/datasources.module';
 import { QueryStatsModule } from './query-stats/query-stats.module';
 import { AdminDatasourcesModule } from './admin-datasources/admin-datasources.module';
@@ -56,6 +57,7 @@ import { HttpAccessLogMiddleware } from './common/middleware/http-access-log.mid
     UsersModule,
     RolesModule,
     AuditModule,
+    DatasourceSecretsModule,
     DatasourcesModule,
     AdminDatasourcesModule,
     QueryStatsModule,

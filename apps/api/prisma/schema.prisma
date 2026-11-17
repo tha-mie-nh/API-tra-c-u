@@ -254,6 +254,19 @@ model QueryLogPayload {
   @@schema("app")
 }
 
+/// API key của nguồn dữ liệu do admin nhập trên giao diện, mã hóa AES-256-GCM (khóa chủ SECRETS_ENCRYPTION_KEY nằm ở env).
+/// Chỉ giải mã trong bộ nhớ API; không bao giờ trả về trình duyệt. Xem datasource-secret-store.service.ts.
+model DatasourceSecret {
+  datasourceCode String   @id @map("datasource_code") @db.VarChar(100)
+  /// "v1.<iv>.<tag>.<ciphertext>" (base64url); AAD = datasourceCode nên không thể hoán đổi giữa các dòng.
+  encryptedValue String   @map("encrypted_value")
+  updatedBy      String?  @map("updated_by") @db.VarChar(100)
+  updatedAt      DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  @@map("datasource_secrets")
+  @@schema("app")
+}
+
 // ---------------------------------------------------------------------------
 // Admin audit trail (spec g) — before/after diffs, password hashes stripped
 // by the audit writer (Phase 03), never persisted here.

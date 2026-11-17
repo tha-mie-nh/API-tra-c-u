@@ -43,6 +43,9 @@ export const datasourceFormSchema = z
     authKind: z.enum(['none', 'apiKeyHeader', 'bearer', 'basic']),
     authHeader: z.string().optional(),
     authValueEnv: z.string().optional(),
+    /** Chỉ ghi: API key nhập tay (server mã hóa và lưu trong DB). Không bao giờ được điền lại khi mở form sửa. */
+    authApiKey: z.string().optional(),
+    authClearApiKey: z.boolean().optional(),
     maxResults: z.string().optional(),
     pageSize: z.string().optional(),
     inputFields: z.array(inputFieldRowSchema).min(1, vi.admin.datasources.atLeastOneFieldRequired),
@@ -120,6 +123,8 @@ export const EMPTY_DATASOURCE_FORM_VALUES: DatasourceFormValues = {
   authKind: 'none',
   authHeader: '',
   authValueEnv: '',
+  authApiKey: '',
+  authClearApiKey: false,
   maxResults: '',
   pageSize: '',
   inputFields: [makeEmptyInputFieldRow()],

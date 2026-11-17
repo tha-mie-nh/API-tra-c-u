@@ -29,6 +29,7 @@ function httpAdminDatasource(overrides: Partial<AdminDatasource> = {}): AdminDat
       fields: [{ name: 'id', label: 'ID', from: 'id', type: 'string' }],
     },
     envStatus: { apiKeyEnvSet: true, baseUrlEnvSet: null },
+    apiKeyStored: false,
     ...overrides,
   } as AdminDatasource;
 }
@@ -170,6 +171,28 @@ describe('input/output field builder round trip (follow-up to phase-03: visual b
 
     expect(fields[0]).toMatchObject({ format: 'DD/MM/YYYY', in: 'query' });
     expect(fields[1]).not.toHaveProperty('in'); // default (empty) is not written to config
+  });
+  it('typed API key is sent write-only as apiKey and replaces valueEnv; the form never pre-fills it', () => {
+    const original = httpAdminDatasource();
+    const values = entryToFormValues(original);
+    expect(values.authApiKey).toBe('');
+
+    values.authApiKey = '  my-key  ';
+    const payload = formValuesToEntryPayload(values, original) as { apiKey?: string; transport: { auth?: { valueEnv?: string } } };
+
+    expect(payload.apiKey).toBe('my-key');
+    expect(payload.transport.auth?.valueEnv).toBeUndefined();
+  });
+
+  it('without a typed key, valueEnv is kept and no apiKey is sent; clear flag is only sent on request', () => {
+    const original = httpAdminDatasource();
+    const values = entryToFormValues(original);
+    const plain = formValuesToEntryPayload(values, original) as Record<string, unknown>;
+    expect(plain.apiKey).toBeUndefined();
+    expect(plain.clearApiKey).toBeUndefined();
+
+    values.authClearApiKey = true;
+    expect((formValuesToEntryPayload(values, original) as Record<string, unknown>).clearApiKey).toBe(true);
   });
 });
 

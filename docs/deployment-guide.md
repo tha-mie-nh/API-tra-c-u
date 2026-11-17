@@ -326,25 +326,33 @@ validate kỹ (schema + cross-field + thử dựng adapter) trước khi ghi fil
 form — không có cách nào lưu ra 1 `config.json` làm app crash lúc khởi động sau này. Lưu xong áp
 dụng ngay cho người đang dùng, không cần restart.
 
-### Điều kiện bắt buộc trước khi thêm 1 nguồn dữ liệu API thật MỚI
+### Thêm 1 nguồn dữ liệu API thật MỚI (không cần sửa `.env.prod`, không restart)
 
-Giao diện **không cho nhập trực tiếp giá trị secret** (API key) — chỉ cho **chọn tên 1 biến môi
-trường đã có sẵn** trong `.env.prod` (trường xác thực → chọn tên biến `*_API_KEY`; `baseUrl` →
-chọn tên biến `*_BASE_URL`). Nếu datasource cần 1 biến env **CHƯA từng có** trong `.env.prod`:
+Có `SECRETS_ENCRYPTION_KEY` trong `.env.prod` (script `init-env-prod.sh` tự sinh) thì **toàn bộ làm trên giao diện**:
 
-1. DevOps thêm biến đó vào `.env.prod` trước (đặt tên theo quy ước `*_API_KEY` / `*_BASE_URL`,
-   giống các biến `IMMIGRATION_HISTORY_*`/`PASSPORT_INFO_*`... đang có).
-2. Khởi động lại container `api` **đúng 1 lần** để đọc biến mới (Docker chỉ đọc `.env.prod` lúc
-   tạo container):
-   ```bash
-   docker compose -f docker-compose.prod.yml --env-file .env.prod up -d api
-   ```
-3. Sau đó, vào giao diện tạo nguồn dữ liệu, chọn đúng tên biến vừa thêm. Mọi lần
-   tạo/sửa/bật/tắt/xóa SAU NÀY (cùng biến env đó, hoặc datasource khác dùng biến env đã có sẵn)
-   **không cần restart nữa**.
+- **Địa chỉ API (`baseUrl`)**: ghi thẳng URL (ví dụ `http://10.10.10.50:8080`). Không cần biến môi trường.
+- **API key**: nhập vào ô **API key** của form. Server mã hóa AES-256-GCM rồi lưu trong Postgres
+  (bảng `datasource_secrets`); không ghi vào `config.json`, không hiển thị lại, không có trong log/audit.
+  Sửa nguồn mà để trống ô này thì key cũ được giữ; nhập giá trị mới thì thay; nút **Xóa key đã lưu** để bỏ.
+- Lưu xong áp dụng ngay cho người đang dùng.
 
-Nếu biến env đã có sẵn trong `.env.prod` (vd đang mock, giờ chuyển sang API thật) — làm thẳng
-trên giao diện, không cần restart.
+Hai cách cấp key loại trừ nhau trên mỗi nguồn: nhập trên giao diện **hoặc** chọn tên biến môi trường `*_API_KEY`.
+Chuyển sang biến môi trường thì key đã lưu trong DB bị xóa.
+
+**Khóa mã hóa `SECRETS_ENCRYPTION_KEY` (64 ký tự hex):**
+- Mất khóa = các key đã lưu trong DB không giải mã được (phải nhập lại). **Sao lưu khóa cùng chỗ với `.env.prod`.**
+- Không đổi khóa khi đang có key lưu; không dùng chung giữa lab và prod (mỗi môi trường tự sinh).
+- Thiếu khóa thì ô API key bị khóa và giao diện báo rõ; hệ thống vẫn chạy bình thường với biến môi trường.
+- `.env.prod` có sẵn từ bản cũ chưa có khóa: thêm 1 dòng rồi tạo lại container `api`:
+  ```bash
+  echo "SECRETS_ENCRYPTION_KEY=$(openssl rand -hex 32)" >> .env.prod
+  docker compose -f docker-compose.prod.yml --env-file .env.prod up -d api
+  ```
+- Backup DB (`pg_dump`) chứa key đã mã hóa, vô dụng nếu không có khóa; vì vậy lộ file backup không lộ key.
+
+**Cách cũ (vẫn dùng được):** để key trong biến môi trường. DevOps thêm `*_API_KEY` (và `*_BASE_URL` nếu dùng) vào
+`.env.prod`, chạy `docker compose -f docker-compose.prod.yml --env-file .env.prod up -d api` **một lần** (Docker chỉ đọc
+`.env.prod` lúc tạo container), rồi chọn tên biến đó trong form.
 
 ### Cấp quyền tra cứu
 

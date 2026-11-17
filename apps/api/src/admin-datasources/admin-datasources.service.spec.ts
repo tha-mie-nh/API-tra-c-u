@@ -6,6 +6,7 @@ import { DatasourceConfigLoaderService } from '../datasources/datasource-config.
 import { DatasourceRegistryService } from '../datasources/datasource-registry.service';
 import { AdapterFactory } from '../datasources/adapters/adapter.factory';
 import type { PermissionSyncService } from '../datasources/permission-sync.service';
+import { buildInMemorySecretStore } from '../datasource-secrets/in-memory-datasource-secret-store.testing';
 import { AdminDatasourcesService } from './admin-datasources.service';
 
 function fakeConfigService(env: Record<string, string>): { get: (key: string) => string | undefined } {
@@ -70,12 +71,13 @@ describe('AdminDatasourcesService', () => {
   let configPath: string;
 
   async function buildService() {
-    const loader = new DatasourceConfigLoaderService(fakeConfigService({ APP_CONFIG_PATH: configPath }) as never);
+    const { store: secrets, rows: secretRows } = buildInMemorySecretStore();
+    const loader = new DatasourceConfigLoaderService(fakeConfigService({ APP_CONFIG_PATH: configPath }) as never, secrets);
     const factory = new AdapterFactory();
     const registry = new DatasourceRegistryService(loader, factory);
     const permissionSync = fakePermissionSync();
-    const service = new AdminDatasourcesService(loader, registry, factory, permissionSync);
-    return { service, loader, registry, factory, permissionSync };
+    const service = new AdminDatasourcesService(loader, registry, factory, permissionSync, secrets);
+    return { service, loader, registry, factory, permissionSync, secrets, secretRows };
   }
 
   beforeEach(async () => {
@@ -236,7 +238,7 @@ describe('AdminDatasourcesService', () => {
     );
     const factory = new AdapterFactory();
     const registry = new DatasourceRegistryService(prodLoader, factory);
-    const service = new AdminDatasourcesService(prodLoader, registry, factory, fakePermissionSync());
+    const service = new AdminDatasourcesService(prodLoader, registry, factory, fakePermissionSync(), buildInMemorySecretStore().store);
     const before = await readFile(prodConfigPath, 'utf-8');
 
     await expect(service.create(newMockEntry('PROD_MOCK_DS'))).rejects.toBeInstanceOf(UnprocessableEntityException);
@@ -254,5 +256,78 @@ describe('AdminDatasourcesService', () => {
     const codes = onDisk.datasources.map((d: { code: string }) => d.code).sort();
     expect(codes).toEqual(['CONCURRENT_A', 'CONCURRENT_B', 'SAMPLE_DS']);
     expect(registry.getAll().map((d) => d.code).sort()).toEqual(['CONCURRENT_A', 'CONCURRENT_B', 'SAMPLE_DS']);
+  });
+  describe('API key nhập trên giao diện (lưu mã hóa trong DB)', () => {
+    function httpEntry(code: string, auth: object = { kind: 'apiKeyHeader', header: 'X-Access-Key' }) {
+      return { ...newMockEntry(code), transport: { kind: 'http', baseUrl: 'http://upstream.test:8080', path: '/search', method: 'GET', auth } };
+    }
+
+    it('stores the key encrypted, serves it to the adapter, and never returns the value', async () => {
+      const { service, loader, secretRows } = await buildService();
+
+      const created = await service.create({ ...httpEntry('KEYED_DS'), apiKey: 'super-secret-key' });
+
+      expect(created.apiKeyStored).toBe(true);
+      expect(JSON.stringify(created)).not.toContain('super-secret-key');
+      expect((loader.getResolvedSecrets('KEYED_DS') as { apiKeyValue?: string }).apiKeyValue).toBe('super-secret-key');
+      expect(secretRows.get('KEYED_DS')?.encryptedValue).not.toContain('super-secret-key');
+      expect(await readFile(configPath, 'utf-8')).not.toContain('super-secret-key');
+    });
+
+    it('keeps the stored key when later edits omit apiKey, replaces it when a new one is sent', async () => {
+      const { service, loader } = await buildService();
+      await service.create({ ...httpEntry('KEYED_DS'), apiKey: 'key-one' });
+
+      await service.update('KEYED_DS', { ...httpEntry('KEYED_DS'), name: 'Renamed' });
+      expect((loader.getResolvedSecrets('KEYED_DS') as { apiKeyValue?: string }).apiKeyValue).toBe('key-one');
+
+      await service.update('KEYED_DS', { ...httpEntry('KEYED_DS'), apiKey: 'key-two' });
+      expect((loader.getResolvedSecrets('KEYED_DS') as { apiKeyValue?: string }).apiKeyValue).toBe('key-two');
+    });
+
+    it('rolls the key back when validation fails (nothing left in memory or DB)', async () => {
+      const { service, secrets, secretRows } = await buildService();
+      const invalid = { ...httpEntry('BROKEN_KEYED_DS'), output: { fields: [] }, apiKey: 'leaky' };
+
+      await expect(service.create(invalid)).rejects.toBeInstanceOf(UnprocessableEntityException);
+
+      expect(secrets.has('BROKEN_KEYED_DS')).toBe(false);
+      expect(secretRows.size).toBe(0);
+    });
+
+    it('rejects apiKey together with auth.valueEnv (pick one)', async () => {
+      const { service } = await buildService();
+      const both = { ...httpEntry('BOTH_DS', { kind: 'apiKeyHeader', header: 'X-K', valueEnv: 'BOTH_DS_API_KEY' }), apiKey: 'x' };
+      await expect(service.create(both)).rejects.toBeInstanceOf(UnprocessableEntityException);
+    });
+
+    it('drops the stored key when the datasource is deleted or switched to an env var', async () => {
+      const { service, secrets, secretRows } = await buildService();
+      await service.create({ ...httpEntry('GONE_DS'), apiKey: 'k1' });
+      await service.remove('GONE_DS');
+      expect(secrets.has('GONE_DS')).toBe(false);
+      expect(secretRows.size).toBe(0);
+
+      await service.create({ ...httpEntry('SWITCH_DS'), apiKey: 'k2' });
+      process.env.SWITCH_DS_API_KEY = 'from-env';
+      try {
+        await service.update('SWITCH_DS', httpEntry('SWITCH_DS', { kind: 'apiKeyHeader', header: 'X-K', valueEnv: 'SWITCH_DS_API_KEY' }));
+        expect(secrets.has('SWITCH_DS')).toBe(false);
+      } finally {
+        delete process.env.SWITCH_DS_API_KEY;
+      }
+    });
+
+    it('refuses to store a key without SECRETS_ENCRYPTION_KEY (422) and does not write the file', async () => {
+      const { store } = buildInMemorySecretStore(null);
+      const loader = new DatasourceConfigLoaderService(fakeConfigService({ APP_CONFIG_PATH: configPath }) as never, store);
+      const factory = new AdapterFactory();
+      const service = new AdminDatasourcesService(loader, new DatasourceRegistryService(loader, factory), factory, fakePermissionSync(), store);
+      const before = await readFile(configPath, 'utf-8');
+
+      await expect(service.create({ ...httpEntry('NOKEY_DS'), apiKey: 'x' })).rejects.toBeInstanceOf(UnprocessableEntityException);
+      expect(await readFile(configPath, 'utf-8')).toBe(before);
+      expect(service.envRefs().canStoreApiKey).toBe(false);
+    });
   });
 });

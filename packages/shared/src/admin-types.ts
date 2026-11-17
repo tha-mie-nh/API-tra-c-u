@@ -140,6 +140,8 @@ export interface AdminDatasource {
   output: unknown;
   limits?: { maxResults: number; pageSize: number };
   envStatus: DatasourceEnvStatus;
+  /** `true` khi API key của nguồn này đang được lưu mã hóa trong DB (admin nhập trên giao diện). Giá trị không bao giờ được trả về. */
+  apiKeyStored: boolean;
 }
 
 /** `GET /admin/datasources/env-refs` — env var NAMES only, matching the
@@ -148,6 +150,8 @@ export interface AdminDatasource {
 export interface DatasourceEnvRefs {
   apiKeyEnvNames: string[];
   baseUrlEnvNames: string[];
+  /** `true` khi server có SECRETS_ENCRYPTION_KEY, tức là lưu được API key mã hóa trong DB từ giao diện. */
+  canStoreApiKey: boolean;
 }
 
 /** One row from `GET /admin/audit-logs` (spec g: before/after diff, read-only). */

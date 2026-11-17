@@ -2,6 +2,16 @@
 
 Ghi lại các thay đổi đáng chú ý theo ngày. Mới nhất ở trên cùng.
 
+## 2026-11-17
+
+### Mới: nhập API key của nguồn dữ liệu trên giao diện, lưu mã hóa trong Postgres
+- Admin nhập API key ở form nguồn dữ liệu; server mã hóa AES-256-GCM (khóa chủ `SECRETS_ENCRYPTION_KEY` trong env, AAD = mã nguồn) và lưu ở bảng mới `app.datasource_secrets` (migration `20261117150000_add_datasource_secrets`).
+- Thêm nguồn mới không còn cần sửa `.env.prod` + restart: `baseUrl` ghi thẳng URL, key nhập trên giao diện. Cách cũ (`auth.valueEnv` + biến môi trường) vẫn dùng được; mỗi nguồn dùng MỘT trong hai.
+- Key giải mã một lần lúc khởi động và giữ trong bộ nhớ; giá trị không bao giờ trả về trình duyệt (API chỉ trả `apiKeyStored: boolean`), không vào `config.json`, audit hay log. Validate lỗi thì hoàn tác key; xóa nguồn hoặc chuyển sang biến môi trường thì key bị xóa.
+- Thiếu `SECRETS_ENCRYPTION_KEY`: ô API key bị khóa, API trả 422 `SECRETS_ENCRYPTION_KEY_MISSING`; hệ thống vẫn chạy với biến môi trường.
+- `init-env-prod.sh` sinh khóa và `--check` kiểm tra định dạng; `get()` không còn thoát im lặng khi thiếu biến.
+- Triển khai: `.env.prod` cũ phải thêm khóa (xem `deployment-guide.md`); chạy migration (image `api` tự chạy qua `migrate`). Nhiều bản `api` chạy song song thì key mới chỉ có hiệu lực sau khi các bản kia khởi động lại (hiện chỉ chạy 1 bản).
+
 ## 2026-11-16
 
 ### Sửa lỗi: ngày/giờ không sort, datetime hiện `-`, thêm định dạng hiển thị cấu hình được

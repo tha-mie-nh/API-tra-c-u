@@ -1,3 +1,4 @@
+import { buildInMemorySecretStore } from '../datasource-secrets/in-memory-datasource-secret-store.testing';
 import { mkdir, mkdtemp, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -104,7 +105,7 @@ describe('live reload through the actual query path (QueryService + DatasourcePe
     const loader = new DatasourceConfigLoaderService(fakeConfigService({ APP_CONFIG_PATH: configPath }) as never);
     const factory = new AdapterFactory();
     const registry = new DatasourceRegistryService(loader, factory);
-    const adminService = new AdminDatasourcesService(loader, registry, factory, fakePermissionSync());
+    const adminService = new AdminDatasourcesService(loader, registry, factory, fakePermissionSync(), buildInMemorySecretStore().store);
     const queryService = new QueryService(registry, new ResponseMapperService(), fakeQueryLogService());
     const guard = new DatasourcePermissionGuard(
       registry,

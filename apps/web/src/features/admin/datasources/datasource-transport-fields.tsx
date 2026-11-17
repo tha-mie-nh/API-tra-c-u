@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { vi } from '@/i18n/vi';
 import type { DatasourceFormValues } from './datasource-form-schema';
+import { DatasourceAuthApiKeyInput } from './datasource-auth-api-key-input';
 
 interface DatasourceTransportFieldsProps {
   register: UseFormRegister<DatasourceFormValues>;
@@ -20,6 +21,8 @@ interface DatasourceTransportFieldsProps {
   envRefs?: DatasourceEnvRefs;
   /** Server-side "is this env var set on the API instance?" for the entry being edited (edit mode only). */
   envStatus?: AdminDatasource['envStatus'];
+  /** Nguồn đang sửa đã có API key lưu mã hóa trong DB (edit mode only). */
+  apiKeyStored?: boolean;
 }
 
 const CUSTOM_BASE_URL_OPTION = '__custom__';
@@ -31,7 +34,7 @@ const CUSTOM_AUTH_VALUE_ENV_OPTION = '__custom__';
  * Transport mock|http subform (phase-03 Architecture). `minio-pg` is
  * intentionally never offered — the backend rejects it on write
  * (phase-02 Key Insights). */
-export function DatasourceTransportFields({ register, watch, setValue, control, errors, envRefs, envStatus }: DatasourceTransportFieldsProps) {
+export function DatasourceTransportFields({ register, watch, setValue, control, errors, envRefs, envStatus, apiKeyStored }: DatasourceTransportFieldsProps) {
   // "Nhập tay" empties the value, so the custom input must be driven by this flag, not by a non-empty value
   // (otherwise choosing it hides the input and the field looks like it vanished).
   const [baseUrlCustom, setBaseUrlCustom] = useState(false);
@@ -201,6 +204,13 @@ export function DatasourceTransportFields({ register, watch, setValue, control, 
                     <p className="text-muted-foreground text-xs">{t.fieldAuthHeaderHint}</p>
                   </div>
                 )}
+                <DatasourceAuthApiKeyInput
+                  register={register}
+                  watch={watch}
+                  setValue={setValue}
+                  canStore={envRefs?.canStoreApiKey ?? false}
+                  stored={apiKeyStored ?? false}
+                />
                 <div className="mt-2 flex flex-col gap-1.5">
                   <Label htmlFor="authValueEnv">{t.fieldAuthValueEnv}</Label>
                   <Select

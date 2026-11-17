@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, Optional } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -6,6 +6,7 @@ import type { DatasourceConfigFile } from '@app/shared';
 import { buildConfigSnapshot, type ConfigSnapshot } from './config-snapshot-builder';
 import { DatasourceConfigInvalidError, formatIssues } from './datasource-config-invalid.error';
 import type { ResolvedSecrets } from './transport-secret-resolver';
+import { DatasourceSecretStore } from '../datasource-secrets/datasource-secret-store.service';
 
 export type { ResolvedHttpSecrets, ResolvedMinioPgSecrets, ResolvedSecrets } from './transport-secret-resolver';
 export type { ConfigSnapshot } from './config-snapshot-builder';
@@ -43,7 +44,10 @@ export class DatasourceConfigLoaderService {
   private readonly allowMock: boolean;
   private snapshot: ConfigSnapshot;
 
-  constructor(private readonly configService: ConfigService) {
+  constructor(
+    private readonly configService: ConfigService,
+    @Optional() private readonly secretStore?: DatasourceSecretStore,
+  ) {
     this.configPath = this.resolveConfigPath();
     this.configDir = join(this.configPath, '..');
     this.nodeEnv = this.configService.get<string>('NODE_ENV') ?? 'development';
@@ -93,7 +97,12 @@ export class DatasourceConfigLoaderService {
 
   /** Pure: validates `raw` and returns a new snapshot WITHOUT touching `this.snapshot`. Throws `DatasourceConfigInvalidError` on any failure — callers must catch and MUST NOT call `applySnapshot` on failure. */
   buildSnapshot(raw: unknown): ConfigSnapshot {
-    return buildConfigSnapshot(raw, { configDir: this.configDir, nodeEnv: this.nodeEnv, allowMock: this.allowMock });
+    return buildConfigSnapshot(raw, {
+      configDir: this.configDir,
+      nodeEnv: this.nodeEnv,
+      allowMock: this.allowMock,
+      storedApiKey: (code) => this.secretStore?.get(code),
+    });
   }
 
   /** Swaps in an already-validated snapshot by single reference assignment — the only mutation this class ever performs after boot. */

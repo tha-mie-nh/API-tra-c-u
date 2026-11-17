@@ -21,7 +21,7 @@ function computeEnvStatus(entry: DatasourceEntry): AdminDatasource['envStatus'] 
  * secret VALUES to begin with, so no redaction is needed here (unlike
  * `DatasourceRegistryService.toClientProjection`, which strips `transport`
  * entirely for the non-admin client projection). */
-export function toAdminDatasourceProjection(entry: DatasourceEntry): AdminDatasource {
+export function toAdminDatasourceProjection(entry: DatasourceEntry, apiKeyStored = false): AdminDatasource {
   return {
     code: entry.code,
     name: entry.name,
@@ -34,5 +34,6 @@ export function toAdminDatasourceProjection(entry: DatasourceEntry): AdminDataso
     output: entry.output,
     limits: entry.limits,
     envStatus: computeEnvStatus(entry),
+    apiKeyStored,
   };
 }

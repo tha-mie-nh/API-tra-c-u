@@ -4,12 +4,14 @@ import { DatasourceConfigLoaderService } from '../datasources/datasource-config.
 import { DatasourceRegistryService } from '../datasources/datasource-registry.service';
 import { AdapterFactory } from '../datasources/adapters/adapter.factory';
 import { PermissionSyncService } from '../datasources/permission-sync.service';
+import { DatasourceSecretStore } from '../datasource-secrets/datasource-secret-store.service';
 import { DatasourceConfigInvalidError } from '../datasources/datasource-config-invalid.error';
 import { ConfigWriteMutex } from './config-write-mutex';
 import { writeJsonFileAtomically } from './atomic-json-file-writer';
 import { listAvailableEnvRefNames } from './datasource-env-name-policy';
 import { buildCandidateDatasourceEntry } from './admin-datasource-candidate-entry.builder';
 import { toAdminDatasourceProjection } from './admin-datasource-projection.util';
+import { splitApiKeyFields } from './admin-datasource-api-key-fields.util';
 
 /** How long a retired adapter (replaced by an admin write) is kept alive
  * before `close()` — generous default since admin writes are rare and
@@ -17,6 +19,8 @@ import { toAdminDatasourceProjection } from './admin-datasource-projection.util'
 const RELOAD_GRACE_MS = 5_000;
 
 type MutateResult = { candidate: DatasourceConfigFile; touchedIndex: number | null };
+/** Thay đổi API key lưu mã hóa đi kèm một lần ghi: đặt (`set`) hoặc xóa (`clear`). */
+type SecretChange = { code: string; set?: string; clear?: boolean };
 
 /** Strips the `/datasources/<touchedIndex>` prefix AJV/cross-field issue
  * paths carry, so the admin API returns paths relative to the entry being
@@ -49,18 +53,19 @@ export class AdminDatasourcesService {
     private readonly registry: DatasourceRegistryService,
     private readonly adapterFactory: AdapterFactory,
     private readonly permissionSync: PermissionSyncService,
+    private readonly secrets: DatasourceSecretStore,
   ) {}
 
   list(): AdminDatasource[] {
-    return this.loader.getSourceConfig().datasources.map(toAdminDatasourceProjection);
+    return this.loader.getSourceConfig().datasources.map((d) => toAdminDatasourceProjection(d, this.secrets.has(d.code)));
   }
 
   envRefs(): DatasourceEnvRefs {
-    return listAvailableEnvRefNames();
+    return { ...listAvailableEnvRefNames(), canStoreApiKey: this.secrets.canStore };
   }
 
   get(code: string): AdminDatasource {
-    return toAdminDatasourceProjection(this.findEntry(code));
+    return toAdminDatasourceProjection(this.findEntry(code), this.secrets.has(code));
   }
 
   /** Every dictionary in config.json with the fields that reference it. */
@@ -105,27 +110,37 @@ export class AdminDatasourcesService {
   }
 
   async create(body: unknown): Promise<AdminDatasource> {
-    const entry = buildCandidateDatasourceEntry(body, undefined);
+    const { rest, apiKey, clearApiKey } = splitApiKeyFields(body);
+    const entry = buildCandidateDatasourceEntry(rest, undefined);
 
-    await this.withLockedReload(true, (raw) => {
-      if (raw.datasources.some((d) => d.code === entry.code)) {
-        throw new ConflictException({ code: 'DATASOURCE_CODE_TAKEN', message: `Datasource "${entry.code}" already exists` });
-      }
-      raw.datasources.push(entry);
-      return { candidate: raw, touchedIndex: raw.datasources.length - 1 };
-    });
+    await this.withLockedReload(
+      true,
+      (raw) => {
+        if (raw.datasources.some((d) => d.code === entry.code)) {
+          throw new ConflictException({ code: 'DATASOURCE_CODE_TAKEN', message: `Datasource "${entry.code}" already exists` });
+        }
+        raw.datasources.push(entry);
+        return { candidate: raw, touchedIndex: raw.datasources.length - 1 };
+      },
+      this.secretChange(entry, apiKey, clearApiKey),
+    );
     return this.get(entry.code);
   }
 
   async update(code: string, body: unknown): Promise<AdminDatasource> {
-    const entry = buildCandidateDatasourceEntry(body, code);
+    const { rest, apiKey, clearApiKey } = splitApiKeyFields(body);
+    const entry = buildCandidateDatasourceEntry(rest, code);
 
-    await this.withLockedReload(true, (raw) => {
-      const index = raw.datasources.findIndex((d) => d.code === code);
-      if (index === -1) throw this.notFoundError(code);
-      raw.datasources[index] = entry;
-      return { candidate: raw, touchedIndex: index };
-    });
+    await this.withLockedReload(
+      true,
+      (raw) => {
+        const index = raw.datasources.findIndex((d) => d.code === code);
+        if (index === -1) throw this.notFoundError(code);
+        raw.datasources[index] = entry;
+        return { candidate: raw, touchedIndex: index };
+      },
+      this.secretChange(entry, apiKey, clearApiKey),
+    );
     return this.get(code);
   }
 
@@ -146,7 +161,7 @@ export class AdminDatasourcesService {
       if (index === -1) throw this.notFoundError(code);
       raw.datasources.splice(index, 1);
       return { candidate: raw, touchedIndex: null };
-    });
+    }, { code, clear: true });
     return { code };
   }
 
@@ -167,18 +182,31 @@ export class AdminDatasourcesService {
   private async withLockedReload(
     write: boolean,
     mutate: (raw: DatasourceConfigFile) => MutateResult,
+    secret?: SecretChange,
   ): Promise<void> {
     await this.mutex.run(async () => {
       const raw = structuredClone(this.loader.readRawFromDisk()) as DatasourceConfigFile;
       const { candidate, touchedIndex } = mutate(raw);
 
-      const snapshot = this.buildSnapshotOrThrowHttp(candidate, touchedIndex);
-      const entries = this.registry.buildEntries(snapshot);
+      // API key mới được đặt tạm trong bộ nhớ để dry-run validate thấy nó; lỗi ở bất kỳ bước nào sau đó thì hoàn tác.
+      const undoSecret = this.stageSecret(secret);
+      let snapshot;
+      let entries;
+      try {
+        snapshot = this.buildSnapshotOrThrowHttp(candidate, touchedIndex);
+        entries = this.registry.buildEntries(snapshot);
+        if (write && secret) await this.secrets.persist(secret.code, null);
+      } catch (err) {
+        undoSecret();
+        throw err;
+      }
 
       if (write) {
         try {
           await writeJsonFileAtomically(this.loader.getConfigPath(), candidate);
         } catch (err) {
+          undoSecret();
+          if (secret) await this.secrets.persist(secret.code, null).catch(() => undefined);
           const fsCode = (err as NodeJS.ErrnoException).code;
           if (fsCode === 'EROFS' || fsCode === 'EACCES' || fsCode === 'EPERM') {
             this.logger.error(`Cannot write ${this.loader.getConfigPath()}: ${fsCode}`);
@@ -205,6 +233,28 @@ export class AdminDatasourcesService {
         );
       });
     });
+  }
+
+  private stageSecret(change: SecretChange | undefined): () => void {
+    if (!change) return () => undefined;
+    if (change.set !== undefined) return this.secrets.stage(change.code, change.set);
+    return change.clear ? this.secrets.stageRemoval(change.code) : () => undefined;
+  }
+
+  /** Quyết định thay đổi API key lưu mã hóa cho một lần tạo/sửa. `valueEnv` và key nhập tay loại trừ nhau. */
+  private secretChange(entry: DatasourceEntry, apiKey: string | undefined, clearApiKey: boolean): SecretChange | undefined {
+    const usesEnv = entry.transport.kind === 'http' && Boolean(entry.transport.auth?.valueEnv);
+    if (apiKey !== undefined && usesEnv) {
+      throw new UnprocessableEntityException({
+        code: 'DATASOURCE_CONFIG_INVALID',
+        message: 'Datasource config is invalid',
+        details: [{ path: 'transport/auth/valueEnv', message: 'Chọn MỘT trong hai: biến môi trường (valueEnv) hoặc API key nhập trên giao diện' }],
+      });
+    }
+    if (apiKey !== undefined) return { code: entry.code, set: apiKey };
+    // Chuyển sang biến môi trường, hoặc admin chủ động xóa: bỏ key đã lưu để không còn key "mồ côi".
+    if (clearApiKey || (usesEnv && this.secrets.has(entry.code))) return { code: entry.code, clear: true };
+    return undefined;
   }
 
   private buildSnapshotOrThrowHttp(candidate: DatasourceConfigFile, touchedIndex: number | null) {

@@ -32,14 +32,17 @@ function resolveInterpolated(value: string, context: string): string {
  * secrets in the file"). Throws loudly if a referenced env var is absent —
  * called only for enabled datasources by the loader.
  */
-export function resolveTransportSecrets(ds: DatasourceEntry): ResolvedSecrets {
+export function resolveTransportSecrets(ds: DatasourceEntry, storedApiKey?: (code: string) => string | undefined): ResolvedSecrets {
   const transport = ds.transport;
   if (transport.kind === 'http') {
     const baseUrl = resolveInterpolated(transport.baseUrl, `${ds.code}.transport.baseUrl`);
-    const apiKeyValue =
-      transport.auth?.kind && transport.auth.kind !== 'none' && transport.auth.valueEnv
+    // Có `valueEnv` -> biến môi trường (bắt buộc phải có). Không có -> API key admin nhập trên giao diện (lưu mã hóa trong DB).
+    const needsKey = transport.auth?.kind && transport.auth.kind !== 'none';
+    const apiKeyValue = !needsKey
+      ? undefined
+      : transport.auth?.valueEnv
         ? requireEnv(transport.auth.valueEnv, `${ds.code}.transport.auth.valueEnv`)
-        : undefined;
+        : storedApiKey?.(ds.code);
     return { baseUrl, apiKeyValue };
   }
   if (transport.kind === 'minio-pg') {

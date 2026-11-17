@@ -21,6 +21,8 @@ export interface BuildSnapshotOptions {
   configDir: string;
   nodeEnv: string;
   allowMock: boolean;
+  /** API key lưu mã hóa trong DB cho nguồn không dùng `auth.valueEnv`. */
+  storedApiKey?: (code: string) => string | undefined;
 }
 
 // Same depth as datasource-config.loader.ts's REPO_ROOT (this file lives in
@@ -75,7 +77,7 @@ export function buildConfigSnapshot(raw: unknown, options: BuildSnapshotOptions)
     throw new DatasourceConfigInvalidError(crossFieldIssues.map((message) => ({ path: '', message })));
   }
 
-  const resolvedSecrets = resolveSecretsForEnabledDatasources(config);
+  const resolvedSecrets = resolveSecretsForEnabledDatasources(config, options.storedApiKey);
   enforceNoMockInProduction(config, options);
 
   const resolved = resolveRuntimeConfig(config);
@@ -111,12 +113,12 @@ function resolveRuntimeConfig(config: DatasourceConfigFile): DatasourceConfigFil
 }
 
 /** Resolves `${VAR}`/`*Env` references for enabled datasources only (disabled ones may lack real env vars). */
-function resolveSecretsForEnabledDatasources(config: DatasourceConfigFile): ReadonlyMap<string, ResolvedSecrets> {
+function resolveSecretsForEnabledDatasources(config: DatasourceConfigFile, storedApiKey?: (code: string) => string | undefined): ReadonlyMap<string, ResolvedSecrets> {
   const resolved = new Map<string, ResolvedSecrets>();
   for (const ds of config.datasources) {
     if (!ds.enabled) continue;
     try {
-      resolved.set(ds.code, resolveTransportSecrets(ds));
+      resolved.set(ds.code, resolveTransportSecrets(ds, storedApiKey));
     } catch (err) {
       throw new DatasourceConfigInvalidError([
         { path: `datasources/${ds.code}/transport`, message: (err as Error).message },
