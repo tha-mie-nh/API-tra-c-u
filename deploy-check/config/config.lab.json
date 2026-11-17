@@ -1,0 +1,1712 @@
+{
+  "version": 1,
+  "defaults": {
+    "maxResults": 100,
+    "pageSize": 20,
+    "timeoutMs": 10000,
+    "retry": {
+      "attempts": 2,
+      "backoffMs": 300
+    }
+  },
+  "datasources": [
+    {
+      "code": "CITIZEN_BASIC",
+      "name": "Tra cứu thông tin công dân",
+      "description": "Tra cứu thông tin công dân theo họ tên/ngày sinh/giới tính. (Đã tắt)",
+      "type": "info",
+      "enabled": false,
+      "permissionCode": "api:citizen_basic",
+      "transport": {
+        "kind": "http",
+        "baseUrl": "${CITIZEN_BASIC_BASE_URL}",
+        "path": "/tra-cuu/cong-dan-co-ban",
+        "method": "POST",
+        "headers": {
+          "X-ReqType": "LOOKUP"
+        },
+        "timeoutMs": 10000,
+        "auth": {
+          "kind": "apiKeyHeader",
+          "header": "X-Access",
+          "valueEnv": "CITIZEN_BASIC_API_KEY"
+        }
+      },
+      "input": {
+        "fields": [
+          {
+            "name": "cccd",
+            "label": "Số CCCD",
+            "type": "string",
+            "required": false,
+            "pattern": "^[0-9]{12}$"
+          },
+          {
+            "name": "ho_ten",
+            "label": "Họ và tên",
+            "type": "string",
+            "required": false,
+            "minLength": 2,
+            "maxLength": 100
+          },
+          {
+            "name": "ngay_sinh",
+            "label": "Ngày sinh",
+            "type": "date",
+            "required": false,
+            "format": "YYYY-MM-DD"
+          },
+          {
+            "name": "gioi_tinh",
+            "label": "Giới tính",
+            "type": "enum",
+            "required": false,
+            "options": [
+              {
+                "value": "M",
+                "label": "Nam"
+              },
+              {
+                "value": "F",
+                "label": "Nữ"
+              }
+            ]
+          }
+        ],
+        "atLeastOneOf": [
+          "cccd",
+          "ho_ten",
+          "ngay_sinh",
+          "gioi_tinh"
+        ]
+      },
+      "output": {
+        "timestampField": "thoi_diem",
+        "sortOrder": "desc",
+        "identityField": "cccd",
+        "fields": [
+          {
+            "name": "cccd",
+            "label": "Số CCCD",
+            "type": "string",
+            "sensitive": true
+          },
+          {
+            "name": "ho_ten",
+            "label": "Họ và tên",
+            "type": "string"
+          },
+          {
+            "name": "ngay_sinh",
+            "label": "Ngày sinh",
+            "type": "date"
+          },
+          {
+            "name": "gioi_tinh",
+            "label": "Giới tính",
+            "type": "enum",
+            "valueMap": {
+              "1": "Nam",
+              "2": "Nữ"
+            }
+          },
+          {
+            "name": "dia_chi",
+            "label": "Địa chỉ",
+            "type": "string"
+          },
+          {
+            "name": "thoi_diem",
+            "label": "Thời điểm ghi nhận",
+            "type": "datetime"
+          }
+        ],
+        "recordsPath": "data",
+        "labelField": "ho_ten"
+      },
+      "limits": {
+        "maxResults": 100,
+        "pageSize": 20
+      }
+    },
+    {
+      "code": "CITIZEN_EXTENDED",
+      "name": "Tra cứu thông tin mở rộng công dân",
+      "description": "Tra cứu thông tin mở rộng công dân theo số CCCD. (Đã tắt)",
+      "type": "info",
+      "enabled": false,
+      "permissionCode": "api:citizen_extended",
+      "transport": {
+        "kind": "http",
+        "baseUrl": "${CITIZEN_EXT_BASE_URL}",
+        "path": "/tra-cuu/cong-dan-mo-rong",
+        "method": "POST",
+        "headers": {
+          "X-ReqType": "LOOKUP"
+        },
+        "timeoutMs": 10000,
+        "auth": {
+          "kind": "apiKeyHeader",
+          "header": "X-Access",
+          "valueEnv": "CITIZEN_EXT_API_KEY"
+        }
+      },
+      "input": {
+        "fields": [
+          {
+            "name": "so_cccd",
+            "label": "Số CCCD",
+            "type": "string",
+            "required": true,
+            "pattern": "^[0-9]{12}$"
+          },
+          {
+            "name": "nghe_nghiep",
+            "label": "Nghề nghiệp",
+            "type": "string",
+            "required": false,
+            "maxLength": 100
+          }
+        ]
+      },
+      "output": {
+        "timestampField": "ngay_cap_nhat",
+        "sortOrder": "asc",
+        "identityField": "so_cccd",
+        "fields": [
+          {
+            "name": "so_cccd",
+            "label": "Số CCCD",
+            "type": "string",
+            "sensitive": true
+          },
+          {
+            "name": "ho_va_ten",
+            "label": "Họ và tên",
+            "type": "string"
+          },
+          {
+            "name": "nam_sinh",
+            "label": "Năm sinh",
+            "type": "number"
+          },
+          {
+            "name": "nghe_nghiep",
+            "label": "Nghề nghiệp",
+            "type": "string"
+          },
+          {
+            "name": "noi_o_hien_tai",
+            "label": "Nơi ở hiện tại",
+            "type": "string"
+          },
+          {
+            "name": "ngay_cap_nhat",
+            "label": "Cập nhật lúc",
+            "type": "datetime"
+          }
+        ],
+        "recordsPath": "data",
+        "labelField": "ho_va_ten"
+      },
+      "limits": {
+        "maxResults": 100,
+        "pageSize": 20
+      }
+    },
+    {
+      "code": "CITIZEN_RESIDENCE",
+      "name": "Tra cứu thông tin cư trú",
+      "description": "Tra cứu thông tin cư trú theo số CCCD/số hộ khẩu. (Đã tắt)",
+      "type": "info",
+      "enabled": false,
+      "permissionCode": "api:citizen_residence",
+      "transport": {
+        "kind": "http",
+        "baseUrl": "${CITIZEN_RESIDENCE_BASE_URL}",
+        "path": "/tra-cuu/cu-tru",
+        "method": "POST",
+        "headers": {
+          "X-ReqType": "LOOKUP"
+        },
+        "timeoutMs": 10000,
+        "auth": {
+          "kind": "apiKeyHeader",
+          "header": "X-Access",
+          "valueEnv": "CITIZEN_RESIDENCE_API_KEY"
+        }
+      },
+      "input": {
+        "fields": [
+          {
+            "name": "citizen_id",
+            "label": "Số CCCD",
+            "type": "string",
+            "required": true,
+            "pattern": "^[0-9]{12}$"
+          },
+          {
+            "name": "ho_khau_so",
+            "label": "Số hộ khẩu",
+            "type": "string",
+            "required": false
+          }
+        ]
+      },
+      "output": {
+        "timestampField": "ngay_dang_ky",
+        "sortOrder": "desc",
+        "identityField": "citizen_id",
+        "fields": [
+          {
+            "name": "citizen_id",
+            "label": "Số CCCD",
+            "type": "string",
+            "sensitive": true
+          },
+          {
+            "name": "full_name",
+            "label": "Họ và tên",
+            "type": "string"
+          },
+          {
+            "name": "ho_khau_so",
+            "label": "Số hộ khẩu",
+            "type": "string"
+          },
+          {
+            "name": "dia_chi_thuong_tru",
+            "label": "Địa chỉ thường trú",
+            "type": "string"
+          },
+          {
+            "name": "loai_dang_ky",
+            "label": "Loại đăng ký",
+            "type": "enum",
+            "valueMap": {
+              "TT": "Thường trú",
+              "TT2": "Tạm trú"
+            }
+          },
+          {
+            "name": "ngay_dang_ky",
+            "label": "Ngày đăng ký",
+            "type": "datetime"
+          }
+        ],
+        "recordsPath": "data",
+        "labelField": "full_name"
+      },
+      "limits": {
+        "maxResults": 100,
+        "pageSize": 20
+      }
+    },
+    {
+      "name": "Tra cứu lịch sử xuất nhập cảnh",
+      "description": "Tra cứu lịch sử xuất nhập cảnh (demo cũ). (Đã tắt)",
+      "type": "info",
+      "enabled": false,
+      "transport": {
+        "kind": "http",
+        "baseUrl": "${XUAT_NHAP_CANH_BASE_URL}",
+        "path": "/tra-cuu/xuat-nhap-canh",
+        "method": "POST",
+        "headers": {
+          "X-ReqType": "LOOKUP"
+        },
+        "timeoutMs": 10000,
+        "auth": {
+          "kind": "apiKeyHeader",
+          "header": "X-Access",
+          "valueEnv": "XUAT_NHAP_CANH_API_KEY"
+        }
+      },
+      "input": {
+        "fields": [
+          {
+            "name": "so_cccd",
+            "label": "Số CCCD",
+            "type": "string",
+            "required": true,
+            "pattern": "^[0-9]{12}$"
+          },
+          {
+            "name": "chieu",
+            "label": "Chiều xuất/nhập cảnh",
+            "type": "enum",
+            "required": false,
+            "options": [
+              {
+                "value": "XUAT",
+                "label": "Xuất cảnh"
+              },
+              {
+                "value": "NHAP",
+                "label": "Nhập cảnh"
+              }
+            ]
+          }
+        ]
+      },
+      "output": {
+        "timestampField": "thoi_diem",
+        "sortOrder": "desc",
+        "identityField": "so_cccd",
+        "fields": [
+          {
+            "name": "so_cccd",
+            "label": "Số CCCD",
+            "type": "string",
+            "sensitive": true
+          },
+          {
+            "name": "ho_ten",
+            "label": "Họ và tên",
+            "type": "string"
+          },
+          {
+            "name": "chieu",
+            "label": "Chiều xuất/nhập cảnh",
+            "type": "enum",
+            "valueMap": {
+              "XUAT": "Xuất cảnh",
+              "NHAP": "Nhập cảnh"
+            }
+          },
+          {
+            "name": "cua_khau",
+            "label": "Cửa khẩu / cảng",
+            "type": "string"
+          },
+          {
+            "name": "quoc_gia",
+            "label": "Quốc gia đối tác",
+            "type": "string"
+          },
+          {
+            "name": "muc_dich",
+            "label": "Mục đích chuyến đi",
+            "type": "string"
+          },
+          {
+            "name": "thoi_diem",
+            "label": "Thời điểm xuất/nhập cảnh",
+            "type": "datetime"
+          }
+        ],
+        "recordsPath": "data",
+        "labelField": "ho_ten"
+      },
+      "limits": {
+        "maxResults": 100,
+        "pageSize": 20
+      },
+      "code": "XUAT_NHAP_CANH",
+      "permissionCode": "api:xuat_nhap_canh"
+    },
+    {
+      "code": "CCCD_HISTORY",
+      "name": "Tra cứu lịch sử làm Căn cước công dân",
+      "description": "Tra cứu lịch sử cấp/đổi CMND, CCCD, Thẻ căn cước. (Đã tắt)",
+      "type": "info",
+      "enabled": false,
+      "permissionCode": "api:cccd_history",
+      "transport": {
+        "kind": "http",
+        "baseUrl": "${CCCD_HISTORY_BASE_URL}",
+        "path": "/tra-cuu/lich-su-cccd",
+        "method": "POST",
+        "headers": {
+          "X-ReqType": "LOOKUP"
+        },
+        "timeoutMs": 10000,
+        "auth": {
+          "kind": "apiKeyHeader",
+          "header": "X-Access",
+          "valueEnv": "CCCD_HISTORY_API_KEY"
+        }
+      },
+      "input": {
+        "fields": [
+          {
+            "name": "so_cccd",
+            "label": "Số CCCD",
+            "type": "string",
+            "required": true,
+            "pattern": "^[0-9]{12}$"
+          },
+          {
+            "name": "loai_giay_to",
+            "label": "Loại giấy tờ",
+            "type": "enum",
+            "required": false,
+            "options": [
+              {
+                "value": "CMND9",
+                "label": "CMND 9 số"
+              },
+              {
+                "value": "CCCD_MVACH",
+                "label": "CCCD mã vạch"
+              },
+              {
+                "value": "CCCD_CHIP",
+                "label": "CCCD gắn chip điện tử"
+              },
+              {
+                "value": "THE_CAN_CUOC",
+                "label": "Thẻ căn cước"
+              }
+            ]
+          }
+        ]
+      },
+      "output": {
+        "timestampField": "ngay_cap",
+        "sortOrder": "desc",
+        "identityField": "so_cccd",
+        "fields": [
+          {
+            "name": "so_cccd",
+            "label": "Số CCCD",
+            "type": "string",
+            "sensitive": true
+          },
+          {
+            "name": "ho_ten",
+            "label": "Họ và tên",
+            "type": "string"
+          },
+          {
+            "name": "loai_giay_to",
+            "label": "Loại giấy tờ",
+            "type": "enum",
+            "valueMap": {
+              "CMND9": "CMND 9 số",
+              "CCCD_MVACH": "CCCD mã vạch",
+              "CCCD_CHIP": "CCCD gắn chip điện tử",
+              "THE_CAN_CUOC": "Thẻ căn cước"
+            }
+          },
+          {
+            "name": "so_giay_to",
+            "label": "Số giấy tờ",
+            "type": "string"
+          },
+          {
+            "name": "tuoi_luc_cap",
+            "label": "Tuổi tại thời điểm cấp",
+            "type": "number"
+          },
+          {
+            "name": "chieu_cao",
+            "label": "Chiều cao (cm)",
+            "type": "number"
+          },
+          {
+            "name": "dac_diem_nhan_dang",
+            "label": "Đặc điểm nhận dạng",
+            "type": "string"
+          },
+          {
+            "name": "noi_cap",
+            "label": "Nơi cấp",
+            "type": "string"
+          },
+          {
+            "name": "ngay_cap",
+            "label": "Ngày cấp",
+            "type": "datetime"
+          }
+        ],
+        "recordsPath": "data",
+        "labelField": "ho_ten"
+      },
+      "limits": {
+        "maxResults": 100,
+        "pageSize": 20
+      }
+    },
+    {
+      "code": "VEHICLE_OWNERSHIP",
+      "name": "Tra cứu lịch sử sở hữu phương tiện",
+      "description": "Tra cứu lịch sử sở hữu phương tiện theo số CCCD. (Đã tắt)",
+      "type": "info",
+      "enabled": false,
+      "permissionCode": "api:vehicle_ownership",
+      "transport": {
+        "kind": "http",
+        "baseUrl": "${VEHICLE_OWNERSHIP_BASE_URL}",
+        "path": "/tra-cuu/phuong-tien",
+        "method": "POST",
+        "headers": {
+          "X-ReqType": "LOOKUP"
+        },
+        "timeoutMs": 10000,
+        "auth": {
+          "kind": "apiKeyHeader",
+          "header": "X-Access",
+          "valueEnv": "VEHICLE_OWNERSHIP_API_KEY"
+        }
+      },
+      "input": {
+        "fields": [
+          {
+            "name": "so_cccd",
+            "label": "Số CCCD",
+            "type": "string",
+            "required": true,
+            "pattern": "^[0-9]{12}$"
+          },
+          {
+            "name": "loai_xe",
+            "label": "Loại phương tiện",
+            "type": "enum",
+            "required": false,
+            "options": [
+              {
+                "value": "XE_MAY",
+                "label": "Xe máy"
+              },
+              {
+                "value": "O_TO",
+                "label": "Ô tô"
+              }
+            ]
+          }
+        ]
+      },
+      "output": {
+        "timestampField": "ngay_dang_ky",
+        "sortOrder": "desc",
+        "identityField": "so_cccd",
+        "fields": [
+          {
+            "name": "so_cccd",
+            "label": "Số CCCD",
+            "type": "string",
+            "sensitive": true
+          },
+          {
+            "name": "chu_so_huu",
+            "label": "Chủ sở hữu",
+            "type": "string"
+          },
+          {
+            "name": "loai_xe",
+            "label": "Loại phương tiện",
+            "type": "enum",
+            "valueMap": {
+              "XE_MAY": "Xe máy",
+              "O_TO": "Ô tô"
+            }
+          },
+          {
+            "name": "hang_xe",
+            "label": "Hãng xe",
+            "type": "string"
+          },
+          {
+            "name": "dong_xe",
+            "label": "Dòng xe",
+            "type": "string"
+          },
+          {
+            "name": "bien_so",
+            "label": "Biển số đăng ký",
+            "type": "string"
+          },
+          {
+            "name": "gia_tri",
+            "label": "Giá trị xe (VNĐ)",
+            "type": "number"
+          },
+          {
+            "name": "noi_dang_ky",
+            "label": "Nơi đăng ký",
+            "type": "string"
+          },
+          {
+            "name": "ngay_dang_ky",
+            "label": "Ngày đăng ký",
+            "type": "datetime"
+          }
+        ],
+        "recordsPath": "data",
+        "labelField": "chu_so_huu"
+      },
+      "limits": {
+        "maxResults": 100,
+        "pageSize": 20
+      }
+    },
+    {
+      "code": "FAMILY_EVENTS",
+      "name": "Tra cứu sự kiện hộ tịch & quan hệ gia đình",
+      "description": "Tra cứu sự kiện hộ tịch & quan hệ gia đình theo số CCCD. (Đã tắt)",
+      "type": "info",
+      "enabled": false,
+      "permissionCode": "api:family_events",
+      "transport": {
+        "kind": "http",
+        "baseUrl": "${FAMILY_EVENTS_BASE_URL}",
+        "path": "/tra-cuu/ho-tich",
+        "method": "POST",
+        "headers": {
+          "X-ReqType": "LOOKUP"
+        },
+        "timeoutMs": 10000,
+        "auth": {
+          "kind": "apiKeyHeader",
+          "header": "X-Access",
+          "valueEnv": "FAMILY_EVENTS_API_KEY"
+        }
+      },
+      "input": {
+        "fields": [
+          {
+            "name": "so_cccd",
+            "label": "Số CCCD",
+            "type": "string",
+            "required": true,
+            "pattern": "^[0-9]{12}$"
+          },
+          {
+            "name": "loai_su_kien",
+            "label": "Loại sự kiện",
+            "type": "enum",
+            "required": false,
+            "options": [
+              {
+                "value": "KHAI_SINH",
+                "label": "Khai sinh"
+              },
+              {
+                "value": "KET_HON",
+                "label": "Kết hôn"
+              },
+              {
+                "value": "KHAI_SINH_CON",
+                "label": "Khai sinh con"
+              },
+              {
+                "value": "LY_HON",
+                "label": "Ly hôn"
+              }
+            ]
+          }
+        ]
+      },
+      "output": {
+        "timestampField": "ngay_su_kien",
+        "sortOrder": "desc",
+        "identityField": "so_cccd",
+        "fields": [
+          {
+            "name": "so_cccd",
+            "label": "Số CCCD",
+            "type": "string",
+            "sensitive": true
+          },
+          {
+            "name": "ho_ten",
+            "label": "Họ và tên",
+            "type": "string"
+          },
+          {
+            "name": "loai_su_kien",
+            "label": "Loại sự kiện",
+            "type": "enum",
+            "valueMap": {
+              "KHAI_SINH": "Khai sinh",
+              "KET_HON": "Kết hôn",
+              "KHAI_SINH_CON": "Khai sinh con",
+              "LY_HON": "Ly hôn"
+            }
+          },
+          {
+            "name": "quan_he",
+            "label": "Mối quan hệ",
+            "type": "string"
+          },
+          {
+            "name": "nguoi_lien_quan",
+            "label": "Người liên quan",
+            "type": "string"
+          },
+          {
+            "name": "cccd_nguoi_lien_quan",
+            "label": "Số CCCD người liên quan",
+            "type": "string",
+            "sensitive": true
+          },
+          {
+            "name": "noi_dang_ky",
+            "label": "Nơi đăng ký hộ tịch",
+            "type": "string"
+          },
+          {
+            "name": "ngay_su_kien",
+            "label": "Ngày sự kiện",
+            "type": "datetime"
+          }
+        ],
+        "recordsPath": "data",
+        "labelField": "ho_ten"
+      },
+      "limits": {
+        "maxResults": 100,
+        "pageSize": 20
+      }
+    },
+    {
+      "code": "IMMIGRATION_HISTORY",
+      "name": "Tra cứu dữ liệu xuất nhập cảnh",
+      "description": "Tra cứu lịch sử xuất nhập cảnh theo số hộ chiếu, hoặc họ tên + ngày sinh + giới tính. (Lab: đã tắt, chưa có API thật của đối tác)",
+      "type": "info",
+      "enabled": false,
+      "permissionCode": "api:immigration_history",
+      "transport": {
+        "kind": "http",
+        "baseUrl": "${IMMIGRATION_HISTORY_BASE_URL}",
+        "path": "/find",
+        "method": "POST",
+        "headers": {
+          "X-Request-Type": "find_immihistory"
+        },
+        "timeoutMs": 10000,
+        "auth": {
+          "kind": "apiKeyHeader",
+          "header": "X-Access-Key",
+          "valueEnv": "IMMIGRATION_HISTORY_API_KEY"
+        }
+      },
+      "input": {
+        "fields": [
+          {
+            "name": "soHC",
+            "label": "Số hộ chiếu",
+            "type": "string",
+            "required": false
+          },
+          {
+            "name": "hoTen",
+            "label": "Họ và tên",
+            "type": "string",
+            "required": false
+          },
+          {
+            "name": "ngaySinh",
+            "label": "Ngày sinh",
+            "type": "date",
+            "required": false
+          },
+          {
+            "name": "gioiTinh",
+            "label": "Giới tính",
+            "type": "enum",
+            "required": false,
+            "options": [
+              {
+                "value": "M",
+                "label": "Nam"
+              },
+              {
+                "value": "F",
+                "label": "Nữ"
+              }
+            ]
+          }
+        ],
+        "requireGroups": [
+          [
+            "soHC"
+          ],
+          [
+            "hoTen",
+            "ngaySinh",
+            "gioiTinh"
+          ]
+        ]
+      },
+      "output": {
+        "recordsPath": "data.0.data",
+        "timestampField": "ngayXuatNhap",
+        "sortOrder": "desc",
+        "identityField": "soHoChieu",
+        "fields": [
+          {
+            "name": "hoTen",
+            "label": "Họ và tên",
+            "type": "string"
+          },
+          {
+            "name": "ngaySinh",
+            "label": "Ngày sinh",
+            "type": "date",
+            "format": "DD/MM/YYYY"
+          },
+          {
+            "name": "defNgaySinh",
+            "label": "Độ chính xác ngày sinh",
+            "type": "enum",
+            "valueMap": {
+              "D": "Chính xác đến ngày",
+              "M": "Chính xác đến tháng",
+              "Y": "Chính xác đến năm"
+            }
+          },
+          {
+            "name": "gioiTinh",
+            "label": "Giới tính",
+            "type": "enum",
+            "valueMap": {
+              "M": "Nam",
+              "F": "Nữ",
+              "X": "Không xác định"
+            }
+          },
+          {
+            "name": "soHoChieu",
+            "label": "Số hộ chiếu",
+            "type": "string",
+            "sensitive": true
+          },
+          {
+            "name": "loaiHoChieu",
+            "label": "Loại hộ chiếu",
+            "type": "enum",
+            "valueMap": {
+              "PT": "Phổ thông",
+              "CV": "Công vụ",
+              "NG": "Ngoại giao",
+              "TH": "Thông hành"
+            }
+          },
+          {
+            "name": "hanHoChieu",
+            "label": "Ngày hết hạn hộ chiếu",
+            "type": "date",
+            "format": "DD/MM/YYYY"
+          },
+          {
+            "name": "noiCapHoChieu",
+            "label": "Nơi cấp hộ chiếu",
+            "type": "string"
+          },
+          {
+            "name": "quocTich",
+            "label": "Quốc tịch",
+            "type": "string"
+          },
+          {
+            "name": "soThiThuc",
+            "label": "Số thị thực",
+            "type": "string"
+          },
+          {
+            "name": "loaiThiThuc",
+            "label": "Loại thị thực",
+            "type": "string"
+          },
+          {
+            "name": "ngayThiThuc",
+            "label": "Ngày cấp thị thực",
+            "type": "date",
+            "format": "DD/MM/YYYY"
+          },
+          {
+            "name": "noiCapThiThuc",
+            "label": "Nơi cấp thị thực",
+            "type": "string"
+          },
+          {
+            "name": "xuatNhap",
+            "label": "Xuất/nhập cảnh",
+            "type": "enum",
+            "valueMap": {
+              "X": "Xuất cảnh",
+              "N": "Nhập cảnh"
+            },
+            "emphasize": true,
+            "iconMap": {
+              "Xuất cảnh": "arrow-up-right",
+              "Nhập cảnh": "arrow-down-left"
+            },
+            "headerField": true
+          },
+          {
+            "name": "ngayXuatNhap",
+            "label": "Ngày giờ xuất/nhập cảnh",
+            "type": "datetime",
+            "format": "DD/MM/YYYY HH:mm:ss"
+          },
+          {
+            "name": "cuaKhau",
+            "label": "Cửa khẩu",
+            "type": "string"
+          },
+          {
+            "name": "mucDich",
+            "label": "Mục đích",
+            "type": "string"
+          },
+          {
+            "name": "tuyenDuong",
+            "label": "Tuyến đường",
+            "type": "string"
+          },
+          {
+            "name": "soHieuPhuongTien",
+            "label": "Số hiệu phương tiện",
+            "type": "string"
+          }
+        ],
+        "labelField": "hoTen"
+      },
+      "limits": {
+        "maxResults": 100,
+        "pageSize": 20
+      }
+    },
+    {
+      "code": "PASSPORT_INFO",
+      "name": "Tra cứu thông tin hộ chiếu",
+      "description": "Tra cứu thông tin hộ chiếu theo số CMND/CCCD, hoặc họ tên + ngày sinh + giới tính. (Lab: đã tắt, chưa có API thật của đối tác)",
+      "type": "info",
+      "enabled": false,
+      "permissionCode": "api:passport_info",
+      "transport": {
+        "kind": "http",
+        "baseUrl": "${PASSPORT_INFO_BASE_URL}",
+        "path": "/find",
+        "method": "POST",
+        "headers": {
+          "X-Request-Type": "find-passport"
+        },
+        "timeoutMs": 10000,
+        "auth": {
+          "kind": "apiKeyHeader",
+          "header": "X-Access-Key",
+          "valueEnv": "PASSPORT_INFO_API_KEY"
+        }
+      },
+      "input": {
+        "fields": [
+          {
+            "name": "soCCCD",
+            "label": "Số CMND/CCCD",
+            "type": "string",
+            "required": false
+          },
+          {
+            "name": "hoTen",
+            "label": "Họ và tên",
+            "type": "string",
+            "required": false
+          },
+          {
+            "name": "ngaySinh",
+            "label": "Ngày sinh",
+            "type": "date",
+            "required": false
+          },
+          {
+            "name": "gioiTinh",
+            "label": "Giới tính",
+            "type": "enum",
+            "required": false,
+            "options": [
+              {
+                "value": "M",
+                "label": "Nam"
+              },
+              {
+                "value": "F",
+                "label": "Nữ"
+              }
+            ]
+          }
+        ],
+        "requireGroups": [
+          [
+            "soCCCD"
+          ],
+          [
+            "hoTen",
+            "ngaySinh",
+            "gioiTinh"
+          ]
+        ]
+      },
+      "output": {
+        "recordsPath": "data.0.data",
+        "timestampField": "ngayCapHoChieu",
+        "sortOrder": "desc",
+        "identityField": "soGiayToDangKy",
+        "fields": [
+          {
+            "name": "hoTen",
+            "label": "Họ và tên",
+            "type": "string"
+          },
+          {
+            "name": "ngaySinh",
+            "label": "Ngày sinh",
+            "type": "date",
+            "format": "DD/MM/YYYY"
+          },
+          {
+            "name": "gioiTinh",
+            "label": "Giới tính",
+            "type": "enum",
+            "valueMap": {
+              "M": "Nam",
+              "F": "Nữ"
+            }
+          },
+          {
+            "name": "noiSinh",
+            "label": "Nơi sinh",
+            "type": "string"
+          },
+          {
+            "name": "danToc",
+            "label": "Dân tộc",
+            "type": "string"
+          },
+          {
+            "name": "soGiayToDangKy",
+            "label": "Số CMND/CCCD",
+            "type": "string",
+            "sensitive": true
+          },
+          {
+            "name": "noiCapGiayTo",
+            "label": "Nơi cấp CMND/CCCD",
+            "type": "string"
+          },
+          {
+            "name": "ngayCapGiayTo",
+            "label": "Ngày cấp CMND/CCCD",
+            "type": "date",
+            "format": "DD/MM/YYYY"
+          },
+          {
+            "name": "soDienThoai",
+            "label": "Số điện thoại",
+            "type": "string"
+          },
+          {
+            "name": "ngheNghiep",
+            "label": "Nghề nghiệp",
+            "type": "string"
+          },
+          {
+            "name": "noiLamViec",
+            "label": "Nơi làm việc",
+            "type": "string"
+          },
+          {
+            "name": "chucVu",
+            "label": "Chức vụ",
+            "type": "string"
+          },
+          {
+            "name": "diaChiThuongTru",
+            "label": "Địa chỉ thường trú",
+            "type": "string"
+          },
+          {
+            "name": "diaChiTamTru",
+            "label": "Địa chỉ tạm trú",
+            "type": "string"
+          },
+          {
+            "name": "soHoChieu",
+            "label": "Số hộ chiếu",
+            "type": "string"
+          },
+          {
+            "name": "ngayCapHoChieu",
+            "label": "Ngày cấp hộ chiếu",
+            "type": "date",
+            "format": "DD/MM/YYYY"
+          },
+          {
+            "name": "hanHoChieu",
+            "label": "Hạn hộ chiếu",
+            "type": "date",
+            "format": "DD/MM/YYYY"
+          },
+          {
+            "name": "noiCapHoChieu",
+            "label": "Nơi cấp hộ chiếu",
+            "type": "string"
+          },
+          {
+            "name": "trangThai",
+            "label": "Trạng thái",
+            "type": "string"
+          },
+          {
+            "name": "ngayHuy",
+            "label": "Ngày hủy",
+            "type": "date",
+            "format": "DD/MM/YYYY"
+          }
+        ],
+        "labelField": "hoTen"
+      },
+      "limits": {
+        "maxResults": 100,
+        "pageSize": 20
+      }
+    },
+    {
+      "code": "DRIVER_LICENSE",
+      "name": "Tra cứu thông tin GPLX",
+      "description": "Tra cứu thông tin giấy phép lái xe — cần nhập đủ cả 5 trường. (Lab: đã tắt, chưa có API thật của đối tác)",
+      "type": "info",
+      "enabled": false,
+      "permissionCode": "api:driver_license",
+      "transport": {
+        "kind": "http",
+        "baseUrl": "${DRIVER_LICENSE_BASE_URL}",
+        "path": "/find",
+        "method": "POST",
+        "headers": {
+          "X-Request-Type": "find-driverlicense"
+        },
+        "timeoutMs": 10000,
+        "auth": {
+          "kind": "apiKeyHeader",
+          "header": "X-Access-Key",
+          "valueEnv": "DRIVER_LICENSE_API_KEY"
+        }
+      },
+      "input": {
+        "fields": [
+          {
+            "name": "hoVaTen",
+            "label": "Họ tên",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "soGplx",
+            "label": "Số GPLX",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "soCCCD",
+            "label": "Số CMND/CCCD",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "ngaySinh",
+            "label": "Ngày sinh",
+            "type": "date",
+            "required": true
+          },
+          {
+            "name": "hangGPLX",
+            "label": "Hạng GPLX",
+            "type": "string",
+            "required": true
+          }
+        ]
+      },
+      "output": {
+        "recordsPath": "data.0.data",
+        "timestampField": "ngayCap",
+        "sortOrder": "desc",
+        "identityField": "soCCCD",
+        "fields": [
+          {
+            "name": "soCCCD",
+            "label": "Số CMND/CCCD",
+            "type": "string",
+            "sensitive": true
+          },
+          {
+            "name": "soGplx",
+            "label": "Số GPLX",
+            "type": "string"
+          },
+          {
+            "name": "ngaySinh",
+            "label": "Ngày sinh",
+            "type": "date",
+            "format": "DD/MM/YYYY"
+          },
+          {
+            "name": "hangGPLX",
+            "label": "Hạng GPLX",
+            "type": "string"
+          },
+          {
+            "name": "hinhAnh",
+            "label": "Ảnh GPLX",
+            "type": "image"
+          },
+          {
+            "name": "ngayCap",
+            "label": "Ngày cấp GPLX",
+            "type": "date",
+            "format": "DD/MM/YYYY"
+          }
+        ]
+      },
+      "limits": {
+        "maxResults": 100,
+        "pageSize": 20
+      }
+    },
+    {
+      "code": "FACE_PHOTO",
+      "name": "Tra cứu ảnh mặt",
+      "description": "Tra cứu ảnh mặt theo số CMND/CCCD. (Lab: đã tắt, chưa có API thật của đối tác)",
+      "type": "info",
+      "enabled": false,
+      "permissionCode": "api:face_photo",
+      "transport": {
+        "kind": "http",
+        "baseUrl": "${FACE_PHOTO_BASE_URL}",
+        "path": "/find",
+        "method": "POST",
+        "headers": {
+          "X-Request-Type": "find-face"
+        },
+        "timeoutMs": 10000,
+        "auth": {
+          "kind": "apiKeyHeader",
+          "header": "X-Access-Key",
+          "valueEnv": "FACE_PHOTO_API_KEY"
+        }
+      },
+      "input": {
+        "fields": [
+          {
+            "name": "soCCCD",
+            "label": "Số CMND/CCCD",
+            "type": "string",
+            "required": true
+          }
+        ]
+      },
+      "output": {
+        "recordsPath": "data",
+        "timestampField": "created_at",
+        "sortOrder": "desc",
+        "identityField": "soCCCD",
+        "fields": [
+          {
+            "name": "soCCCD",
+            "label": "Số CMND/CCCD",
+            "type": "string",
+            "sensitive": true
+          },
+          {
+            "name": "hinhAnh",
+            "label": "Ảnh mặt",
+            "type": "image"
+          },
+          {
+            "name": "created_at",
+            "label": "Thời gian nhận ảnh",
+            "type": "datetime",
+            "format": "DD/MM/YYYY HH:mm:ss"
+          }
+        ]
+      },
+      "limits": {
+        "maxResults": 100,
+        "pageSize": 20
+      }
+    },
+    {
+      "code": "ECHO_DEMO",
+      "name": "Echo demo",
+      "type": "info",
+      "enabled": true,
+      "transport": {
+        "kind": "http",
+        "baseUrl": "http://mock-echo:4200",
+        "path": "/find",
+        "method": "POST",
+        "queryParams": {
+          "tab": "1"
+        }
+      },
+      "input": {
+        "fields": [
+          {
+            "name": "soHC",
+            "label": "Số hộ chiếu",
+            "type": "string"
+          }
+        ],
+        "atLeastOneOf": [
+          "soHC"
+        ]
+      },
+      "output": {
+        "timestampField": "thoi_diem",
+        "sortOrder": "desc",
+        "identityField": "cccd",
+        "fields": [
+          {
+            "name": "cccd",
+            "label": "Số CCCD",
+            "type": "string"
+          },
+          {
+            "name": "ho_ten",
+            "label": "Họ và tên",
+            "type": "string"
+          },
+          {
+            "name": "soHC",
+            "label": "Số hộ chiếu",
+            "type": "string"
+          },
+          {
+            "name": "tab",
+            "label": "Tab",
+            "type": "string"
+          },
+          {
+            "name": "thoi_diem",
+            "label": "Thời điểm",
+            "type": "datetime",
+            "displayTimeZone": "Asia/Ho_Chi_Minh"
+          }
+        ],
+        "recordsPath": "data.items",
+        "totalPath": "total",
+        "requestIdPath": "requestId"
+      },
+      "permissionCode": "api:echo_demo"
+    },
+    {
+      "code": "SA_SEARCH_GET",
+      "name": "SimpleAPI GET /search",
+      "type": "info",
+      "enabled": true,
+      "transport": {
+        "kind": "http",
+        "baseUrl": "http://simple-api:8080",
+        "path": "/search",
+        "method": "GET",
+        "headers": {
+          "X-Request-Type": "LOOKUP"
+        },
+        "auth": {
+          "kind": "apiKeyHeader",
+          "header": "X-Access-Key"
+        }
+      },
+      "input": {
+        "fields": [
+          {
+            "name": "param1",
+            "label": "Param 1",
+            "type": "string"
+          },
+          {
+            "name": "count",
+            "label": "Số lượng",
+            "type": "number",
+            "min": 1,
+            "max": 50
+          },
+          {
+            "name": "ngaySinh",
+            "label": "Ngày sinh",
+            "type": "datetime"
+          }
+        ],
+        "atLeastOneOf": [
+          "param1"
+        ]
+      },
+      "output": {
+        "timestampField": "update_at",
+        "sortOrder": "desc",
+        "identityField": "id",
+        "fields": [
+          {
+            "name": "id",
+            "label": "ID",
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "label": "Tên",
+            "type": "string"
+          },
+          {
+            "name": "description",
+            "label": "Mô tả",
+            "type": "string"
+          },
+          {
+            "name": "type",
+            "label": "Loại",
+            "type": "enum",
+            "valueMap": {
+              "M": "Nam",
+              "F": "Nữ"
+            }
+          },
+          {
+            "name": "create_at",
+            "label": "Tạo lúc",
+            "type": "datetime"
+          },
+          {
+            "name": "update_at",
+            "label": "Cập nhật",
+            "type": "datetime",
+            "format": "DD/MM/YYYY HH:mm:ss"
+          },
+          {
+            "name": "delete_at",
+            "label": "Xóa lúc",
+            "type": "date",
+            "format": "DD/MM/YYYY"
+          }
+        ],
+        "labelField": "name"
+      },
+      "permissionCode": "api:sa_search_get"
+    },
+    {
+      "code": "SA_SEARCH_POST",
+      "name": "SimpleAPI POST /search (param + body)",
+      "type": "info",
+      "enabled": true,
+      "transport": {
+        "kind": "http",
+        "baseUrl": "http://simple-api:8080",
+        "path": "/search",
+        "method": "POST"
+      },
+      "input": {
+        "fields": [
+          {
+            "name": "param1",
+            "label": "Param 1",
+            "type": "string"
+          },
+          {
+            "name": "count",
+            "label": "Số lượng",
+            "type": "number",
+            "min": 1,
+            "max": 50
+          },
+          {
+            "name": "note",
+            "label": "Ghi chú (body)",
+            "type": "string",
+            "in": "body"
+          }
+        ]
+      },
+      "output": {
+        "timestampField": "update_at",
+        "sortOrder": "desc",
+        "identityField": "id",
+        "labelField": "name",
+        "fields": [
+          {
+            "name": "id",
+            "label": "ID",
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "label": "Tên",
+            "type": "string"
+          },
+          {
+            "name": "description",
+            "label": "Mô tả",
+            "type": "string"
+          },
+          {
+            "name": "type",
+            "label": "Loại",
+            "type": "enum",
+            "valueMap": {
+              "M": "Nam",
+              "F": "Nữ"
+            }
+          },
+          {
+            "name": "create_at",
+            "label": "Tạo lúc",
+            "type": "datetime"
+          },
+          {
+            "name": "update_at",
+            "label": "Cập nhật",
+            "type": "datetime",
+            "format": "DD/MM/YYYY HH:mm:ss"
+          },
+          {
+            "name": "delete_at",
+            "label": "Xóa lúc",
+            "type": "date",
+            "format": "DD/MM/YYYY"
+          }
+        ],
+        "recordsPath": "data"
+      },
+      "permissionCode": "api:sa_search_post"
+    },
+    {
+      "code": "SA_IMAGES",
+      "name": "SimpleAPI ảnh",
+      "type": "image",
+      "enabled": true,
+      "transport": {
+        "kind": "http",
+        "baseUrl": "http://simple-api:8080",
+        "path": "/images",
+        "method": "GET",
+        "auth": {
+          "kind": "apiKeyHeader",
+          "header": "X-Access-Key",
+          "valueEnv": "SIMPLE_IMAGES_API_KEY"
+        }
+      },
+      "input": {
+        "fields": [
+          {
+            "name": "count",
+            "label": "Số ảnh",
+            "type": "number",
+            "min": 1,
+            "max": 5
+          }
+        ]
+      },
+      "output": {
+        "timestampField": "create_at",
+        "sortOrder": "desc",
+        "identityField": "id",
+        "labelField": "description",
+        "fields": [
+          {
+            "name": "id",
+            "label": "ID",
+            "type": "string"
+          },
+          {
+            "name": "description",
+            "label": "Mô tả",
+            "type": "string"
+          },
+          {
+            "name": "create_at",
+            "label": "Tạo lúc",
+            "type": "datetime"
+          },
+          {
+            "name": "image_base64",
+            "label": "Ảnh",
+            "type": "image"
+          }
+        ],
+        "recordsPath": "data"
+      },
+      "permissionCode": "api:sa_images"
+    },
+    {
+      "code": "SA_IMAGES_BADKEY",
+      "name": "SimpleAPI ảnh (sai khóa)",
+      "type": "image",
+      "enabled": true,
+      "transport": {
+        "kind": "http",
+        "baseUrl": "http://simple-api:8080",
+        "path": "/images",
+        "method": "GET",
+        "auth": {
+          "kind": "apiKeyHeader",
+          "header": "X-Access-Key",
+          "valueEnv": "SIMPLE_BADKEY_API_KEY"
+        }
+      },
+      "input": {
+        "fields": [
+          {
+            "name": "count",
+            "label": "Số ảnh",
+            "type": "number",
+            "min": 1,
+            "max": 5
+          }
+        ]
+      },
+      "output": {
+        "timestampField": "create_at",
+        "sortOrder": "desc",
+        "identityField": "id",
+        "labelField": "description",
+        "fields": [
+          {
+            "name": "id",
+            "label": "ID",
+            "type": "string"
+          },
+          {
+            "name": "description",
+            "label": "Mô tả",
+            "type": "string"
+          },
+          {
+            "name": "create_at",
+            "label": "Tạo lúc",
+            "type": "datetime"
+          },
+          {
+            "name": "image_base64",
+            "label": "Ảnh",
+            "type": "image"
+          }
+        ],
+        "recordsPath": "data"
+      },
+      "permissionCode": "api:sa_images_badkey"
+    }
+  ],
+  "dictionaries": {
+    "GENDER": [
+      {
+        "value": "M",
+        "label": "Nam Giới"
+      },
+      {
+        "value": "F",
+        "label": "Nữ"
+      }
+    ],
+    "TAB": [
+      {
+        "value": "A",
+        "label": "1"
+      },
+      {
+        "value": "B",
+        "label": "2"
+      }
+    ]
+  }
+}

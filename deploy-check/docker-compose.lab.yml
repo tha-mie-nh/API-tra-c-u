@@ -1,0 +1,17 @@
+# Overlay CHO MÁY LAB khi chưa có API thật của đối tác: thêm hai API giả vào cùng mạng Docker với `api`,
+# để các nguồn dữ liệu mẫu (ECHO_DEMO, SA_*) chạy giống môi trường dev. KHÔNG dùng cho production.
+#
+#   docker compose -p app-tra-cuu-kit -f docker-compose.prod.yml -f docker-compose.lab.yml --env-file .env.prod up -d
+#
+# Không công bố cổng ra máy chủ: chỉ container `api` gọi tới được (tên dịch vụ = tên máy trong mạng Docker).
+services:
+  simple-api:
+    image: vhung98vp/simple-api:1.0 # GET/POST /search, GET /images (header X-Access-Key: my-secret-key)
+    restart: unless-stopped
+    networks: [backend] # cùng mạng với `api` (xem docker-compose.prod.yml)
+  mock-echo:
+    image: gthanh/app_tra_cuu:mock-echo-v1 # trả lại đúng những gì nhận được; log từng request/response
+    restart: unless-stopped
+    environment:
+      PORT: 4200
+    networks: [backend]
