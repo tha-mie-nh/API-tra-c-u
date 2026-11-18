@@ -1,3 +1,5 @@
+import { normalizeTimeZone } from '@shared/index';
+
 /**
  * `vi-VN` date/number formatting helpers, display timezone
  * `Asia/Ho_Chi_Minh` (the API itself always deals in UTC — see
@@ -21,7 +23,7 @@ export function formatWithPattern(iso: string, pattern: string, timeZone: string
   let parts: Intl.DateTimeFormatPart[];
   try {
     parts = new Intl.DateTimeFormat('en-GB', {
-      timeZone,
+      timeZone: normalizeTimeZone(timeZone),
       year: 'numeric',
       month: '2-digit',
       day: '2-digit',

@@ -9,6 +9,10 @@ Ghi lại các thay đổi đáng chú ý theo ngày. Mới nhất ở trên cù
 - Nay: che mọi header có tên chứa `key`, `signature`, `session` (ngoài các từ khóa cũ), và header khai làm xác thực. Có test.
 - Chỉ áp dụng cho lượt tra cứu MỚI. Các dòng đã lưu trước đó vẫn chứa giá trị rõ: xem cách xóa ở mục dưới. Key dán vào Header tùy chỉnh còn nằm trong `config.json`: nên chuyển sang ô **API key** và xóa header tùy chỉnh đó.
 
+### Sửa: ô múi giờ nhập được dạng "UTC+7"
+- Ô "Tùy chỉnh" của múi giờ nguồn/hiển thị trước đây hiện gợi ý `DD/MM/YYYY HH:mm` (nhầm với ô định dạng ngày). Nay gợi ý "UTC+7, UTC-5 hoặc tên IANA", danh sách chọn kèm độ lệch (VD "UTC+7 · Việt Nam (Asia/Ho_Chi_Minh)"), và xem trước định dạng hiển thị dùng đúng múi giờ hiển thị đã chọn.
+- API và giao diện hiểu `UTC+7`, `UTC-5`, `GMT+7`, `+07:00` (giờ nguyên, -12..+14) qua hàm chung `normalizeTimeZone` (gói `@app/shared`, quy về `Etc/GMT-7`...). Lệch lẻ giờ (UTC+5:30) vẫn phải dùng tên IANA (`Asia/Kolkata`); `UTC+N` không có giờ mùa hè, vùng có DST nên dùng tên IANA.
+
 ### Sửa: lịch sử ghi đúng lỗi của đối tác, thêm cột "Phản hồi đối tác", gọn form trường output
 - **Lịch sử tra cứu ghi đúng lỗi thật.** Trước: lỗi nào từ đối tác cũng ghi câu chung ("Upstream datasource returned HTTP 500", "request failed"). Nay `error_message` là điều đã xảy ra: `Đối tác trả lỗi HTTP 401: Invalid access key` (lời lấy từ khóa `message`/`error`/`detail`... trong phản hồi lỗi, rút gọn 300 ký tự), `Không kết nối được tới đối tác: connect ECONNREFUSED ...`, `Đối tác không phản hồi: ... timed out ...`, `Không xử lý được phản hồi của đối tác: ...`. Trình duyệt vẫn chỉ nhận mã + `upstreamStatus`, không nhận lời của đối tác.
 - **Cột mới `upstream_duration_ms`** (migration `20261118120000_add_upstream_duration_to_query_logs`): thời gian đối tác phản hồi (lần gọi cuối). Cột cũ `duration_ms` giữ nghĩa là tổng thời gian xử lý trong hệ thống; hiển thị là "Xử lý hệ thống" và "Phản hồi đối tác" ở bảng, chi tiết và CSV (CSV thêm một cột, các cột sau dịch một vị trí). Dòng cũ không có giá trị (hiện "—").

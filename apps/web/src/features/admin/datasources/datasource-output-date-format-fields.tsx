@@ -18,7 +18,17 @@ const SOURCE_PRESETS = [
 /** Formats an upstream may expect for a date/datetime the user picked in the search form (default is ISO YYYY-MM-DD). */
 export const INPUT_SEND_PRESETS = ['DD/MM/YYYY', 'DD-MM-YYYY', 'YYYYMMDD', 'YYYY-MM-DD HH:mm:ss', 'DD/MM/YYYY HH:mm:ss', 'YYYYMMDDHHmmss'];
 const DISPLAY_PRESETS = ['DD/MM/YYYY', 'DD-MM-YYYY', 'YYYY-MM-DD', 'DD/MM/YYYY HH:mm', 'DD/MM/YYYY HH:mm:ss', 'HH:mm DD/MM/YYYY'];
-const TIME_ZONES = ['UTC', 'Asia/Ho_Chi_Minh', 'Asia/Bangkok', 'Asia/Singapore', 'Asia/Tokyo', 'Europe/London', 'America/New_York'];
+/** Múi giờ gợi ý: giá trị lưu là tên IANA, nhãn hiển thị kèm độ lệch UTC để chọn theo "UTC+mấy". Múi giờ khác: "Tùy chỉnh" (gõ UTC+7, UTC-5 hoặc tên IANA). */
+const TIME_ZONE_LABELS: Record<string, string> = {
+  UTC: 'UTC+0 (UTC)',
+  'Asia/Ho_Chi_Minh': 'UTC+7 · Việt Nam (Asia/Ho_Chi_Minh)',
+  'Asia/Bangkok': 'UTC+7 · Bangkok (Asia/Bangkok)',
+  'Asia/Singapore': 'UTC+8 · Singapore (Asia/Singapore)',
+  'Asia/Tokyo': 'UTC+9 · Nhật Bản (Asia/Tokyo)',
+  'Europe/London': 'UTC+0/+1 · London (Europe/London, có giờ mùa hè)',
+  'America/New_York': 'UTC-5/-4 · New York (America/New_York, có giờ mùa hè)',
+};
+const TIME_ZONES = Object.keys(TIME_ZONE_LABELS);
 const DEFAULT_VALUE = '__default__';
 const CUSTOM_VALUE = '__custom__';
 /** 09:30 on 2026-01-15 in Asia/Ho_Chi_Minh — a fixed example so the preview is stable. */
@@ -29,6 +39,10 @@ interface DateFormatSelectProps {
   hint: string;
   defaultLabel: string;
   presets: string[];
+  /** Nhãn hiển thị thay cho giá trị thô của từng mục (vd múi giờ kèm UTC+7). */
+  presetLabels?: Record<string, string>;
+  /** Gợi ý trong ô nhập khi chọn "Tùy chỉnh" (mặc định là mẫu định dạng ngày). */
+  customPlaceholder?: string;
   value: string;
   onChange: (value: string) => void;
   register: ReturnType<UseFormRegister<DatasourceFormValues>>;
@@ -37,7 +51,7 @@ interface DateFormatSelectProps {
   previewTimeZone?: string;
 }
 
-export function DateFormatSelect({ label, hint, defaultLabel, presets, value, onChange, register, preview, previewTimeZone }: DateFormatSelectProps) {
+export function DateFormatSelect({ label, hint, defaultLabel, presets, presetLabels, customPlaceholder, value, onChange, register, preview, previewTimeZone }: DateFormatSelectProps) {
   const t = vi.admin.datasources;
   const isPreset = value === '' || presets.includes(value);
   const [custom, setCustom] = useState(!isPreset);
@@ -63,13 +77,13 @@ export function DateFormatSelect({ label, hint, defaultLabel, presets, value, on
           <SelectItem value={DEFAULT_VALUE}>{defaultLabel}</SelectItem>
           {presets.map((p) => (
             <SelectItem key={p} value={p}>
-              {p}
+              {presetLabels?.[p] ?? p}
             </SelectItem>
           ))}
           <SelectItem value={CUSTOM_VALUE}>{t.dateFormatCustomOption}</SelectItem>
         </SelectContent>
       </Select>
-      {mode === CUSTOM_VALUE && <Input placeholder="DD/MM/YYYY HH:mm" {...register} />}
+      {mode === CUSTOM_VALUE && <Input placeholder={customPlaceholder ?? 'DD/MM/YYYY HH:mm'} {...register} />}
       <span className="text-muted-foreground text-xs">{example ? `${t.dateFormatExample} ${example}` : hint}</span>
     </div>
   );
@@ -107,12 +121,15 @@ export function DatasourceOutputDateFormatFields({ index, register, watch, setVa
         onChange={(v) => setValue(`outputFields.${index}.displayFormat`, v)}
         register={register(`outputFields.${index}.displayFormat`)}
         preview
+        previewTimeZone={row.displayTimeZone || undefined}
       />
       <DateFormatSelect
         label={t.timeZoneSourceLabel}
         hint={t.timeZoneSourceHint}
         defaultLabel={t.timeZoneSourceDefault}
         presets={TIME_ZONES}
+        presetLabels={TIME_ZONE_LABELS}
+        customPlaceholder={t.timeZoneCustomPlaceholder}
         value={row.sourceTimeZone}
         onChange={(v) => setValue(`outputFields.${index}.sourceTimeZone`, v)}
         register={register(`outputFields.${index}.sourceTimeZone`)}
@@ -122,6 +139,8 @@ export function DatasourceOutputDateFormatFields({ index, register, watch, setVa
         hint={t.timeZoneDisplayHint}
         defaultLabel={t.timeZoneDisplayDefault}
         presets={TIME_ZONES}
+        presetLabels={TIME_ZONE_LABELS}
+        customPlaceholder={t.timeZoneCustomPlaceholder}
         value={row.displayTimeZone}
         onChange={(v) => setValue(`outputFields.${index}.displayTimeZone`, v)}
         register={register(`outputFields.${index}.displayTimeZone`)}

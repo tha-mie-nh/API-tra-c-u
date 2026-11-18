@@ -1,3 +1,5 @@
+import { normalizeTimeZone } from '@app/shared';
+
 const TOKEN_PATTERNS: Record<string, string> = {
   YYYY: '(\\d{4})',
   MM: '(\\d{2})',
@@ -34,7 +36,8 @@ function zoneOffsetMs(utcMs: number, timeZone: string): number {
 }
 
 /** Wall-clock components written in `timeZone` -> the real UTC instant (ms). `UTC`/undefined = no shift. */
-function zonedWallTimeToUtcMs(wallAsUtcMs: number, timeZone?: string): number {
+function zonedWallTimeToUtcMs(wallAsUtcMs: number, rawTimeZone?: string): number {
+  const timeZone = rawTimeZone ? normalizeTimeZone(rawTimeZone) : rawTimeZone;
   if (!timeZone || timeZone === 'UTC') return wallAsUtcMs;
   const first = wallAsUtcMs - zoneOffsetMs(wallAsUtcMs, timeZone);
   return wallAsUtcMs - zoneOffsetMs(first, timeZone);
@@ -43,7 +46,7 @@ function zonedWallTimeToUtcMs(wallAsUtcMs: number, timeZone?: string): number {
 /** True when `timeZone` is a valid IANA zone name. */
 export function isValidTimeZone(timeZone: string): boolean {
   try {
-    new Intl.DateTimeFormat('en-US', { timeZone });
+    new Intl.DateTimeFormat('en-US', { timeZone: normalizeTimeZone(timeZone) });
     return true;
   } catch {
     return false;
