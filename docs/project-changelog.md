@@ -14,7 +14,7 @@ Ghi lại các thay đổi đáng chú ý theo ngày. Mới nhất ở trên cù
 - Nay form chỉ gửi những tên còn là trường nhập thật; không còn tham chiếu nào thì không gửi khóa rỗng.
 
 ### Phát hành image api-v14 / web-v17 (2026-11-18)
-- `gthanh/app_tra_cuu:api-v14` digest `sha256:eed30118d23079f66287480607ef38a6bcc34b80842da7ffefb2fa883f2de4f0`; `gthanh/app_tra_cuu:web-v17` digest `sha256:514e97db4480e234f4a54ca1aab71b202d706a4cc8f6dd58046c0e1a16d33a7a`. `docker-compose.prod.yml` và `deploy-check/` trỏ tag mới.
+- `gthanh/app_tra_cuu:api-v14` digest `sha256:eed30118d23079f66287480607ef38a6bcc34b80842da7ffefb2fa883f2de4f0`; `gthanh/app_tra_cuu:web-v17` digest `sha256:fa0fedecab46b6edf0cb747787233f46bcaad04e366660a42a0a111a29255a69` (ghi đè lần 2, gồm sửa lỗi atLeastOneOf`. `docker-compose.prod.yml` và `deploy-check/` trỏ tag mới.
 - Gồm: lưu API key mã hóa trong Postgres (cần `SECRETS_ENCRYPTION_KEY`), mã lỗi thật của đối tác, che header `X-Access-Key`, lịch sử ghi đúng lỗi + cột phản hồi đối tác + nguồn mã HTTP, múi giờ nhập `UTC+N`, ẩn danh mục ở trường không phải danh sách chọn, cột Thao tác dính phải, bỏ icon.
 - Nâng cấp: `docker compose pull && up -d` (service `migrate` tự thêm cột `upstream_duration_ms`, `upstream_status_code` và bảng `datasource_secrets`). `.env.prod` cũ thêm `SECRETS_ENCRYPTION_KEY` nếu muốn lưu key trên giao diện.
 
