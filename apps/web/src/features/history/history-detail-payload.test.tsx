@@ -20,7 +20,7 @@ vi.mock('./history-api', async () => {
 const ID = '11111111-1111-4111-8111-111111111111';
 const detail: QueryLogDetail = {
   id: ID, userId: 'u1', username: 'alice', datasourceCode: 'ds1', querySummary: null, status: 'success', statusCode: 200,
-  errorCode: null, recordCount: 1, durationMs: 10, createdAt: '2026-11-04T17:00:00.000Z', queryParams: {}, errorMessage: null,
+  errorCode: null, recordCount: 1, durationMs: 10, upstreamDurationMs: 8, createdAt: '2026-11-04T17:00:00.000Z', queryParams: {}, errorMessage: null,
   upstreamRequestId: null, ip: null, userAgent: null,
 };
 const payload: QueryLogPayloadResponse = {

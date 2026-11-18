@@ -221,7 +221,10 @@ model QueryLog {
   errorMessage       String?     @map("error_message")
   recordCount        Int?        @map("record_count")
   upstreamRequestId  String?     @map("upstream_request_id") @db.VarChar(255)
+  /// Tổng thời gian xử lý trong hệ thống này (nhận request -> trả kết quả), gồm cả gọi đối tác, ánh xạ và ghi log.
   durationMs         Int?        @map("duration_ms")
+  /// Thời gian đối tác phản hồi (lần gọi cuối cùng tới API đối tác). NULL: không gọi được/không có (từ chối quyền, nguồn mock...).
+  upstreamDurationMs Int?        @map("upstream_duration_ms")
   ip                 String?     @db.Inet
   userAgent          String?     @map("user_agent")
   createdAt          DateTime    @default(now()) @map("created_at") @db.Timestamptz

@@ -39,6 +39,7 @@ export class QueryLogRowMapper {
       errorCode: row.errorCode,
       recordCount: row.recordCount,
       durationMs: row.durationMs,
+      upstreamDurationMs: row.upstreamDurationMs,
       createdAt: row.createdAt.toISOString(),
     };
   }

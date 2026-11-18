@@ -118,8 +118,21 @@ describe('Query log payload monitor (e2e)', () => {
     const body = (await payload(admin.token, await latestLogId(admin.id))).body as QueryLogPayloadResponse;
     expect(body.upstreamResponse).toMatchObject({ statusCode: status, body: { message: text } });
     expect(body.upstreamRequest?.attempt).toBe(attempt);
-    expect(body.clientResponse).toMatchObject({ error: { code: 'UPSTREAM_ERROR' } });
+    expect(body.clientResponse).toMatchObject({ error: { code: 'UPSTREAM_ERROR', upstreamStatus: status } });
     expect(JSON.stringify(body)).not.toContain(API_KEY);
+    // Lịch sử ghi ĐÚNG lời đối tác + có thời gian phản hồi của đối tác; trình duyệt không nhận lời của đối tác.
+    const row = await prisma.queryLog.findUniqueOrThrow({ where: { id: await latestLogId(admin.id) } });
+    expect(row.errorMessage).toBe(`Đối tác trả lỗi HTTP ${status}: ${text}`);
+    expect(row.upstreamDurationMs).toEqual(expect.any(Number));
+    expect(row.durationMs).toBeGreaterThanOrEqual(row.upstreamDurationMs ?? 0);
+    expect(JSON.stringify(res.body)).not.toContain(text);
+  });
+
+  it('thành công: ghi thời gian phản hồi của đối tác (không lớn hơn tổng thời gian xử lý)', async () => {
+    expect((await query(admin.token, '0123456789')).status).toBe(200);
+    const row = await prisma.queryLog.findUniqueOrThrow({ where: { id: await latestLogId(admin.id) } });
+    expect(row.upstreamDurationMs).toEqual(expect.any(Number));
+    expect(row.durationMs).toBeGreaterThanOrEqual(row.upstreamDurationMs ?? 0);
   });
 
   it('stores timeout', async () => {

@@ -84,6 +84,7 @@ export class QueryLogService {
         recordCount: input.recordCount ?? null,
         upstreamRequestId: input.upstreamRequestId ?? null,
         durationMs: input.durationMs ?? null,
+        upstreamDurationMs: input.exchange?.response.durationMs ?? null,
         ip: normalizeClientIp(input.ip),
         userAgent: input.userAgent ?? null,
       };

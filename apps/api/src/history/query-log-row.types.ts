@@ -15,6 +15,7 @@ export interface QueryLogRowView {
   recordCount: number | null;
   upstreamRequestId: string | null;
   durationMs: number | null;
+  upstreamDurationMs: number | null;
   ip: string | null;
   userAgent: string | null;
   createdAt: Date;

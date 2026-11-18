@@ -3,6 +3,7 @@ import type { QueryEnvelope } from '@app/shared';
 import { DatasourceRegistryService } from '../datasources/datasource-registry.service';
 import { ResponseMapperService } from '../datasources/response-mapper.service';
 import { UpstreamError, UpstreamTimeoutError } from '../datasources/adapters/adapter-errors';
+import { describeUpstreamFailure } from './upstream-error-detail.util';
 import type { UpstreamExchange } from '../datasources/adapters/datasource-adapter.interface';
 import type { JwtUser } from '../rbac/jwt-user.interface';
 import { QueryLogService } from '../history/query-log.service';
@@ -24,6 +25,8 @@ interface TranslatedError {
   status: HttpStatus;
   /** Mã HTTP thật mà API đối tác trả về (chỉ khi đối tác có trả lời). Không phải mã trả cho trình duyệt. */
   upstreamStatus?: number;
+  /** Câu mô tả chi tiết CHỈ để ghi lịch sử (không gửi về trình duyệt). */
+  detail?: string;
 }
 
 /**
@@ -131,7 +134,8 @@ export class QueryService {
         statusCode: translated.status,
         params: validatedParams,
         errorCode: translated.code,
-        errorMessage: translated.message,
+        // Lịch sử ghi đúng điều đã xảy ra với đối tác (mã HTTP + lời đối tác / lý do không kết nối được), không chỉ câu chung.
+        errorMessage: describeUpstreamFailure((err as { exchange?: UpstreamExchange } | null)?.exchange) ?? translated.detail ?? translated.message,
         durationMs: tookMs,
         requestId: input.requestId,
         ip: input.ip,
@@ -160,6 +164,13 @@ export class QueryService {
       }
       return { code: 'UPSTREAM_ERROR', message: 'Upstream datasource request failed', status: HttpStatus.BAD_GATEWAY };
     }
-    return { code: 'UPSTREAM_ERROR', message: 'Upstream datasource request failed', status: HttpStatus.BAD_GATEWAY };
+    // Lỗi không phải do đối tác trả lỗi (vd phản hồi 2xx nhưng không phải JSON): ghi nguyên nhân thật vào lịch sử.
+    const cause = err instanceof Error ? err.message.replace(/\s+/g, ' ').slice(0, 300) : '';
+    return {
+      code: 'UPSTREAM_ERROR',
+      message: 'Upstream datasource request failed',
+      status: HttpStatus.BAD_GATEWAY,
+      ...(cause ? { detail: `Không xử lý được phản hồi của đối tác: ${cause}` } : {}),
+    };
   }
 }

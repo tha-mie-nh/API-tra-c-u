@@ -27,7 +27,7 @@ vi.mock('./history-api', async () => {
 
 const detail: QueryLogDetail = {
   id: '11111111-1111-4111-8111-111111111111', userId: 'user-1', username: 'alice', datasourceCode: 'ds1', querySummary: 'cccd=***',
-  status: 'failed', statusCode: 504, errorCode: 'UPSTREAM_TIMEOUT', recordCount: null, durationMs: 1200,
+  status: 'failed', statusCode: 504, errorCode: 'UPSTREAM_TIMEOUT', recordCount: null, durationMs: 1200, upstreamDurationMs: 1100,
   createdAt: '2026-11-04T17:00:00.000Z', queryParams: { cccd: '***' }, errorMessage: 'timeout',
   upstreamRequestId: 'up-9', ip: '10.1.1.1',
   userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36',
@@ -124,7 +124,7 @@ describe('HistoryPage URL filters', () => {
       items: [{ ...detail, recordCount: 1 }], page: 1, pageSize: 20, total: 1,
     });
     setup('/lich-su', ALL);
-    await user.click(await screen.findByRole('button', { name: 'Sắp xếp theo Thời gian xử lý' }));
+    await user.click(await screen.findByRole('button', { name: 'Sắp xếp theo Xử lý hệ thống' }));
     const sp = new URLSearchParams(screen.getByTestId('loc').textContent ?? '');
     expect(sp.get('sort')).toBe('durationMs');
     expect(sp.get('order')).toBe('desc');

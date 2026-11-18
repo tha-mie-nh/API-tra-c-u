@@ -116,6 +116,7 @@ function HistoryOverview({ detail, canViewAll }: { detail: QueryLogDetail; canVi
         {detail.userAgent && <span className="text-muted-foreground block text-xs break-all">{detail.userAgent}</span>}
       </Row>
       <Row label={vi.history.detailDuration}>{vi.history.detailDurationMs(detail.durationMs)}</Row>
+      <Row label={vi.history.detailUpstreamDuration}>{vi.history.detailDurationMs(detail.upstreamDurationMs)}</Row>
       <Row label={vi.history.detailErrorCode}>{detail.errorCode ?? '—'}</Row>
       <Row label={vi.history.detailError}>{detail.errorMessage ?? vi.history.detailNoError}</Row>
       <Row label={canViewSensitive ? vi.history.detailParamsFull : vi.history.detailParams}>

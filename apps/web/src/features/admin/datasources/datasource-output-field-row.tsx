@@ -67,9 +67,17 @@ export function DatasourceOutputFieldRow({
         />
         <Select
           value={row.type || undefined}
-          onValueChange={(v) =>
-            setValue(`outputFields.${index}.type`, (v === '__none__' ? '' : v) as (typeof FIELD_TYPE_VALUES)[number])
-          }
+          onValueChange={(v) => {
+            const next = (v === '__none__' ? '' : v) as (typeof FIELD_TYPE_VALUES)[number];
+            setValue(`outputFields.${index}.type`, next);
+            // Danh mục / bảng đổi giá trị / icon chỉ thuộc kiểu "Danh sách chọn": đổi sang kiểu khác thì bỏ chúng đi,
+            // kẻo lưu kèm dữ liệu ẩn mà người dùng không còn thấy để sửa.
+            if (next !== 'enum') {
+              setValue(`outputFields.${index}.valueMapRef`, '');
+              setValue(`outputFields.${index}.valueMap`, []);
+              setValue(`outputFields.${index}.iconMap`, []);
+            }
+          }}
         >
           <SelectTrigger className="w-36 shrink-0">
             <SelectValue placeholder={t.clearSelectionOption} />
@@ -116,35 +124,39 @@ export function DatasourceOutputFieldRow({
           {row.from && (
             <Input placeholder={t.outputFieldFrom} title={t.outputFieldFromHint} {...register(`outputFields.${index}.from`)} />
           )}
-          <DictionaryRefSelect value={row.valueMapRef} onChange={(v) => setValue(`outputFields.${index}.valueMapRef`, v)} />
-          <div className="grid grid-cols-2 gap-2">
-            <div className="flex flex-col gap-1.5">
-              <span className="text-xs font-medium">{t.outputFieldValueMap}</span>
-              <PairRowsEditor
-                rows={row.valueMap}
-                onRowsChange={(rows) => setValue(`outputFields.${index}.valueMap`, rows)}
-                firstField="key"
-                secondField="value"
-                firstPlaceholder={t.keyValueKeyPlaceholder}
-                secondPlaceholder={t.keyValueValuePlaceholder}
-                addButtonLabel={t.addMapRowButton}
-                makeEmptyRow={makeEmptyKeyValueRow}
-              />
+          {row.type === 'enum' && (
+            <>
+            <DictionaryRefSelect value={row.valueMapRef} onChange={(v) => setValue(`outputFields.${index}.valueMapRef`, v)} />
+            <div className="grid grid-cols-2 gap-2">
+              <div className="flex flex-col gap-1.5">
+                <span className="text-xs font-medium">{t.outputFieldValueMap}</span>
+                <PairRowsEditor
+                  rows={row.valueMap}
+                  onRowsChange={(rows) => setValue(`outputFields.${index}.valueMap`, rows)}
+                  firstField="key"
+                  secondField="value"
+                  firstPlaceholder={t.keyValueKeyPlaceholder}
+                  secondPlaceholder={t.keyValueValuePlaceholder}
+                  addButtonLabel={t.addMapRowButton}
+                  makeEmptyRow={makeEmptyKeyValueRow}
+                />
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <span className="text-xs font-medium">{t.outputFieldIconMap}</span>
+                <PairRowsEditor
+                  rows={row.iconMap}
+                  onRowsChange={(rows) => setValue(`outputFields.${index}.iconMap`, rows)}
+                  firstField="key"
+                  secondField="value"
+                  firstPlaceholder={t.keyValueKeyPlaceholder}
+                  secondPlaceholder={t.keyValueValuePlaceholder}
+                  addButtonLabel={t.addMapRowButton}
+                  makeEmptyRow={makeEmptyKeyValueRow}
+                />
+              </div>
             </div>
-            <div className="flex flex-col gap-1.5">
-              <span className="text-xs font-medium">{t.outputFieldIconMap}</span>
-              <PairRowsEditor
-                rows={row.iconMap}
-                onRowsChange={(rows) => setValue(`outputFields.${index}.iconMap`, rows)}
-                firstField="key"
-                secondField="value"
-                firstPlaceholder={t.keyValueKeyPlaceholder}
-                secondPlaceholder={t.keyValueValuePlaceholder}
-                addButtonLabel={t.addMapRowButton}
-                makeEmptyRow={makeEmptyKeyValueRow}
-              />
-            </div>
-          </div>
+            </>
+          )}
         </div>
       )}
     </div>

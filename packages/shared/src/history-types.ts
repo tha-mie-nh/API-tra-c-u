@@ -22,7 +22,10 @@ export interface QueryLogListItem {
   statusCode: number | null;
   errorCode: string | null;
   recordCount: number | null;
+  /** Tổng thời gian xử lý trong hệ thống (ms), gồm cả chờ đối tác. */
   durationMs: number | null;
+  /** Thời gian đối tác phản hồi (ms, lần gọi cuối); null khi không gọi đối tác hoặc không có. */
+  upstreamDurationMs: number | null;
   createdAt: string;
 }
 

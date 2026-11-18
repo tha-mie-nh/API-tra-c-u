@@ -95,7 +95,7 @@ describe('History CSV export (e2e)', () => {
     const list = await request(app.getHttpServer()).get(`/api/v1/history?${Q()}&pageSize=100`).set(auth(full.token));
     expect(rows.slice(1).map((r) => r[0])).toEqual(list.body.items.map((i: { id: string }) => i.id));
     expect(rows[1]![1]).toBe('2021-06-01T10:05:00.000+07:00'); // VN time
-    expect(rows[1]![13]).toBe('10.1.1.1');
+    expect(rows[1]![14]).toBe('10.1.1.1');
   });
 
   it('CSV injection: formula cells get a leading apostrophe; quotes/newlines round-trip', async () => {

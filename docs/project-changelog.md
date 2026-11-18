@@ -9,6 +9,13 @@ Ghi lại các thay đổi đáng chú ý theo ngày. Mới nhất ở trên cù
 - Nay: che mọi header có tên chứa `key`, `signature`, `session` (ngoài các từ khóa cũ), và header khai làm xác thực. Có test.
 - Chỉ áp dụng cho lượt tra cứu MỚI. Các dòng đã lưu trước đó vẫn chứa giá trị rõ: xem cách xóa ở mục dưới. Key dán vào Header tùy chỉnh còn nằm trong `config.json`: nên chuyển sang ô **API key** và xóa header tùy chỉnh đó.
 
+### Sửa: lịch sử ghi đúng lỗi của đối tác, thêm cột "Phản hồi đối tác", gọn form trường output
+- **Lịch sử tra cứu ghi đúng lỗi thật.** Trước: lỗi nào từ đối tác cũng ghi câu chung ("Upstream datasource returned HTTP 500", "request failed"). Nay `error_message` là điều đã xảy ra: `Đối tác trả lỗi HTTP 401: Invalid access key` (lời lấy từ khóa `message`/`error`/`detail`... trong phản hồi lỗi, rút gọn 300 ký tự), `Không kết nối được tới đối tác: connect ECONNREFUSED ...`, `Đối tác không phản hồi: ... timed out ...`, `Không xử lý được phản hồi của đối tác: ...`. Trình duyệt vẫn chỉ nhận mã + `upstreamStatus`, không nhận lời của đối tác.
+- **Cột mới `upstream_duration_ms`** (migration `20261118120000_add_upstream_duration_to_query_logs`): thời gian đối tác phản hồi (lần gọi cuối). Cột cũ `duration_ms` giữ nghĩa là tổng thời gian xử lý trong hệ thống; hiển thị là "Xử lý hệ thống" và "Phản hồi đối tác" ở bảng, chi tiết và CSV (CSV thêm một cột, các cột sau dịch một vị trí). Dòng cũ không có giá trị (hiện "—").
+- **Form nguồn dữ liệu, trường output:** Danh mục, bảng đổi giá trị và icon chỉ hiện khi kiểu trường là "Danh sách chọn"; đổi sang kiểu khác thì các giá trị đó bị bỏ.
+- **Kiểm chứng method gửi tới đối tác:** test dựng server HTTP thật xác nhận nguồn cấu hình GET gửi đúng GET (tham số ở query string, không body), POST gửi đúng POST (tham số trong body JSON). `POST /api/v1/query/<mã>` trong log là lời gọi nội bộ từ trình duyệt vào API này, không phải lời gọi sang đối tác.
+- Triển khai: chạy migration (service `migrate` tự chạy); `deploy-check/schema/07-add-upstream-duration-to-query-logs.sql` cho PG có sẵn.
+
 ### Sửa: lỗi do API đối tác hiện đúng mã lỗi của đối tác
 - Trước: đối tác trả 401 (sai/thiếu API key) thì giao diện chỉ hiện một câu cố định, còn trình duyệt nhận 502 của API mình nên dễ tưởng là lỗi của hệ thống.
 - Nay: lỗi tra cứu do đối tác (`UPSTREAM_UNAUTHORIZED`, `UPSTREAM_ERROR`) kèm trường `error.upstreamStatus` (mã HTTP thật của đối tác); giao diện hiện "API đối tác trả về lỗi 401. API key không hợp lệ hoặc hết hạn." (có gợi ý ngắn cho 401, 403, 404, 5xx).

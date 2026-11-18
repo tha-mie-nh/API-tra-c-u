@@ -16,7 +16,7 @@ const ROW_COLUMNS = Prisma.sql`
   id, user_id AS "userId", username_snapshot AS "usernameSnapshot", datasource_code AS "datasourceCode",
   query_params AS "queryParams", query_summary AS "querySummary", status::text AS status,
   status_code AS "statusCode", error_code AS "errorCode", error_message AS "errorMessage",
-  record_count AS "recordCount", upstream_request_id AS "upstreamRequestId", duration_ms AS "durationMs",
+  record_count AS "recordCount", upstream_request_id AS "upstreamRequestId", duration_ms AS "durationMs", upstream_duration_ms AS "upstreamDurationMs",
   host(ip) AS ip, user_agent AS "userAgent", created_at AS "createdAt"`;
 
 interface RawSummaryRow {

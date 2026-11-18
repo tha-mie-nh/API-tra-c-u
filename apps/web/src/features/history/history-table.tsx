@@ -70,6 +70,10 @@ export function HistoryTable({ items, onViewDetail, sort, order, onSort }: Histo
       header: sortHeader(vi.history.columnDuration, 'durationMs'),
       cell: (c) => vi.history.detailDurationMs(c.getValue()),
     }),
+    columnHelper.accessor('upstreamDurationMs', {
+      header: vi.history.columnUpstreamDuration,
+      cell: (c) => vi.history.detailDurationMs(c.getValue()),
+    }),
     columnHelper.accessor('querySummary', {
       header: vi.history.columnSummary,
       cell: (c) => (
