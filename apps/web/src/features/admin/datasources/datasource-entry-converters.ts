@@ -110,8 +110,13 @@ function buildLimits(values: DatasourceFormValues): DatasourceLimits | undefined
 
 /** Builds `input` for the submit payload from the field-builder rows. */
 function buildInput(values: DatasourceFormValues, original?: DatasourceInput): DatasourceInput {
-  const atLeastOneOf = values.inputAtLeastOneOf.filter((name) => name.trim());
-  const requireGroups = values.inputRequireGroups.map((group) => group.filter((name) => name.trim())).filter((group) => group.length > 0);
+  // Chỉ giữ tên còn là một trường nhập thật: xóa/đổi tên trường mà không bỏ tên cũ khỏi "ít nhất một" / "bắt buộc theo nhóm" thì
+  // máy chủ từ chối ("atLeastOneOf references unknown input field"), mà tên cũ không còn hiện trên form để bỏ tick.
+  const known = new Set(values.inputFields.map((row) => row.name.trim()).filter(Boolean));
+  const atLeastOneOf = values.inputAtLeastOneOf.filter((name) => name.trim() && known.has(name.trim()));
+  const requireGroups = values.inputRequireGroups
+    .map((group) => group.filter((name) => name.trim() && known.has(name.trim())))
+    .filter((group) => group.length > 0);
   return {
     ...omitKeys(original, ['fields', 'atLeastOneOf', 'requireGroups']),
     fields: values.inputFields.map(rowToInputField),

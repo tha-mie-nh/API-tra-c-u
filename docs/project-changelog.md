@@ -9,6 +9,10 @@ Ghi lại các thay đổi đáng chú ý theo ngày. Mới nhất ở trên cù
 - Nay: che mọi header có tên chứa `key`, `signature`, `session` (ngoài các từ khóa cũ), và header khai làm xác thực. Có test.
 - Chỉ áp dụng cho lượt tra cứu MỚI. Các dòng đã lưu trước đó vẫn chứa giá trị rõ: xem cách xóa ở mục dưới. Key dán vào Header tùy chỉnh còn nằm trong `config.json`: nên chuyển sang ô **API key** và xóa header tùy chỉnh đó.
 
+### Sửa: không lưu được nguồn vì "atLeastOneOf references unknown input field"
+- Nguyên nhân: xóa hoặc đổi tên một trường nhập trong form nhưng tên cũ vẫn nằm trong "Cần ít nhất một trong" / "Bắt buộc theo nhóm"; tên đó không còn hiện thành ô tick nên không bỏ được, và máy chủ từ chối lưu.
+- Nay form chỉ gửi những tên còn là trường nhập thật; không còn tham chiếu nào thì không gửi khóa rỗng.
+
 ### Phát hành image api-v14 / web-v17 (2026-11-18)
 - `gthanh/app_tra_cuu:api-v14` digest `sha256:eed30118d23079f66287480607ef38a6bcc34b80842da7ffefb2fa883f2de4f0`; `gthanh/app_tra_cuu:web-v17` digest `sha256:514e97db4480e234f4a54ca1aab71b202d706a4cc8f6dd58046c0e1a16d33a7a`. `docker-compose.prod.yml` và `deploy-check/` trỏ tag mới.
 - Gồm: lưu API key mã hóa trong Postgres (cần `SECRETS_ENCRYPTION_KEY`), mã lỗi thật của đối tác, che header `X-Access-Key`, lịch sử ghi đúng lỗi + cột phản hồi đối tác + nguồn mã HTTP, múi giờ nhập `UTC+N`, ẩn danh mục ở trường không phải danh sách chọn, cột Thao tác dính phải, bỏ icon.

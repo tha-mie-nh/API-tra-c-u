@@ -194,5 +194,28 @@ describe('input/output field builder round trip (follow-up to phase-03: visual b
     values.authClearApiKey = true;
     expect((formValuesToEntryPayload(values, original) as Record<string, unknown>).clearApiKey).toBe(true);
   });
+  it('bỏ tên không còn là trường nhập khỏi atLeastOneOf / requireGroups (xóa hoặc đổi tên trường không làm máy chủ từ chối)', () => {
+    const original = httpAdminDatasource();
+    const values = entryToFormValues(original);
+    values.inputFields = values.inputFields.map((row) => (row.name === 'id' ? { ...row, name: 'maSo' } : row)); // đổi tên id -> maSo
+    values.inputAtLeastOneOf = ['id', 'maSo'];
+    values.inputRequireGroups = [['id'], ['maSo', 'id']];
+
+    const input = formValuesToEntryPayload(values, original).input as { atLeastOneOf?: string[]; requireGroups?: string[][] };
+
+    expect(input.atLeastOneOf).toEqual(['maSo']);
+    expect(input.requireGroups).toEqual([['maSo']]);
+  });
+
+  it('không còn trường nào được tham chiếu: không gửi atLeastOneOf / requireGroups rỗng', () => {
+    const original = httpAdminDatasource();
+    const values = entryToFormValues(original);
+    values.inputFields = [];
+    values.inputAtLeastOneOf = ['id'];
+    values.inputRequireGroups = [['id']];
+    const input = formValuesToEntryPayload(values, original).input as unknown as Record<string, unknown>;
+    expect(input).not.toHaveProperty('atLeastOneOf');
+    expect(input).not.toHaveProperty('requireGroups');
+  });
 });
 
