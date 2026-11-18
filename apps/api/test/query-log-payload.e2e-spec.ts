@@ -125,8 +125,9 @@ describe('Query log payload monitor (e2e)', () => {
     expect(row.errorMessage).toBe(`Đối tác trả lỗi HTTP ${status}: ${text}`);
     expect(row.upstreamDurationMs).toEqual(expect.any(Number));
     expect(row.durationMs).toBeGreaterThanOrEqual(row.upstreamDurationMs ?? 0);
-    // Mã hệ thống trả cho trình duyệt là 502, nhưng lịch sử còn giữ mã THẬT của đối tác để hiển thị.
-    expect(row.statusCode).toBe(502);
+    // Trình duyệt nhận 502, nhưng lịch sử lưu mã THẬT của đối tác (404/503) ở cột mã HTTP, đánh dấu là mã của đối tác.
+    expect(res.status).toBe(502);
+    expect(row.statusCode).toBe(status);
     expect(row.upstreamStatusCode).toBe(status);
     expect(JSON.stringify(res.body)).not.toContain(text);
   });

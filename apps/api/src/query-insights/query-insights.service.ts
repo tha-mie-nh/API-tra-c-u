@@ -45,7 +45,7 @@ export class QueryInsightsService {
 
   async topErrors(q: QueryInsightsQueryDto): Promise<QueryInsightsErrorRow[]> {
     const rows = await this.top.topErrors(buildQueryLogWhereSql(q), q.limit);
-    return rows.map((r) => ({ errorCode: r.error_code, statusCode: r.status_code, count: r.count }));
+    return rows.map((r) => ({ errorCode: r.error_code, statusCode: r.status_code, fromUpstream: r.from_upstream, count: r.count }));
   }
 
   async datasourceLatency(q: QueryInsightsQueryDto): Promise<QueryInsightsLatencyRow[]> {

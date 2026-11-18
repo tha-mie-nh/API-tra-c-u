@@ -21,6 +21,7 @@ export interface RawLatencyRow {
 export interface RawErrorCountRow {
   error_code: string | null;
   status_code: number | null;
+  from_upstream: boolean;
   count: number;
 }
 
@@ -52,7 +53,7 @@ export class QueryInsightsTopSqlRepository {
 
   topErrors(where: Prisma.Sql, limit: number): Promise<RawErrorCountRow[]> {
     return this.prisma.$queryRaw<RawErrorCountRow[]>(Prisma.sql`
-      SELECT error_code, status_code, COUNT(*)::int AS count
+      SELECT error_code, status_code, COUNT(*)::int AS count, BOOL_OR(upstream_status_code IS NOT NULL) AS from_upstream
       FROM app.query_logs
       WHERE ${where} AND status <> 'success'
       GROUP BY error_code, status_code

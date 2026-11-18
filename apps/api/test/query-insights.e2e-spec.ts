@@ -144,9 +144,9 @@ describe('Query insights (e2e)', () => {
     it('top-errors: count desc then errorCode asc; success rows excluded', async () => {
       const res = await get(`top-errors?${base}`, full.token);
       expect(res.body).toEqual([
-        { errorCode: 'VALIDATION_ERROR', statusCode: 422, count: 2 },
-        { errorCode: 'FORBIDDEN_DS', statusCode: 403, count: 1 },
-        { errorCode: 'UPSTREAM_TIMEOUT', statusCode: 504, count: 1 },
+        { errorCode: 'VALIDATION_ERROR', statusCode: 422, fromUpstream: false, count: 2 },
+        { errorCode: 'FORBIDDEN_DS', statusCode: 403, fromUpstream: false, count: 1 },
+        { errorCode: 'UPSTREAM_TIMEOUT', statusCode: 504, fromUpstream: false, count: 1 },
       ]);
       expect(((await get(`top-errors?${base}&limit=1`, full.token)).body as unknown[]).length).toBe(1);
     });

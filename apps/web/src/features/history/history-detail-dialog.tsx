@@ -99,6 +99,11 @@ function HistoryOverview({ detail, canViewAll }: { detail: QueryLogDetail; canVi
         {/* Mã HTTP THẬT của API đối tác khi có (vd 401); không thì mã hệ thống trả cho trình duyệt (vd 504, 422). */}
         <HistoryStatusBadge status={detail.status} statusCode={detail.upstreamStatusCode ?? detail.statusCode} />
         {(detail.upstreamStatusCode ?? detail.statusCode) != null && <span className="ml-2">HTTP {detail.upstreamStatusCode ?? detail.statusCode}</span>}
+        {detail.status !== 'success' && (detail.upstreamStatusCode ?? detail.statusCode) != null && (
+          <span className="text-muted-foreground ml-2 text-xs">
+            ({detail.upstreamStatusCode != null ? vi.history.codeSourceUpstream : vi.history.codeSourceSystem})
+          </span>
+        )}
       </Row>
       <Row label={vi.history.detailRecordCount}>{detail.recordCount ?? '—'}</Row>
       <Row label={vi.history.detailUpstreamRequestId}>

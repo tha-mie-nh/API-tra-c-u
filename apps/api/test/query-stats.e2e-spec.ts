@@ -144,9 +144,9 @@ describe('Query stats (e2e)', () => {
     expect(ts.find((b) => b.bucket === '2020-03-14T13')!.requests).toBe(2); // 06:00Z, 06:10Z
     expect(res.body.topErrors).toEqual(
       expect.arrayContaining([
-        { errorCode: 'UPSTREAM_TIMEOUT', statusCode: 504, count: 1 },
-        { errorCode: 'VALIDATION_ERROR', statusCode: 422, count: 1 },
-        { errorCode: null, statusCode: 403, count: 1 },
+        { errorCode: 'UPSTREAM_TIMEOUT', statusCode: 504, fromUpstream: false, count: 1 },
+        { errorCode: 'VALIDATION_ERROR', statusCode: 422, fromUpstream: false, count: 1 },
+        { errorCode: null, statusCode: 403, fromUpstream: false, count: 1 },
       ]),
     );
     expect(res.body.topErrors).toHaveLength(3);

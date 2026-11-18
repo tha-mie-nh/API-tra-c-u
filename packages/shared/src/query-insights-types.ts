@@ -35,6 +35,8 @@ export interface QueryInsightsTopUserRow extends QueryStatsCounters {
 export interface QueryInsightsErrorRow {
   errorCode: string | null;
   statusCode: number | null;
+  /** `true`: mã do đối tác trả về; `false`: mã của hệ thống. */
+  fromUpstream: boolean;
   count: number;
 }
 export interface QueryInsightsLatencyRow {

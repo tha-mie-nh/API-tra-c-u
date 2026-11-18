@@ -26,7 +26,7 @@ export class QueryInsightsCsvService {
       }
       case 'top-errors': {
         const r = await this.insights.topErrors(q);
-        return [['Mã lỗi', 'HTTP status', 'Số lượt'], r.map((x) => [x.errorCode, x.statusCode, x.count])];
+        return [['Mã lỗi', 'HTTP status', 'Nguồn mã HTTP', 'Số lượt'], r.map((x) => [x.errorCode, x.statusCode, x.fromUpstream ? 'đối tác' : 'hệ thống', x.count])];
       }
       case 'datasource-latency': {
         const r = await this.insights.datasourceLatency(q);

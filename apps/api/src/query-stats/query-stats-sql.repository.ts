@@ -27,6 +27,7 @@ export interface RawBucketRow extends RawCounterRow {
 export interface RawErrorRow {
   error_code: string | null;
   status_code: number | null;
+  from_upstream: boolean;
   count: number;
 }
 
@@ -68,7 +69,7 @@ export class QueryStatsSqlRepository {
 
   topErrors(range: QueryStatsRange, code?: string): Promise<RawErrorRow[]> {
     return this.prisma.$queryRaw<RawErrorRow[]>(Prisma.sql`
-      SELECT error_code, status_code, COUNT(*)::int AS count
+      SELECT error_code, status_code, COUNT(*)::int AS count, BOOL_OR(upstream_status_code IS NOT NULL) AS from_upstream
       FROM app.query_logs
       WHERE ${this.where(range, code)} AND status <> 'success'
       GROUP BY error_code, status_code

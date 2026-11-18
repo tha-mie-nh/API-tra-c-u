@@ -17,6 +17,9 @@ export const viHistory = {
   emptyList: 'Không có lịch sử tra cứu nào.',
   statusSuccess: 'Thành công',
   statusFailed: 'Thất bại',
+  // Nguồn của mã HTTP: đối tác có trả lời (401, 404, 500...) hay lỗi do hệ thống (504 quá thời gian, 422, 403...).
+  codeSourceUpstream: 'mã lỗi đối tác',
+  codeSourceSystem: 'mã lỗi hệ thống',
   statusDenied: 'Bị từ chối',
   filterUser: 'Tên đăng nhập',
   filterUserPlaceholder: 'vd: admin',

@@ -31,7 +31,12 @@ export function QueryInsightsErrorsTable({ rows, filter }: { rows: QueryInsights
                 <span className="font-mono text-xs">{r.errorCode ?? t.noCode}</span>
                 {label && <span className="text-muted-foreground ml-2 text-xs">({label})</span>}
               </TableCell>
-              <TableCell>{r.statusCode ?? '—'}</TableCell>
+              <TableCell>
+                {r.statusCode ?? '—'}
+                {r.statusCode != null && (
+                  <span className="text-muted-foreground ml-1 text-xs">({r.fromUpstream ? vi.history.codeSourceUpstream : vi.history.codeSourceSystem})</span>
+                )}
+              </TableCell>
               <TableCell className="text-right tabular-nums">
                 <QueryStatsDrillNumber
                   value={r.count}

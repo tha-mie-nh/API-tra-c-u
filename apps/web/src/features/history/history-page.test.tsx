@@ -185,3 +185,25 @@ describe('HistoryPage: trạng thái hiện mã HTTP thật của đối tác', 
     expect(await screen.findByText('HTTP 504')).toBeInTheDocument();
   });
 });
+
+describe('HistoryPage: ghi rõ mã là của đối tác hay của hệ thống', () => {
+  it('bảng + chi tiết: 401 do đối tác -> "mã lỗi đối tác"; 504 do hệ thống -> "mã lỗi hệ thống"', async () => {
+    vi.mocked(api.fetchHistoryList).mockResolvedValue({
+      items: [
+        { ...detail, id: 'a', statusCode: 401, upstreamStatusCode: 401, errorCode: 'UPSTREAM_UNAUTHORIZED' },
+        { ...detail, id: 'b', statusCode: 504, upstreamStatusCode: null, errorCode: 'UPSTREAM_TIMEOUT' },
+      ],
+      page: 1, pageSize: 20, total: 2,
+    });
+    setup('/lich-su', ALL);
+    expect(await screen.findByText('401 · mã lỗi đối tác')).toBeInTheDocument();
+    expect(screen.getByText('504 · mã lỗi hệ thống')).toBeInTheDocument();
+  });
+
+  it('chi tiết nêu nguồn mã', async () => {
+    vi.mocked(api.fetchHistoryDetail).mockResolvedValue({ ...detail, statusCode: 401, upstreamStatusCode: 401, errorCode: 'UPSTREAM_UNAUTHORIZED' });
+    setup(`/lich-su?detail=${detail.id}`, ALL);
+    expect(await screen.findByText('HTTP 401')).toBeInTheDocument();
+    expect(screen.getByText('(mã lỗi đối tác)')).toBeInTheDocument();
+  });
+});

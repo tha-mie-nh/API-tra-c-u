@@ -70,7 +70,7 @@ describe('datasource table + top errors', () => {
     expect(hrefs().filter((x) => x.startsWith('/lich-su'))).toHaveLength(0);
   });
   it('top error row links with errorCode/statusCode', () => {
-    wrap(<QueryStatsTopErrorsTable items={[{ errorCode: null, statusCode: 504, count: 3 }]} drill={{ range }} />);
+    wrap(<QueryStatsTopErrorsTable items={[{ errorCode: null, statusCode: 504, fromUpstream: false, count: 3 }]} drill={{ range }} />);
     const [h] = hrefs();
     expect(h).toContain('errorCode=__null__');
     expect(h).toContain('statusCode=504');

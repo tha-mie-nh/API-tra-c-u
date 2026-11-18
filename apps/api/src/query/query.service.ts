@@ -131,7 +131,8 @@ export class QueryService {
         username: input.user.username,
         datasourceCode: input.code,
         status: 'failed',
-        statusCode: translated.status,
+        // Lịch sử ghi mã lỗi của ĐỐI TÁC khi đối tác có trả lời (401, 404, 500...); không thì mã hệ thống (504, 502 không kết nối được...).
+        statusCode: translated.upstreamStatus ?? translated.status,
         params: validatedParams,
         errorCode: translated.code,
         // Lịch sử ghi đúng điều đã xảy ra với đối tác (mã HTTP + lời đối tác / lý do không kết nối được), không chỉ câu chung.

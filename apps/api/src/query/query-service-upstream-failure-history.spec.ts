@@ -26,7 +26,7 @@ async function fail(err: unknown) {
 describe('QueryService: lịch sử ghi đúng lỗi của đối tác', () => {
   it('đối tác trả 401 kèm lời: lịch sử có mã và lời đó; trình duyệt chỉ có upstreamStatus, không có lời của đối tác', async () => {
     const out = await fail(new UpstreamError('x', 'DS', undefined, exchange({ statusCode: 401, body: { message: 'Invalid access key' } })));
-    expect(out.logged).toMatchObject({ errorCode: 'UPSTREAM_UNAUTHORIZED', statusCode: 502, errorMessage: 'Đối tác trả lỗi HTTP 401: Invalid access key' });
+    expect(out.logged).toMatchObject({ errorCode: 'UPSTREAM_UNAUTHORIZED', statusCode: 401, errorMessage: 'Đối tác trả lỗi HTTP 401: Invalid access key' });
     expect(out.clientBody).toMatchObject({ code: 'UPSTREAM_UNAUTHORIZED', upstreamStatus: 401 });
     expect(JSON.stringify(out.clientBody)).not.toContain('Invalid access key');
     expect(out.status).toBe(502);
@@ -34,20 +34,21 @@ describe('QueryService: lịch sử ghi đúng lỗi của đối tác', () => {
 
   it('đối tác trả 500: lịch sử nêu 500 và lời đối tác', async () => {
     const out = await fail(new UpstreamError('x', 'DS', undefined, exchange({ statusCode: 500, body: { error: 'database down' } })));
-    expect(out.logged).toMatchObject({ errorCode: 'UPSTREAM_ERROR', errorMessage: 'Đối tác trả lỗi HTTP 500: database down' });
+    expect(out.logged).toMatchObject({ errorCode: 'UPSTREAM_ERROR', statusCode: 500, errorMessage: 'Đối tác trả lỗi HTTP 500: database down' });
     expect(out.clientBody).toMatchObject({ upstreamStatus: 500 });
   });
 
   it('không kết nối được: lịch sử nêu nguyên nhân thật (ECONNREFUSED), không có upstreamStatus', async () => {
     const out = await fail(new UpstreamError('x', 'DS', undefined, exchange({ error: 'network error: connect ECONNREFUSED 10.0.0.5:8080' })));
     expect(out.logged.errorMessage).toBe('Không kết nối được tới đối tác: connect ECONNREFUSED 10.0.0.5:8080');
+    expect(out.logged.statusCode).toBe(502); // không có mã của đối tác -> mã hệ thống
     expect(out.clientBody).not.toHaveProperty('upstreamStatus');
   });
 
   it('quá thời gian: 504, lịch sử nêu lý do', async () => {
     const out = await fail(new UpstreamTimeoutError('DS: timed out after 3000ms', 'DS', exchange({ error: 'DS: timed out after 3000ms' }, 3000)));
     expect(out.status).toBe(504);
-    expect(out.logged).toMatchObject({ errorCode: 'UPSTREAM_TIMEOUT', errorMessage: 'Đối tác không phản hồi: DS: timed out after 3000ms' });
+    expect(out.logged).toMatchObject({ errorCode: 'UPSTREAM_TIMEOUT', statusCode: 504, errorMessage: 'Đối tác không phản hồi: DS: timed out after 3000ms' });
   });
 
   it('phản hồi 2xx nhưng không đọc được: lịch sử nêu nguyên nhân thật thay vì câu chung', async () => {

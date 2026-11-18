@@ -78,5 +78,5 @@ export function fillTimeseries(raw: RawBucketRow[], keys: string[]): QueryStatsB
 }
 
 export function toErrorItems(rows: RawErrorRow[]): QueryStatsErrorItem[] {
-  return rows.map((r) => ({ errorCode: r.error_code, statusCode: r.status_code, count: r.count }));
+  return rows.map((r) => ({ errorCode: r.error_code, statusCode: r.status_code, fromUpstream: r.from_upstream, count: r.count }));
 }

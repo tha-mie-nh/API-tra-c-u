@@ -57,6 +57,8 @@ export interface QueryStatsBucket extends QueryStatsCounters {
 export interface QueryStatsErrorItem {
   errorCode: string | null;
   statusCode: number | null;
+  /** `true`: `statusCode` là mã lỗi do ĐỐI TÁC trả về; `false`: mã lỗi của hệ thống (504 quá thời gian, 422, 403...). */
+  fromUpstream: boolean;
   count: number;
 }
 
