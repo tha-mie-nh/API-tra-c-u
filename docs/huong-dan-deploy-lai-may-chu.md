@@ -103,7 +103,7 @@ Tùy chọn:
 ```bash
 cd "$WORK_DIR"
 ls -A                                  # .env.prod, docker-compose.prod.yml, docker-compose.stand-in.yml, config/ ...
-grep -n "app_tra_cuu:" docker-compose.prod.yml          # api-v13, web-v16
+grep -n "app_tra_cuu:" docker-compose.prod.yml          # api-v14, web-v17
 grep -c '"enabled": true' config/config.json            # các nguồn đang bật
 nano .env.prod                         # chỉ khi cần đổi (xem dưới)
 ./init-env-prod.sh --check             # chạy lại sau khi sửa
@@ -144,7 +144,7 @@ cd "$DEPLOY_DIR"
 F="-f docker-compose.prod.yml"; [ -f docker-compose.stand-in.yml ] && F="$F -f docker-compose.stand-in.yml"
 dc() { docker compose -p "$PROJECT" $F --env-file .env.prod "$@"; }
 
-dc pull          # kéo image mới nhất: api-v13, web-v16 và các API giả
+dc pull          # kéo image mới nhất: api-v14, web-v17 và các API giả
 dc up -d
 dc ps
 ```

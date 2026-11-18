@@ -9,6 +9,11 @@ Ghi lại các thay đổi đáng chú ý theo ngày. Mới nhất ở trên cù
 - Nay: che mọi header có tên chứa `key`, `signature`, `session` (ngoài các từ khóa cũ), và header khai làm xác thực. Có test.
 - Chỉ áp dụng cho lượt tra cứu MỚI. Các dòng đã lưu trước đó vẫn chứa giá trị rõ: xem cách xóa ở mục dưới. Key dán vào Header tùy chỉnh còn nằm trong `config.json`: nên chuyển sang ô **API key** và xóa header tùy chỉnh đó.
 
+### Phát hành image api-v14 / web-v17 (2026-11-18)
+- `gthanh/app_tra_cuu:api-v14` digest `sha256:eed30118d23079f66287480607ef38a6bcc34b80842da7ffefb2fa883f2de4f0`; `gthanh/app_tra_cuu:web-v17` digest `sha256:514e97db4480e234f4a54ca1aab71b202d706a4cc8f6dd58046c0e1a16d33a7a`. `docker-compose.prod.yml` và `deploy-check/` trỏ tag mới.
+- Gồm: lưu API key mã hóa trong Postgres (cần `SECRETS_ENCRYPTION_KEY`), mã lỗi thật của đối tác, che header `X-Access-Key`, lịch sử ghi đúng lỗi + cột phản hồi đối tác + nguồn mã HTTP, múi giờ nhập `UTC+N`, ẩn danh mục ở trường không phải danh sách chọn, cột Thao tác dính phải, bỏ icon.
+- Nâng cấp: `docker compose pull && up -d` (service `migrate` tự thêm cột `upstream_duration_ms`, `upstream_status_code` và bảng `datasource_secrets`). `.env.prod` cũ thêm `SECRETS_ENCRYPTION_KEY` nếu muốn lưu key trên giao diện.
+
 ### Bỏ: tính năng icon theo giá trị (`iconMap`)
 - Không dùng và ít ý nghĩa nên gỡ: ô "Bảng icon theo giá trị" trong form nguồn dữ liệu, phần hiển thị icon ở bảng kết quả, và `iconMap` khỏi dữ liệu gửi về trình duyệt. Nguồn `IMMIGRATION_HISTORY` (trường `xuatNhap`) không còn icon mũi tên; "Xuất cảnh"/"Nhập cảnh" vẫn đổi chữ bằng `valueMap` và vẫn in đậm (`emphasize`).
 - Tương thích: schema cấu hình vẫn chấp nhận khóa `iconMap` (đánh dấu deprecated, bị bỏ qua) để file `config.json` cũ trên các máy đang chạy vẫn nạp được. Lưu lại nguồn từ form sẽ tự bỏ khóa này.
