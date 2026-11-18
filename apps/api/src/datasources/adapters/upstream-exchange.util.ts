@@ -5,7 +5,8 @@ export const REDACTED = '[redacted]';
 /** Cap for raw text bodies kept in a snapshot (final per-part limit is applied again at write time). */
 export const MAX_TEXT_BODY_CHARS = 64 * 1024;
 
-const SECRET_HEADER_RE = /auth|api[-_]?key|token|secret|cookie|password|credential/i;
+// Rộng có chủ ý: mọi tên chứa `key` (api-key, access-key, x-secret-key, key...) cũng bị che, vì `X-Access-Key` từng lọt qua và lộ key trong lịch sử.
+const SECRET_HEADER_RE = /auth|key|token|secret|cookie|password|credential|signature|session/i;
 
 /** Copy of `headers` with every secret-looking header value (and any header named in `extraSecretHeaders`) replaced by "[redacted]". */
 export function redactHeaders(headers: Record<string, string>, extraSecretHeaders: string[] = []): Record<string, string> {

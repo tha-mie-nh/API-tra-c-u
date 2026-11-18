@@ -4,6 +4,11 @@ Ghi lại các thay đổi đáng chú ý theo ngày. Mới nhất ở trên cù
 
 ## 2026-11-17
 
+### Sửa bảo mật: header `X-Access-Key` bị lưu dạng rõ trong chi tiết tra cứu
+- Nguyên nhân: quy tắc che header chỉ khớp tên có `auth`, `api-key`, `token`, `secret`, `cookie`, `password`, `credential`; `access-key` lọt qua nên key nhập vào **Header tùy chỉnh** của nguồn hiện nguyên văn trong "Chi tiết tra cứu" và được lưu trong `query_log_payloads`.
+- Nay: che mọi header có tên chứa `key`, `signature`, `session` (ngoài các từ khóa cũ), và header khai làm xác thực. Có test.
+- Chỉ áp dụng cho lượt tra cứu MỚI. Các dòng đã lưu trước đó vẫn chứa giá trị rõ: xem cách xóa ở mục dưới. Key dán vào Header tùy chỉnh còn nằm trong `config.json`: nên chuyển sang ô **API key** và xóa header tùy chỉnh đó.
+
 ### Sửa: lỗi do API đối tác hiện đúng mã lỗi của đối tác
 - Trước: đối tác trả 401 (sai/thiếu API key) thì giao diện chỉ hiện một câu cố định, còn trình duyệt nhận 502 của API mình nên dễ tưởng là lỗi của hệ thống.
 - Nay: lỗi tra cứu do đối tác (`UPSTREAM_UNAUTHORIZED`, `UPSTREAM_ERROR`) kèm trường `error.upstreamStatus` (mã HTTP thật của đối tác); giao diện hiện "API đối tác trả về lỗi 401. API key không hợp lệ hoặc hết hạn." (có gợi ý ngắn cho 401, 403, 404, 5xx).
