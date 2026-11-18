@@ -14,7 +14,7 @@ const VN_OFFSET_MS = 7 * 3_600_000;
 
 const HEADER = [
   'ID', 'Thời điểm (giờ VN)', 'Tên đăng nhập', 'User ID', 'Nguồn', 'Điều kiện tra cứu (đã che)', 'Trạng thái',
-  'HTTP status', 'Mã lỗi', 'Thông báo lỗi', 'Số bản ghi', 'Thời gian xử lý hệ thống (ms)', 'Thời gian phản hồi đối tác (ms)', 'Upstream request ID', 'IP', 'User-Agent',
+  'HTTP status', 'Mã lỗi', 'Thông báo lỗi', 'Số bản ghi', 'Thời gian xử lý hệ thống (ms)', 'Thời gian phản hồi đối tác (ms)', 'Upstream request ID', 'IP', 'User-Agent', 'HTTP status đối tác',
 ];
 
 export interface PreparedCsvExport {
@@ -82,7 +82,7 @@ export class HistoryExportCsvService {
         chunk += toCsvRow([
           r.id, toVnIso(r.createdAt), r.usernameSnapshot, r.userId, r.datasourceCode,
           this.mapper.maskedParams(r, canViewSensitive).summary, r.status, r.statusCode, r.errorCode,
-          r.errorMessage, r.recordCount, r.durationMs, r.upstreamDurationMs, r.upstreamRequestId, r.ip, r.userAgent,
+          r.errorMessage, r.recordCount, r.durationMs, r.upstreamDurationMs, r.upstreamRequestId, r.ip, r.userAgent, r.upstreamStatusCode,
         ]);
       }
       yield chunk;

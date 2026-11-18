@@ -9,6 +9,11 @@ Ghi lại các thay đổi đáng chú ý theo ngày. Mới nhất ở trên cù
 - Nay: che mọi header có tên chứa `key`, `signature`, `session` (ngoài các từ khóa cũ), và header khai làm xác thực. Có test.
 - Chỉ áp dụng cho lượt tra cứu MỚI. Các dòng đã lưu trước đó vẫn chứa giá trị rõ: xem cách xóa ở mục dưới. Key dán vào Header tùy chỉnh còn nằm trong `config.json`: nên chuyển sang ô **API key** và xóa header tùy chỉnh đó.
 
+### Sửa: lịch sử hiện mã HTTP thật của đối tác (401), không hiện 502 của hệ thống
+- Trước: đối tác trả 401 (sai key) nhưng lịch sử hiện "Thất bại (5xx) HTTP 502" (mã hệ thống trả cho trình duyệt).
+- Nay: cột mới `upstream_status_code` (migration `20261118150000_add_upstream_status_code_to_query_logs`) lưu mã thật của đối tác; bảng và chi tiết lịch sử hiện "Thất bại (4xx) HTTP 401". Không có mã đối tác (timeout, không kết nối được, bị từ chối quyền, lỗi nhập liệu) thì hiện mã hệ thống như cũ (504, 422...). CSV thêm cột cuối "HTTP status đối tác".
+- Giữ nguyên: `status_code` vẫn là mã hệ thống trả cho trình duyệt; bộ lọc "mã HTTP" và thống kê lỗi vẫn theo cột này (đối tác 401 vẫn nằm nhóm 502). Dòng cũ không có mã đối tác nên hiện mã hệ thống.
+
 ### Sửa: ô múi giờ nhập được dạng "UTC+7"
 - Ô "Tùy chỉnh" của múi giờ nguồn/hiển thị trước đây hiện gợi ý `DD/MM/YYYY HH:mm` (nhầm với ô định dạng ngày). Nay gợi ý "UTC+7, UTC-5 hoặc tên IANA", danh sách chọn kèm độ lệch (VD "UTC+7 · Việt Nam (Asia/Ho_Chi_Minh)"), và xem trước định dạng hiển thị dùng đúng múi giờ hiển thị đã chọn.
 - API và giao diện hiểu `UTC+7`, `UTC-5`, `GMT+7`, `+07:00` (giờ nguyên, -12..+14) qua hàm chung `normalizeTimeZone` (gói `@app/shared`, quy về `Etc/GMT-7`...). Lệch lẻ giờ (UTC+5:30) vẫn phải dùng tên IANA (`Asia/Kolkata`); `UTC+N` không có giờ mùa hè, vùng có DST nên dùng tên IANA.

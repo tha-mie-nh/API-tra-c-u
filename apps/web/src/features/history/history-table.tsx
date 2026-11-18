@@ -60,7 +60,7 @@ export function HistoryTable({ items, onViewDetail, sort, order, onSort }: Histo
     // like it was missing.
     columnHelper.accessor('status', {
       header: vi.history.columnStatus,
-      cell: (c) => <HistoryStatusBadge status={c.getValue()} statusCode={c.row.original.statusCode} />,
+      cell: (c) => <HistoryStatusBadge status={c.getValue()} statusCode={c.row.original.upstreamStatusCode ?? c.row.original.statusCode} />,
     }),
     columnHelper.accessor('recordCount', {
       header: sortHeader(vi.history.columnRecordCount, 'recordCount'),

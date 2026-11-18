@@ -27,7 +27,7 @@ vi.mock('./history-api', async () => {
 
 const detail: QueryLogDetail = {
   id: '11111111-1111-4111-8111-111111111111', userId: 'user-1', username: 'alice', datasourceCode: 'ds1', querySummary: 'cccd=***',
-  status: 'failed', statusCode: 504, errorCode: 'UPSTREAM_TIMEOUT', recordCount: null, durationMs: 1200, upstreamDurationMs: 1100,
+  status: 'failed', statusCode: 504, errorCode: 'UPSTREAM_TIMEOUT', recordCount: null, durationMs: 1200, upstreamDurationMs: 1100, upstreamStatusCode: null,
   createdAt: '2026-11-04T17:00:00.000Z', queryParams: { cccd: '***' }, errorMessage: 'timeout',
   upstreamRequestId: 'up-9', ip: '10.1.1.1',
   userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36',
@@ -165,5 +165,23 @@ describe('HistoryPage detail (?detail=)', () => {
     vi.mocked(api.fetchHistoryDetail).mockRejectedValue(new ApiError(404, 'NOT_FOUND', 'x', 'r'));
     setup('/lich-su?detail=22222222-2222-4222-8222-222222222222', ALL);
     expect(await screen.findByText('Không tìm thấy bản ghi tra cứu này.')).toBeInTheDocument();
+  });
+});
+
+describe('HistoryPage: trạng thái hiện mã HTTP thật của đối tác', () => {
+  it('đối tác trả 401 (hệ thống trả 502 cho trình duyệt): chi tiết hiện HTTP 401, nhóm 4xx, không hiện 502', async () => {
+    vi.mocked(api.fetchHistoryList).mockResolvedValue({ items: [{ ...detail, statusCode: 502, upstreamStatusCode: 401, errorCode: 'UPSTREAM_UNAUTHORIZED' }], page: 1, pageSize: 20, total: 1 });
+    vi.mocked(api.fetchHistoryDetail).mockResolvedValue({ ...detail, statusCode: 502, upstreamStatusCode: 401, errorCode: 'UPSTREAM_UNAUTHORIZED' });
+    setup(`/lich-su?detail=${detail.id}`, ALL);
+    expect(await screen.findByText('HTTP 401')).toBeInTheDocument();
+    expect(screen.queryByText('HTTP 502')).not.toBeInTheDocument();
+    expect(screen.getAllByText('(4xx)').length).toBeGreaterThan(0);
+  });
+
+  it('không có mã đối tác (timeout, không kết nối được): vẫn hiện mã hệ thống như trước', async () => {
+    vi.mocked(api.fetchHistoryList).mockResolvedValue({ items: [{ ...detail, statusCode: 504, upstreamStatusCode: null }], page: 1, pageSize: 20, total: 1 });
+    vi.mocked(api.fetchHistoryDetail).mockResolvedValue({ ...detail, statusCode: 504, upstreamStatusCode: null });
+    setup(`/lich-su?detail=${detail.id}`, ALL);
+    expect(await screen.findByText('HTTP 504')).toBeInTheDocument();
   });
 });

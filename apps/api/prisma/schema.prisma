@@ -225,6 +225,8 @@ model QueryLog {
   durationMs         Int?        @map("duration_ms")
   /// Thời gian đối tác phản hồi (lần gọi cuối cùng tới API đối tác). NULL: không gọi được/không có (từ chối quyền, nguồn mock...).
   upstreamDurationMs Int?        @map("upstream_duration_ms")
+  /// Mã HTTP thật mà API đối tác trả về (lần gọi cuối). Khác `status_code` (mã hệ thống này trả cho trình duyệt: đối tác 401 -> 502). NULL: đối tác không trả lời/không gọi.
+  upstreamStatusCode Int?        @map("upstream_status_code")
   ip                 String?     @db.Inet
   userAgent          String?     @map("user_agent")
   createdAt          DateTime    @default(now()) @map("created_at") @db.Timestamptz

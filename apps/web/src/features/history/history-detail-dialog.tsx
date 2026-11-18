@@ -96,8 +96,9 @@ function HistoryOverview({ detail, canViewAll }: { detail: QueryLogDetail; canVi
       <Row label={vi.history.columnTime}>{formatDateTime(detail.createdAt)}</Row>
       <Row label={vi.history.detailSummary}>{detail.querySummary ?? '—'}</Row>
       <Row label={vi.history.columnStatus}>
-        <HistoryStatusBadge status={detail.status} statusCode={detail.statusCode} />
-        {detail.statusCode != null && <span className="ml-2">HTTP {detail.statusCode}</span>}
+        {/* Mã HTTP THẬT của API đối tác khi có (vd 401); không thì mã hệ thống trả cho trình duyệt (vd 504, 422). */}
+        <HistoryStatusBadge status={detail.status} statusCode={detail.upstreamStatusCode ?? detail.statusCode} />
+        {(detail.upstreamStatusCode ?? detail.statusCode) != null && <span className="ml-2">HTTP {detail.upstreamStatusCode ?? detail.statusCode}</span>}
       </Row>
       <Row label={vi.history.detailRecordCount}>{detail.recordCount ?? '—'}</Row>
       <Row label={vi.history.detailUpstreamRequestId}>

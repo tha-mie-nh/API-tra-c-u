@@ -16,6 +16,7 @@ export interface QueryLogRowView {
   upstreamRequestId: string | null;
   durationMs: number | null;
   upstreamDurationMs: number | null;
+  upstreamStatusCode: number | null;
   ip: string | null;
   userAgent: string | null;
   createdAt: Date;

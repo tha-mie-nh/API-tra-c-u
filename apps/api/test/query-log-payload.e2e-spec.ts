@@ -125,6 +125,9 @@ describe('Query log payload monitor (e2e)', () => {
     expect(row.errorMessage).toBe(`Đối tác trả lỗi HTTP ${status}: ${text}`);
     expect(row.upstreamDurationMs).toEqual(expect.any(Number));
     expect(row.durationMs).toBeGreaterThanOrEqual(row.upstreamDurationMs ?? 0);
+    // Mã hệ thống trả cho trình duyệt là 502, nhưng lịch sử còn giữ mã THẬT của đối tác để hiển thị.
+    expect(row.statusCode).toBe(502);
+    expect(row.upstreamStatusCode).toBe(status);
     expect(JSON.stringify(res.body)).not.toContain(text);
   });
 
@@ -133,6 +136,7 @@ describe('Query log payload monitor (e2e)', () => {
     const row = await prisma.queryLog.findUniqueOrThrow({ where: { id: await latestLogId(admin.id) } });
     expect(row.upstreamDurationMs).toEqual(expect.any(Number));
     expect(row.durationMs).toBeGreaterThanOrEqual(row.upstreamDurationMs ?? 0);
+    expect(row.upstreamStatusCode).toBe(200);
   });
 
   it('stores timeout', async () => {

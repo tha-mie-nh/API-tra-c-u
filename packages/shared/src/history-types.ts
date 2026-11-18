@@ -26,6 +26,8 @@ export interface QueryLogListItem {
   durationMs: number | null;
   /** Thời gian đối tác phản hồi (ms, lần gọi cuối); null khi không gọi đối tác hoặc không có. */
   upstreamDurationMs: number | null;
+  /** Mã HTTP thật của API đối tác (lần gọi cuối); `statusCode` là mã hệ thống trả cho trình duyệt (đối tác 401 -> 502). Giao diện hiện mã này khi có. */
+  upstreamStatusCode: number | null;
   createdAt: string;
 }
 
