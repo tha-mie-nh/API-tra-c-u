@@ -2,6 +2,11 @@ import type { UseFormSetError, FieldValues, Path } from 'react-hook-form';
 import { ApiError } from '@/lib/api-client';
 import { vi } from '@/i18n/vi';
 
+/** "API đối tác trả về lỗi 401. API key không hợp lệ hoặc hết hạn." — mã lỗi thật của đối tác, kèm gợi ý ngắn. */
+function upstreamStatusMessage(status: number): string {
+  return `${vi.query.errorUpstreamStatus(status)}${vi.query.errorUpstreamStatusHint(status)}`;
+}
+
 /** Maps a `POST /query/:code` failure to a Vietnamese message for
  * `ResultStates`'s error state (phase-07 Implementation Step 12: 422 is
  * handled separately via `applyServerFieldErrors`, everything else lands
@@ -17,9 +22,10 @@ export function queryErrorMessage(error: unknown): string {
       case 'DATASOURCE_NOT_FOUND':
         return vi.query.errorForbidden;
       case 'UPSTREAM_UNAUTHORIZED':
-        return vi.query.errorUpstreamAuth;
-      case 'UPSTREAM_TIMEOUT':
+        return error.upstreamStatus ? upstreamStatusMessage(error.upstreamStatus) : vi.query.errorUpstreamAuth;
       case 'UPSTREAM_ERROR':
+        return error.upstreamStatus ? upstreamStatusMessage(error.upstreamStatus) : vi.query.errorUpstream;
+      case 'UPSTREAM_TIMEOUT':
         return vi.query.errorUpstream;
       default:
         break;

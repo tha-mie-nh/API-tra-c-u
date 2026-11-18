@@ -21,14 +21,17 @@ export class ApiError extends Error {
   readonly code: string;
   readonly requestId: string;
   readonly details?: ApiErrorDetail[];
+  /** Mã HTTP thật mà API đối tác trả về (chỉ có ở lỗi tra cứu do đối tác). `status` là mã của API mình trả cho trình duyệt. */
+  readonly upstreamStatus?: number;
 
-  constructor(status: number, code: string, message: string, requestId: string, details?: ApiErrorDetail[]) {
+  constructor(status: number, code: string, message: string, requestId: string, details?: ApiErrorDetail[], upstreamStatus?: number) {
     super(message);
     this.name = 'ApiError';
     this.status = status;
     this.code = code;
     this.requestId = requestId;
     this.details = details;
+    this.upstreamStatus = upstreamStatus;
   }
 }
 
@@ -41,7 +44,7 @@ async function parseError(res: Response): Promise<ApiError> {
   }
   const errorField =
     body && typeof body === 'object' && 'error' in body
-      ? (body as { error?: { code?: string; message?: string; requestId?: string; details?: ApiErrorDetail[] } }).error
+      ? (body as { error?: { code?: string; message?: string; requestId?: string; details?: ApiErrorDetail[]; upstreamStatus?: number } }).error
       : undefined;
   return new ApiError(
     res.status,
@@ -49,6 +52,7 @@ async function parseError(res: Response): Promise<ApiError> {
     errorField?.message ?? res.statusText ?? 'Unexpected error',
     errorField?.requestId ?? '',
     errorField?.details,
+    typeof errorField?.upstreamStatus === 'number' ? errorField.upstreamStatus : undefined,
   );
 }
 

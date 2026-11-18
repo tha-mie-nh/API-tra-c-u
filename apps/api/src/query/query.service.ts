@@ -22,6 +22,8 @@ interface TranslatedError {
   code: string;
   message: string;
   status: HttpStatus;
+  /** Mã HTTP thật mà API đối tác trả về (chỉ khi đối tác có trả lời). Không phải mã trả cho trình duyệt. */
+  upstreamStatus?: number;
 }
 
 /**
@@ -112,7 +114,14 @@ export class QueryService {
         `query failed datasource=${input.code} requestId=${input.requestId} code=${translated.code} tookMs=${tookMs} cause=${(err as Error)?.message ?? err}`,
         err instanceof Error ? err.stack : undefined,
       );
-      const clientError = { error: { code: translated.code, message: translated.message, requestId: input.requestId } };
+      const clientError = {
+        error: {
+          code: translated.code,
+          message: translated.message,
+          ...(translated.upstreamStatus ? { upstreamStatus: translated.upstreamStatus } : {}),
+          requestId: input.requestId,
+        },
+      };
 
       await this.queryLogService.record({
         userId: input.user.id,
@@ -144,10 +153,10 @@ export class QueryService {
       // The client still gets 502: a 401 here would be confused with the user's own login and sign them out.
       const upstreamStatus = err.exchange?.response?.statusCode;
       if (upstreamStatus === 401 || upstreamStatus === 403) {
-        return { code: 'UPSTREAM_UNAUTHORIZED', message: `Upstream rejected the access key (HTTP ${upstreamStatus})`, status: HttpStatus.BAD_GATEWAY };
+        return { code: 'UPSTREAM_UNAUTHORIZED', message: `Upstream rejected the access key (HTTP ${upstreamStatus})`, status: HttpStatus.BAD_GATEWAY, upstreamStatus };
       }
       if (upstreamStatus) {
-        return { code: 'UPSTREAM_ERROR', message: `Upstream datasource returned HTTP ${upstreamStatus}`, status: HttpStatus.BAD_GATEWAY };
+        return { code: 'UPSTREAM_ERROR', message: `Upstream datasource returned HTTP ${upstreamStatus}`, status: HttpStatus.BAD_GATEWAY, upstreamStatus };
       }
       return { code: 'UPSTREAM_ERROR', message: 'Upstream datasource request failed', status: HttpStatus.BAD_GATEWAY };
     }

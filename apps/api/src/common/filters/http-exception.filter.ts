@@ -37,6 +37,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
     let code = STATUS_CODE_MAP[status] ?? 'ERROR';
     let message = 'Unexpected error';
     let details: unknown;
+    let upstreamStatus: number | undefined;
 
     if (body && typeof body === 'object') {
       const asRecord = body as Record<string, unknown>;
@@ -44,6 +45,8 @@ export class HttpExceptionFilter implements ExceptionFilter {
       if (typeof nested.code === 'string') code = nested.code;
       if (typeof nested.message === 'string') message = nested.message;
       if (Array.isArray(nested.details)) details = nested.details;
+      // Mã lỗi thật của API đối tác (số nguyên 100-599) để giao diện nói đúng đối tác trả lỗi gì; không kèm nội dung phản hồi.
+      if (Number.isInteger(nested.upstreamStatus) && (nested.upstreamStatus as number) >= 100 && (nested.upstreamStatus as number) <= 599) upstreamStatus = nested.upstreamStatus as number;
     } else if (exception instanceof Error) {
       message = exception.message;
     }
@@ -56,6 +59,6 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
     response
       .status(status)
-      .json({ error: { code, message, ...(details ? { details } : {}), requestId: request?.requestId ?? randomUUID() } });
+      .json({ error: { code, message, ...(details ? { details } : {}), ...(upstreamStatus ? { upstreamStatus } : {}), requestId: request?.requestId ?? randomUUID() } });
   }
 }

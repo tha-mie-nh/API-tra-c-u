@@ -4,6 +4,11 @@ Ghi lại các thay đổi đáng chú ý theo ngày. Mới nhất ở trên cù
 
 ## 2026-11-17
 
+### Sửa: lỗi do API đối tác hiện đúng mã lỗi của đối tác
+- Trước: đối tác trả 401 (sai/thiếu API key) thì giao diện chỉ hiện một câu cố định, còn trình duyệt nhận 502 của API mình nên dễ tưởng là lỗi của hệ thống.
+- Nay: lỗi tra cứu do đối tác (`UPSTREAM_UNAUTHORIZED`, `UPSTREAM_ERROR`) kèm trường `error.upstreamStatus` (mã HTTP thật của đối tác); giao diện hiện "API đối tác trả về lỗi 401. API key không hợp lệ hoặc hết hạn." (có gợi ý ngắn cho 401, 403, 404, 5xx).
+- Giữ nguyên: HTTP status trả cho trình duyệt vẫn là 502 (để 401 của đối tác không bị hiểu nhầm là hết phiên đăng nhập và đăng xuất người dùng); không gửi nội dung phản hồi của đối tác ra trình duyệt. Timeout và mất kết nối không có `upstreamStatus`, vẫn dùng câu chung.
+
 ### Mới: nhập API key của nguồn dữ liệu trên giao diện, lưu mã hóa trong Postgres
 - Admin nhập API key ở form nguồn dữ liệu; server mã hóa AES-256-GCM (khóa chủ `SECRETS_ENCRYPTION_KEY` trong env, AAD = mã nguồn) và lưu ở bảng mới `app.datasource_secrets` (migration `20261117150000_add_datasource_secrets`).
 - Thêm nguồn mới không còn cần sửa `.env.prod` + restart: `baseUrl` ghi thẳng URL, key nhập trên giao diện. Cách cũ (`auth.valueEnv` + biến môi trường) vẫn dùng được; mỗi nguồn dùng MỘT trong hai.

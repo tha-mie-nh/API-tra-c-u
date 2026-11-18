@@ -105,6 +105,10 @@ export const vi = {
     errorForbidden: 'Bạn không có quyền tra cứu chức năng này.',
     errorUpstreamAuth: 'Nguồn dữ liệu từ chối khóa truy cập (API key sai hoặc hết hạn). Vui lòng báo quản trị viên kiểm tra cấu hình.',
     errorUpstream: 'Nguồn dữ liệu tạm thời không phản hồi, vui lòng thử lại sau.',
+    // API đối tác có trả lời nhưng báo lỗi: nói đúng mã lỗi của họ để người dùng/quản trị biết phải xử lý gì.
+    errorUpstreamStatus: (status: number) => `API đối tác trả về lỗi ${status}.`,
+    errorUpstreamStatusHint: (status: number) =>
+      status === 401 ? ' API key không hợp lệ hoặc hết hạn.' : status === 403 ? ' API key không đủ quyền.' : status === 404 ? ' Không tìm thấy địa chỉ/đường dẫn.' : status >= 500 ? ' Máy chủ của đối tác đang lỗi.' : '',
     errorRateLimited: 'Bạn đã tra cứu quá nhiều lần trong thời gian ngắn, vui lòng thử lại sau.',
     errorGeneric: 'Đã có lỗi xảy ra khi tra cứu, vui lòng thử lại.',
     previousPage: 'Trang trước',
