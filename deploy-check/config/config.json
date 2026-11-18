@@ -930,10 +930,6 @@
               "N": "Nhập cảnh"
             },
             "emphasize": true,
-            "iconMap": {
-              "Xuất cảnh": "arrow-up-right",
-              "Nhập cảnh": "arrow-down-left"
-            },
             "headerField": true
           },
           {

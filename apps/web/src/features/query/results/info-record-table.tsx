@@ -1,19 +1,8 @@
-import type { ComponentType, ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { useReactTable, getCoreRowModel, createColumnHelper, type ColumnDef } from '@tanstack/react-table';
-import { ArrowUpRight, ArrowDownLeft } from 'lucide-react';
 import type { QueryColumn, QueryRecord } from '@shared/index';
-import { cn } from '@/lib/utils';
 import { formatDate, formatDateTime, formatWithPattern } from '@/lib/format';
 import { Base64ImageCell } from './base64-image-cell';
-
-/** Fixed, small vocabulary of icon keys a datasource's `output.fields[].iconMap`
- * can reference (see `datasource-config.types.ts`'s `OutputFieldDef.iconMap`
- * doc comment) — not arbitrary icon names, so config.json can't reference a
- * component that doesn't exist here. */
-const ICON_BY_KEY: Record<string, ComponentType<{ className?: string }>> = {
-  'arrow-up-right': ArrowUpRight,
-  'arrow-down-left': ArrowDownLeft,
-};
 
 interface InfoRecordTableProps {
   columns: QueryColumn[];
@@ -38,24 +27,15 @@ function formatCellValue(value: unknown, type: QueryColumn['type'], displayForma
 }
 
 /** `type: "image"` columns render a thumbnail instead of raw base64 text.
- * `emphasize`/`iconMap` (review feedback: the XNC direction column needed to
- * stand out next to the timestamp) are generic — any datasource's enum
- * column can opt in via config.json, not hardcoded to one field name. */
+ * `emphasize` (review feedback: the XNC direction column needed to stand out
+ * next to the timestamp) is generic — any column can opt in via config.json. */
 function renderCellValue(value: unknown, column: QueryColumn | undefined): ReactNode {
   if (column?.type === 'image' && typeof value === 'string' && value.length > 0) {
     return <Base64ImageCell value={value} label={column.label} />;
   }
 
   const text = formatCellValue(value, column?.type ?? 'string', column?.displayFormat, column?.displayTimeZone);
-  const Icon = column?.iconMap ? ICON_BY_KEY[column.iconMap[text] ?? ''] : undefined;
-
-  if (!column?.emphasize && !Icon) return text;
-  return (
-    <span className={cn('inline-flex items-center gap-1', column?.emphasize && 'font-semibold')}>
-      {Icon && <Icon className="size-3.5 shrink-0" />}
-      {text}
-    </span>
-  );
+  return column?.emphasize ? <span className="font-semibold">{text}</span> : text;
 }
 
 const columnHelper = createColumnHelper<QueryRecord>();

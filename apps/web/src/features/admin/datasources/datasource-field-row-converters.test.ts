@@ -10,7 +10,7 @@ import {
 } from './datasource-field-row-converters';
 import { makeEmptyInputFieldRow, makeEmptyOutputFieldRow } from './datasource-field-row-types';
 
-describe('recordToKeyValueRows / keyValueRowsToRecord (valueMap/iconMap round trip)', () => {
+describe('recordToKeyValueRows / keyValueRowsToRecord (valueMap round trip)', () => {
   it('round-trips a populated record', () => {
     const record = { '1': 'Nam', '2': 'Nữ' };
     expect(keyValueRowsToRecord(recordToKeyValueRows(record))).toEqual(record);
@@ -78,14 +78,13 @@ describe('outputFieldToRow / rowToOutputField (output field DSL round trip)', ()
     expect(rowToOutputField(outputFieldToRow(field))).toEqual(field);
   });
 
-  it('round-trips `from`, valueMap, iconMap, and all 4 booleans', () => {
+  it('round-trips `from`, valueMap, and all 4 booleans', () => {
     const field: OutputFieldDef = {
       name: 'gender',
       label: 'Giới tính',
       from: 'gioi_tinh',
       type: 'enum',
       valueMap: { '1': 'Nam', '2': 'Nữ' },
-      iconMap: { Nam: 'male', Nữ: 'female' },
       sensitive: true,
       internal: true,
       emphasize: true,

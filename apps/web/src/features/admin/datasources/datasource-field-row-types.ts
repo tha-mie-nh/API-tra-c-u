@@ -17,7 +17,7 @@ export const fieldOptionRowSchema = z.object({ value: z.string(), label: z.strin
 export type FieldOptionRow = z.infer<typeof fieldOptionRowSchema>;
 export const makeEmptyFieldOptionRow = (): FieldOptionRow => ({ value: '', label: '' });
 
-/** Shared by `outputField.valueMap` and `outputField.iconMap`. */
+/** `outputField.valueMap` rows (key -> display text). */
 export const keyValueRowSchema = z.object({ key: z.string(), value: z.string() });
 export type KeyValueRow = z.infer<typeof keyValueRowSchema>;
 export const makeEmptyKeyValueRow = (): KeyValueRow => ({ key: '', value: '' });
@@ -67,7 +67,6 @@ export const outputFieldRowSchema = z.object({
   valueMapRef: z.string(),
   type: z.enum(FIELD_TYPE_VALUES),
   valueMap: z.array(keyValueRowSchema),
-  iconMap: z.array(keyValueRowSchema),
   sensitive: z.boolean(),
   internal: z.boolean(),
   emphasize: z.boolean(),
@@ -85,7 +84,6 @@ export const makeEmptyOutputFieldRow = (): OutputFieldRow => ({
   valueMapRef: '',
   type: 'string',
   valueMap: [],
-  iconMap: [],
   sensitive: false,
   internal: false,
   emphasize: false,

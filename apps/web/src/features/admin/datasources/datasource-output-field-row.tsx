@@ -28,7 +28,7 @@ interface DatasourceOutputFieldRowProps {
 const BOOLEAN_FLAGS = ['sensitive', 'internal', 'emphasize', 'headerField'] as const;
 
 /** One row of the output-fields table (`datasource-output-fields-editor.tsx`):
- * name/label/from/type always visible, `valueMap`/`iconMap`/4 booleans
+ * name/label/from/type always visible, `valueMap`/4 booleans
  * behind an expand toggle (phase-03 follow-up scope). */
 export function DatasourceOutputFieldRow({
   index,
@@ -75,7 +75,6 @@ export function DatasourceOutputFieldRow({
             if (next !== 'enum') {
               setValue(`outputFields.${index}.valueMapRef`, '');
               setValue(`outputFields.${index}.valueMap`, []);
-              setValue(`outputFields.${index}.iconMap`, []);
             }
           }}
         >
@@ -127,25 +126,12 @@ export function DatasourceOutputFieldRow({
           {row.type === 'enum' && (
             <>
             <DictionaryRefSelect value={row.valueMapRef} onChange={(v) => setValue(`outputFields.${index}.valueMapRef`, v)} />
-            <div className="grid grid-cols-2 gap-2">
+            <div className="flex flex-col gap-2">
               <div className="flex flex-col gap-1.5">
                 <span className="text-xs font-medium">{t.outputFieldValueMap}</span>
                 <PairRowsEditor
                   rows={row.valueMap}
                   onRowsChange={(rows) => setValue(`outputFields.${index}.valueMap`, rows)}
-                  firstField="key"
-                  secondField="value"
-                  firstPlaceholder={t.keyValueKeyPlaceholder}
-                  secondPlaceholder={t.keyValueValuePlaceholder}
-                  addButtonLabel={t.addMapRowButton}
-                  makeEmptyRow={makeEmptyKeyValueRow}
-                />
-              </div>
-              <div className="flex flex-col gap-1.5">
-                <span className="text-xs font-medium">{t.outputFieldIconMap}</span>
-                <PairRowsEditor
-                  rows={row.iconMap}
-                  onRowsChange={(rows) => setValue(`outputFields.${index}.iconMap`, rows)}
                   firstField="key"
                   secondField="value"
                   firstPlaceholder={t.keyValueKeyPlaceholder}

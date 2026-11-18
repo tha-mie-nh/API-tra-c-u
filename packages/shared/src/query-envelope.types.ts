@@ -12,7 +12,6 @@ export interface QueryColumn {
   label: string;
   type: FieldType;
   emphasize?: boolean;
-  iconMap?: Record<string, string>;
   headerField?: boolean;
   displayFormat?: string;
   displayTimeZone?: string;

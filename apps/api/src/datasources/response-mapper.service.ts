@@ -138,7 +138,6 @@ export class ResponseMapperService {
       label: f.label,
       type: f.type,
       ...(f.emphasize ? { emphasize: f.emphasize } : {}),
-      ...(f.iconMap ? { iconMap: f.iconMap } : {}),
       ...(f.headerField ? { headerField: f.headerField } : {}),
       ...(f.displayFormat ? { displayFormat: f.displayFormat } : {}),
       ...(f.displayTimeZone ? { displayTimeZone: f.displayTimeZone } : {}),

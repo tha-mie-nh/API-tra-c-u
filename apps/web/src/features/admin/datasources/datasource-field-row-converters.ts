@@ -1,7 +1,7 @@
 import type { FieldOption, InputFieldDef, OutputFieldDef } from '@shared/index';
 import type { FieldOptionRow, InputFieldRow, KeyValueRow, OutputFieldRow } from './datasource-field-row-types';
 
-/** `OutputFieldDef['valueMap'|'iconMap']` (a `Record<string,string>`) <-> the
+/** `OutputFieldDef['valueMap']` (a `Record<string,string>`) <-> the
  * ordered key/value row list the editor renders (object key order isn't
  * guaranteed round-trippable, but these maps are small and unordered by
  * nature — same tradeoff `headersToRows`/`rowsToHeaders` already make). */
@@ -81,7 +81,6 @@ export function outputFieldToRow(field: OutputFieldDef): OutputFieldRow {
     valueMapRef: field.valueMapRef ?? '',
     type: field.type,
     valueMap: recordToKeyValueRows(field.valueMap),
-    iconMap: recordToKeyValueRows(field.iconMap),
     sensitive: field.sensitive ?? false,
     internal: field.internal ?? false,
     emphasize: field.emphasize ?? false,
@@ -100,8 +99,6 @@ export function rowToOutputField(row: OutputFieldRow): OutputFieldDef {
   if (row.valueMapRef.trim()) field.valueMapRef = row.valueMapRef.trim();
   const valueMap = row.valueMapRef.trim() ? undefined : keyValueRowsToRecord(row.valueMap);
   if (valueMap) field.valueMap = valueMap;
-  const iconMap = keyValueRowsToRecord(row.iconMap);
-  if (iconMap) field.iconMap = iconMap;
   if (row.sensitive) field.sensitive = true;
   if (row.internal) field.internal = true;
   if (row.emphasize) field.emphasize = true;

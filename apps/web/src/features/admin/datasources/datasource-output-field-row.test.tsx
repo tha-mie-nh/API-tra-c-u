@@ -25,7 +25,6 @@ function Harness({ type }: { type: string }) {
           type: type as never,
           valueMapRef: 'GENDER',
           valueMap: [{ key: 'X', value: 'Xuất' }],
-          iconMap: [{ key: 'Xuất', value: 'arrow-up-right' }],
         },
       ],
     },
@@ -44,7 +43,7 @@ function Harness({ type }: { type: string }) {
         onMoveUp={() => undefined}
         onMoveDown={() => undefined}
       />
-      <output data-testid="state">{JSON.stringify({ ref: watch('outputFields.0.valueMapRef'), vm: watch('outputFields.0.valueMap'), im: watch('outputFields.0.iconMap') })}</output>
+      <output data-testid="state">{JSON.stringify({ ref: watch('outputFields.0.valueMapRef'), vm: watch('outputFields.0.valueMap') })}</output>
     </QueryClientProvider>
   );
 }
@@ -55,20 +54,17 @@ async function expand() {
 
 describe('DatasourceOutputFieldRow: danh mục chỉ hiện với kiểu "Danh sách chọn"', () => {
   const dict = () => screen.queryByText(t.admin.datasources.outputFieldValueMap);
-  const icon = () => screen.queryByText(t.admin.datasources.outputFieldIconMap);
 
-  it.each(['string', 'number', 'date', 'datetime', 'boolean', 'image'])('kiểu %s: KHÔNG hiện danh mục / bảng đổi giá trị / icon', async (type) => {
+  it.each(['string', 'number', 'date', 'datetime', 'boolean', 'image'])('kiểu %s: KHÔNG hiện danh mục / bảng đổi giá trị', async (type) => {
     render(<Harness type={type} />);
     await expand();
     expect(dict()).not.toBeInTheDocument();
-    expect(icon()).not.toBeInTheDocument();
     expect(screen.queryByText(t.admin.datasources.dictionaryPick)).not.toBeInTheDocument();
   });
 
-  it('kiểu enum: hiện đủ danh mục, bảng đổi giá trị và icon', async () => {
+  it('kiểu enum: hiện danh mục và bảng đổi giá trị', async () => {
     render(<Harness type="enum" />);
     await expand();
     expect(dict()).toBeInTheDocument();
-    expect(icon()).toBeInTheDocument();
   });
 });

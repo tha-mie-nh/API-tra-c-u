@@ -185,7 +185,6 @@ export const viAdminDatasources = {
     headerField: 'Hiển thị cạnh thời gian bản ghi',
   },
   outputFieldValueMap: 'Bảng đổi giá trị (valueMap)',
-  outputFieldIconMap: 'Bảng icon theo giá trị (iconMap)',
   keyValueKeyPlaceholder: 'Khóa',
   keyValueValuePlaceholder: 'Giá trị',
   addMapRowButton: 'Thêm dòng',

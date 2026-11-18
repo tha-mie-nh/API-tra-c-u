@@ -9,6 +9,10 @@ Ghi lại các thay đổi đáng chú ý theo ngày. Mới nhất ở trên cù
 - Nay: che mọi header có tên chứa `key`, `signature`, `session` (ngoài các từ khóa cũ), và header khai làm xác thực. Có test.
 - Chỉ áp dụng cho lượt tra cứu MỚI. Các dòng đã lưu trước đó vẫn chứa giá trị rõ: xem cách xóa ở mục dưới. Key dán vào Header tùy chỉnh còn nằm trong `config.json`: nên chuyển sang ô **API key** và xóa header tùy chỉnh đó.
 
+### Bỏ: tính năng icon theo giá trị (`iconMap`)
+- Không dùng và ít ý nghĩa nên gỡ: ô "Bảng icon theo giá trị" trong form nguồn dữ liệu, phần hiển thị icon ở bảng kết quả, và `iconMap` khỏi dữ liệu gửi về trình duyệt. Nguồn `IMMIGRATION_HISTORY` (trường `xuatNhap`) không còn icon mũi tên; "Xuất cảnh"/"Nhập cảnh" vẫn đổi chữ bằng `valueMap` và vẫn in đậm (`emphasize`).
+- Tương thích: schema cấu hình vẫn chấp nhận khóa `iconMap` (đánh dấu deprecated, bị bỏ qua) để file `config.json` cũ trên các máy đang chạy vẫn nạp được. Lưu lại nguồn từ form sẽ tự bỏ khóa này.
+
 ### Sửa: một cột mã HTTP, ưu tiên mã của đối tác, ghi rõ nguồn
 - Trước: đối tác trả 401 (sai key) nhưng lịch sử hiện "Thất bại (5xx) HTTP 502" (mã hệ thống trả cho trình duyệt).
 - Nay `query_logs.status_code` lưu **mã của đối tác khi đối tác có trả lời** (401, 404, 500...), không thì **mã hệ thống** (504 quá thời gian, 502 không kết nối được, 422 nhập sai, 403 bị từ chối quyền). Cột `upstream_status_code` (migration `20261118150000_add_upstream_status_code_to_query_logs`) chỉ đánh dấu "đối tác có trả lời" (khác NULL) để biết nguồn của mã.

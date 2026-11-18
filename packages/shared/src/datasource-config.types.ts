@@ -63,9 +63,7 @@ export interface OutputFieldDef {
   /** Render this column's value in bold (e.g. a direction/status that needs
    * to stand out next to a timestamp column). */
   emphasize?: boolean;
-  /** Display label (post-`valueMap`) -> icon key, rendered next to the
-   * value. Icon keys are a small fixed vocabulary the client renderer
-   * knows (see `apps/web`'s icon-by-key table) — not arbitrary icon names. */
+  /** @deprecated Tính năng icon đã bỏ: khóa này chỉ còn được chấp nhận để file config cũ vẫn nạp được, KHÔNG có tác dụng. */
   iconMap?: Record<string, string>;
   /** Render this column's value next to the record's timestamp instead of
    * in the field grid (e.g. a direction/status that belongs with "when"). */

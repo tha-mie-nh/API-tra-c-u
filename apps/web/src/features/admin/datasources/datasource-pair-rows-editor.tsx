@@ -16,7 +16,7 @@ interface PairRowsEditorProps<T extends Record<string, string>> {
 
 /**
  * Generic controlled 2-column row list — reused for `inputField.options`
- * (value/label), `outputField.valueMap`/`iconMap` (key/value). Deliberately
+ * (value/label), `outputField.valueMap` (key/value). Deliberately
  * NOT wired through `useFieldArray` (these are nested one level inside an
  * already-array-typed row — `watch`/`setValue` on the parent row's array
  * value keeps the typing simple, matching the "keep it minimal, no fancy
